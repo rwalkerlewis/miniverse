@@ -12,8 +12,8 @@ from dataclasses import dataclass, field
 from typing import Dict, Optional
 
 from .executor import Executor, SimpleExecutor
-from .planner import Planner, SimplePlanner
-from .reflection import ReflectionEngine, SimpleReflectionEngine
+from .planner import Planner
+from .reflection import ReflectionEngine
 from .scratchpad import Scratchpad
 from .prompts import PromptLibrary, DEFAULT_PROMPTS
 from .cadence import CognitionCadence
@@ -21,12 +21,47 @@ from .cadence import CognitionCadence
 
 @dataclass
 class AgentCognition:
-    """Collection of cognition modules bound to a single agent."""
+    """Collection of cognition modules bound to a single agent.
 
-    planner: Planner
+    Only executor is required - planner, reflection, and scratchpad are optional
+    enhancements for LLM-driven agents:
+
+    - **planner**: Optional. Generates multi-step plans (LLMPlanner for emergent behavior,
+      custom Planner for deterministic multi-step logic, None for purely reactive agents)
+    - **executor**: Required. Chooses actions each tick (LLMExecutor for LLM decisions,
+      custom executor for deterministic if/then logic)
+    - **reflection**: Optional. Synthesizes insights from memories (LLMReflectionEngine
+      for Stanford-style reflection, None to skip reflection phase)
+    - **scratchpad**: Optional. Working memory for plan state and temporary data
+      (needed if using planner, optional otherwise)
+
+    Examples:
+        Minimal deterministic agent (just executor):
+            AgentCognition(executor=MyExecutor())
+
+        Simple reactive LLM agent (no planning/reflection):
+            AgentCognition(executor=LLMExecutor())
+
+        LLM with planning:
+            AgentCognition(
+                executor=LLMExecutor(),
+                planner=LLMPlanner(),
+                scratchpad=Scratchpad()
+            )
+
+        Full Stanford-style agent:
+            AgentCognition(
+                executor=LLMExecutor(),
+                planner=LLMPlanner(),
+                reflection=LLMReflectionEngine(),
+                scratchpad=Scratchpad()
+            )
+    """
+
     executor: Executor
-    reflection: ReflectionEngine
-    scratchpad: Scratchpad
+    planner: Optional[Planner] = None
+    reflection: Optional[ReflectionEngine] = None
+    scratchpad: Optional[Scratchpad] = None
     prompt_library: PromptLibrary = DEFAULT_PROMPTS
     cadence: CognitionCadence = field(default_factory=CognitionCadence)
 
@@ -36,21 +71,20 @@ def build_default_cognition() -> AgentCognition:
 
     Notes
     -----
-    The default implementations are intentionally simple:
-    - ``SimplePlanner`` produces empty plans
-    - ``SimpleExecutor`` emits a rest action
-    - ``SimpleReflectionEngine`` returns no reflections
-    - ``Scratchpad`` is empty
+    Returns the simplest possible agent configuration:
+    - ``SimpleExecutor`` emits a rest action (fallback for testing)
+    - No planner (purely reactive)
+    - No reflection (no memory synthesis)
+    - No scratchpad (no working memory)
 
-    These placeholders allow the orchestrator to require cognition modules
-    before we wire the full LLM-powered pipeline.
+    For production use, provide explicit executor implementation.
     """
 
     return AgentCognition(
-        planner=SimplePlanner(),
         executor=SimpleExecutor(),
-        reflection=SimpleReflectionEngine(),
-        scratchpad=Scratchpad(),
+        planner=None,
+        reflection=None,
+        scratchpad=None,
         prompt_library=DEFAULT_PROMPTS,
         cadence=CognitionCadence(),
     )

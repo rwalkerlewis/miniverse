@@ -68,12 +68,15 @@ class LLMPlanner(Planner):
         context: PromptContext,
     ) -> Plan:
         # Extract LLM provider and model from context. These come from orchestrator config.
-        # If not configured, return empty plan (agent will use executor fallback logic).
+        # LLMPlanner REQUIRES LLM configuration - fail fast with clear error if missing.
         provider = context.extra.get("llm_provider")
         model = context.extra.get("llm_model")
         if not provider or not model:
-            # No LLM available - return empty plan rather than failing
-            return Plan()
+            raise ValueError(
+                f"LLMPlanner requires LLM configuration (agent: {agent_id}). "
+                f"Set LLM_PROVIDER and LLM_MODEL environment variables, or use "
+                f"planner=None for agents that don't need planning."
+            )
 
         # Resolve prompt library with three-level fallback: instance config -> context
         # config -> system defaults. This allows maximum flexibility in prompt customization.
@@ -141,17 +144,23 @@ class LLMReflectionEngine(ReflectionEngine):
         context: PromptContext | None = None,
     ) -> List[ReflectionResult]:
         # Context is required for reflection - contains memories, world state, plan.
-        # If None, caller didn't build context properly - return empty list.
+        # If None, caller didn't build context properly - fail fast with clear error.
         if context is None:
-            return []
+            raise ValueError(
+                f"LLMReflectionEngine requires PromptContext (agent: {agent_id}). "
+                f"This is likely an orchestrator bug - context should always be provided."
+            )
 
-        # Extract LLM credentials from context. If not configured, skip reflection
-        # (reflections are optional - agent can function without them).
+        # Extract LLM credentials from context. LLMReflectionEngine REQUIRES LLM
+        # configuration - fail fast with clear error if missing.
         provider = context.extra.get("llm_provider")
         model = context.extra.get("llm_model")
         if not provider or not model:
-            # No LLM available - skip reflection rather than failing
-            return []
+            raise ValueError(
+                f"LLMReflectionEngine requires LLM configuration (agent: {agent_id}). "
+                f"Set LLM_PROVIDER and LLM_MODEL environment variables, or use "
+                f"reflection=None for agents that don't need reflection."
+            )
 
         # Resolve prompt library with three-level fallback (same as planner)
         library = self.prompt_library or context.extra.get("prompt_library") or DEFAULT_PROMPTS

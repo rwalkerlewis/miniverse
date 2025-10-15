@@ -26,7 +26,7 @@ from miniverse import (
     Stat,
     WorldState,
 )
-from miniverse.cognition import AgentCognition, Scratchpad, SimplePlanner, SimpleReflectionEngine
+from miniverse.cognition import AgentCognition
 
 
 # ============================================================================
@@ -205,10 +205,10 @@ async def main():
     # For hello world: minimal cognition (no planning, hardcoded actions)
 
     cognition = AgentCognition(
-        planner=SimplePlanner(),  # Returns empty plan (no planning)
         executor=AlwaysWorkExecutor(),  # Our hardcoded "always work" logic
-        reflection=SimpleReflectionEngine(),  # Does nothing (no reflection)
-        scratchpad=Scratchpad()  # Empty working memory
+        planner=None,  # No planning needed (agent is purely reactive)
+        reflection=None,  # No reflection needed (no memory synthesis)
+        scratchpad=None  # No working memory needed (agent has no state)
     )
 
     # ========================================

@@ -1,15 +1,14 @@
 """Cognition module scaffolding for Miniverse.
 
 This package houses the agent cognition stack (scratchpad, planner,
-executor, reflection). Each module currently contains placeholder
-implementations so we can wire the orchestrator contract before adding
-full LLM-powered behavior.
+executor, reflection). All modules except executor are optional - use
+None to skip planning or reflection phases.
 """
 
 from .scratchpad import Scratchpad
-from .planner import Planner, Plan, PlanStep, SimplePlanner
+from .planner import Planner, Plan, PlanStep
 from .executor import Executor, SimpleExecutor
-from .reflection import ReflectionEngine, ReflectionResult, SimpleReflectionEngine
+from .reflection import ReflectionEngine, ReflectionResult
 from .runtime import AgentCognition, AgentCognitionMap, build_default_cognition
 from .context import PromptContext, build_prompt_context
 from .prompts import PromptLibrary, PromptTemplate, DEFAULT_PROMPTS
@@ -28,12 +27,10 @@ __all__ = [
     "Planner",
     "Plan",
     "PlanStep",
-    "SimplePlanner",
     "Executor",
     "SimpleExecutor",
     "ReflectionEngine",
     "ReflectionResult",
-    "SimpleReflectionEngine",
     "AgentCognition",
     "AgentCognitionMap",
     "build_default_cognition",

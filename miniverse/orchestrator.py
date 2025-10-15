@@ -122,6 +122,23 @@ class Orchestrator:
         # tag data with this ID so multiple runs can coexist in the same backend.
         self.run_id: UUID = uuid4()
 
+    def _get_scratchpad_state(self, cognition: AgentCognition) -> dict:
+        """Safely get scratchpad state dict (returns empty dict if scratchpad is None)."""
+        if cognition.scratchpad is None:
+            return {}
+        return cognition.scratchpad.state
+
+    def _set_scratchpad_value(self, cognition: AgentCognition, key: str, value: Any) -> None:
+        """Safely set scratchpad value (no-op if scratchpad is None)."""
+        if cognition.scratchpad is not None:
+            cognition.scratchpad.state[key] = value
+
+    def _get_scratchpad_value(self, cognition: AgentCognition, key: str, default: Any = None) -> Any:
+        """Safely get scratchpad value (returns default if scratchpad is None)."""
+        if cognition.scratchpad is None:
+            return default
+        return cognition.scratchpad.state.get(key, default)
+
     async def run(self, num_ticks: int) -> Dict:
         """Run simulation for N ticks.
 
@@ -343,16 +360,16 @@ class Orchestrator:
             "llm_model": self.llm_model,
             "prompt_library": prompt_library,
             # Allow agents to dynamically switch execution prompt templates via scratchpad
-            "execute_prompt_template": cognition.scratchpad.state.get(
-                "execute_prompt_template", "execute_tick"
+            "execute_prompt_template": self._get_scratchpad_value(
+                cognition, "execute_prompt_template", "execute_tick"
             ),
         }
 
         # Extract existing plan from scratchpad. Plan may be None (agent hasn't planned yet)
         # or Plan object (agent has active multi-step plan). We normalize to Plan() for
         # consistency - empty plans are valid (agent will rest or use heuristics).
-        existing_plan = cognition.scratchpad.state.get("plan")
-        existing_plan_index = cognition.scratchpad.state.get("plan_index", 0)
+        existing_plan = self._get_scratchpad_value(cognition, "plan")
+        existing_plan_index = self._get_scratchpad_value(cognition, "plan_index", 0)
         if isinstance(existing_plan, Plan):
             initial_plan = existing_plan
         else:
@@ -371,7 +388,7 @@ class Orchestrator:
             agent_profile=self.agents[agent_id],
             perception=perception,
             world_state=self.current_state,
-            scratchpad_state=dict(cognition.scratchpad.state),
+            scratchpad_state=self._get_scratchpad_state(cognition),
             plan_state=planning_plan_state,
             memories=recent_agent_memories,
             extra=extra_common,
@@ -394,7 +411,7 @@ class Orchestrator:
             agent_profile=self.agents[agent_id],
             perception=perception,
             world_state=self.current_state,
-            scratchpad_state=dict(cognition.scratchpad.state),
+            scratchpad_state=self._get_scratchpad_state(cognition),
             plan_state=plan_state,
             memories=recent_agent_memories,
             extra=extra_common,
@@ -407,7 +424,7 @@ class Orchestrator:
         action = await cognition.executor.choose_action(
             agent_id,
             perception,
-            cognition.scratchpad,
+            cognition.scratchpad,  # Pass scratchpad directly (can be None)
             plan=plan,
             plan_step=plan_step,
             context=context,
@@ -596,15 +613,20 @@ class Orchestrator:
     ) -> tuple[Plan, PlanStep | None, int]:
         """Ensure the agent has an active plan and return the current step.
 
-        This implements the planner cadence pattern - plans are refreshed periodically
+        If planner is None (agent doesn't use planning), returns empty plan with no steps.
+        Otherwise implements the planner cadence pattern - plans are refreshed periodically
         (e.g., once per day) rather than every tick, reducing LLM calls while maintaining
         long-term coherence. Cadence is configurable per agent via AgentCognition.
         """
 
+        # If agent doesn't use planner, return empty plan (agent is purely reactive)
+        if cognition.planner is None:
+            return Plan(), None, 0
+
         # Extract existing plan from scratchpad. Plan may be None if agent never planned,
         # or Plan object if agent has active plan. We need to check type because scratchpad
         # stores arbitrary key-value pairs.
-        plan_state = cognition.scratchpad.state.get("plan")
+        plan_state = self._get_scratchpad_value(cognition, "plan")
         if isinstance(plan_state, Plan):
             plan = plan_state
         else:
@@ -615,7 +637,7 @@ class Orchestrator:
         # 2. Whether current plan is empty/expired
         # 3. Custom trigger conditions (scenario-specific)
         cadence = cognition.cadence.planner
-        last_plan_tick = cognition.scratchpad.state.get(PLANNER_LAST_TICK_KEY)
+        last_plan_tick = self._get_scratchpad_value(cognition, PLANNER_LAST_TICK_KEY)
 
         should_refresh = cadence.should_generate(
             tick=tick,
@@ -630,7 +652,7 @@ class Orchestrator:
             # (no merging) and resets plan_index to 0.
             plan = await cognition.planner.generate_plan(
                 agent_id,
-                cognition.scratchpad,
+                cognition.scratchpad,  # Pass scratchpad directly (can be None)
                 world_context=self.current_state,
                 context=planning_context,
             )
@@ -638,26 +660,28 @@ class Orchestrator:
             if not isinstance(plan, Plan):
                 plan = Plan()
             # Store new plan and reset index. Recording tick enables cadence tracking.
-            cognition.scratchpad.state["plan"] = plan
-            cognition.scratchpad.state["plan_index"] = 0
-            cognition.scratchpad.state[PLANNER_LAST_TICK_KEY] = tick
+            self._set_scratchpad_value(cognition, "plan", plan)
+            self._set_scratchpad_value(cognition, "plan_index", 0)
+            self._set_scratchpad_value(cognition, PLANNER_LAST_TICK_KEY, tick)
         else:
             # Reuse existing plan. If plan somehow missing (shouldn't happen due to cadence
             # logic), create empty plan as safety net.
             if plan is None:  # safety net; shouldn't happen due to cadence
                 plan = Plan()
-                cognition.scratchpad.state["plan"] = plan
-            cognition.scratchpad.state.setdefault("plan_index", 0)
+                self._set_scratchpad_value(cognition, "plan", plan)
+            # Ensure plan_index exists (default to 0 if missing)
+            if self._get_scratchpad_value(cognition, "plan_index") is None:
+                self._set_scratchpad_value(cognition, "plan_index", 0)
 
         # Extract current step from plan. If plan_index exceeds plan length (can happen if
         # plan was shortened), wrap to 0 to keep agent active. Empty plans return None step,
         # signaling executor to use fallback behavior (rest, wander, reactive actions).
-        plan_index = cognition.scratchpad.state.get("plan_index", 0)
+        plan_index = self._get_scratchpad_value(cognition, "plan_index", 0)
         if plan.steps:
             if plan_index >= len(plan.steps):
                 # Plan exhausted - wrap around to beginning to keep agent active
                 plan_index = 0
-                cognition.scratchpad.state["plan_index"] = plan_index
+                self._set_scratchpad_value(cognition, "plan_index", plan_index)
             plan_step = plan.steps[plan_index]
         else:
             # Empty plan - executor will use fallback logic
@@ -675,21 +699,21 @@ class Orchestrator:
         (conditional branching, parallel steps) could be implemented by subclassing.
         """
 
-        # Empty plans don't advance - executor will keep using fallback behavior
-        if not plan.steps:
+        # No planning or empty plan - nothing to advance
+        if cognition.planner is None or not plan.steps:
             return
 
         # Move to next step, or wrap to beginning if plan exhausted. Wrap-around prevents
         # agents from blocking when plan completes - they loop through plan until planner
         # refreshes with new agenda. This is appropriate for daily routines (wake -> eat ->
         # work -> sleep -> repeat) but not for project plans (may want to stop at end).
-        plan_index = cognition.scratchpad.state.get("plan_index", 0)
+        plan_index = self._get_scratchpad_value(cognition, "plan_index", 0)
         if plan_index < len(plan.steps) - 1:
             # More steps remaining - advance to next step
-            cognition.scratchpad.state["plan_index"] = plan_index + 1
+            self._set_scratchpad_value(cognition, "plan_index", plan_index + 1)
         else:
             # Plan exhausted - wrap to beginning to maintain activity
-            cognition.scratchpad.state["plan_index"] = 0
+            self._set_scratchpad_value(cognition, "plan_index", 0)
 
     @staticmethod
     def _plan_state_summary(plan: Plan, plan_index: int) -> Dict[str, Any]:
@@ -713,14 +737,16 @@ class Orchestrator:
         """
 
         for agent_id, cognition in self.agent_cognition.items():
+            # Skip agents that don't use reflection
+            if cognition.reflection is None:
+                continue
+
             # Count new memories created this tick. Reflection cadence may trigger based on
             # memory accumulation (e.g., reflect after every 5 new experiences) rather than
             # fixed time intervals.
             new_memory_count = len(new_memories.get(agent_id, []))
             cadence = cognition.cadence.reflection
-            last_reflection_tick = cognition.scratchpad.state.get(
-                REFLECTION_LAST_TICK_KEY
-            )
+            last_reflection_tick = self._get_scratchpad_value(cognition, REFLECTION_LAST_TICK_KEY)
 
             # Check if reflection should trigger. Cadence considers both time elapsed and
             # memory count to balance insight generation with LLM cost. Skip if not ready.
@@ -755,8 +781,8 @@ class Orchestrator:
 
             # Extract current plan for reflection context. Reflections may comment on plan
             # progress or suggest adjustments based on accumulated experiences.
-            plan_obj = cognition.scratchpad.state.get("plan")
-            plan_index = cognition.scratchpad.state.get("plan_index", 0)
+            plan_obj = self._get_scratchpad_value(cognition, "plan")
+            plan_index = self._get_scratchpad_value(cognition, "plan_index", 0)
             if not isinstance(plan_obj, Plan):
                 plan_obj = Plan()
                 plan_index = 0
@@ -768,7 +794,7 @@ class Orchestrator:
                 agent_profile=self.agents[agent_id],
                 perception=perception,
                 world_state=self.current_state,
-                scratchpad_state=dict(cognition.scratchpad.state),
+                scratchpad_state=self._get_scratchpad_state(cognition),
                 plan_state=plan_state,
                 memories=recent_memories,
                 extra={
@@ -778,12 +804,12 @@ class Orchestrator:
                 },
             )
 
-            # Invoke reflection engine. May return empty list if LLM unavailable or no
-            # interesting patterns detected. Reflections are free-form text with importance
-            # scores (typically higher than raw observations to influence future retrieval).
+            # Invoke reflection engine. May return empty list if no interesting patterns
+            # detected. Reflections are free-form text with importance scores (typically
+            # higher than raw observations to influence future retrieval).
             reflections = await cognition.reflection.maybe_reflect(
                 agent_id,
-                cognition.scratchpad,
+                cognition.scratchpad,  # Pass scratchpad directly (can be None)
                 recent_memories,
                 trigger_context={
                     "tick": tick,
@@ -793,7 +819,7 @@ class Orchestrator:
             )
 
             # Record reflection tick to prevent double-reflection same tick
-            cognition.scratchpad.state[REFLECTION_LAST_TICK_KEY] = tick
+            self._set_scratchpad_value(cognition, REFLECTION_LAST_TICK_KEY, tick)
 
             # Store reflections as memories. Reflections get memory_type="reflection" for
             # retrieval filtering and typically have elevated importance (6-10) vs actions (5).

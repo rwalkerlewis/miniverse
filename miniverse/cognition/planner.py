@@ -42,7 +42,19 @@ class Plan:
 class Planner(Protocol):
     """Protocol for plan generators.
 
-    Implementations may call LLMs, procedural logic, or both.
+    Planners are optional enhancements for agents that need multi-step reasoning.
+    Common implementations:
+
+    - **LLMPlanner**: LLM generates plans based on agent personality, world state,
+      and recent memories (Stanford Generative Agents pattern)
+    - **Custom deterministic**: Hardcoded plans based on agent role or conditions
+      (see examples/workshop/run.py DeterministicPlanner)
+    - **None**: Skip planning phase entirely (agent is purely reactive via executor)
+
+    When to use:
+    - LLM agents that benefit from long-term coherence and goal pursuit
+    - Deterministic agents with complex multi-step behaviors
+    - Skip for simple reactive agents (deterministic or LLM)
     """
 
     async def generate_plan(
@@ -60,35 +72,16 @@ class Planner(Protocol):
         agent_id:
             Identifier for the agent requesting a plan.
         scratchpad:
-            Current scratchpad (may contain previous plan state).
+            Current scratchpad (may contain previous plan state). Will be None
+            if agent cognition doesn't use scratchpad.
         world_context:
             Arbitrary context object (world state snapshot, scenario config,
             etc.). Type kept broad until we finalize the pipeline.
+        context:
+            Assembled prompt context (agent profile, perception, memories, etc.)
         """
 
         ...
-
-
-class SimplePlanner:
-    """Placeholder planner returning an empty plan.
-
-    Acts as a temporary default so the orchestrator can require a planner
-    reference before the real implementation is ready. Agents using SimplePlanner
-    rely entirely on executor logic (reactive behavior) rather than multi-step plans.
-    Useful for testing, deterministic simulations, or purely reactive agents.
-    """
-
-    async def generate_plan(
-        self,
-        agent_id: str,
-        scratchpad: Scratchpad,
-        *,
-        world_context: Any,
-        context: PromptContext,
-    ) -> Plan:
-        # Return empty plan. Orchestrator will provide None plan_step to executor,
-        # signaling executor to use fallback logic (rest, wander, reactive actions).
-        return Plan()
 
 
 # TODO: add helper functions for merging new plan outputs into scratchpad.
