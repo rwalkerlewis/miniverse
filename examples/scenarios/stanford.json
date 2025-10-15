@@ -1,0 +1,145 @@
+{
+  "name": "Valentine's Day Party (Miniverse Edition)",
+  "description": "Simplified Stanford Generative Agents scenario: Isabella plans a Valentine's Day party and invites Maria and Klaus in a small grid-based neighborhood.",
+  "initial_timestamp": "2023-02-13T10:00:00",
+  "environment": {
+    "metrics": {
+      "temperature_c": {
+        "value": 18.0,
+        "unit": "°C",
+        "label": "Outdoor Temperature"
+      },
+      "time_of_day": {
+        "value": "morning",
+        "label": "Time of Day"
+      }
+    }
+  },
+  "resources": {
+    "metrics": {
+      "party_supplies": {
+        "value": 0,
+        "label": "Party Supplies Gathered"
+      }
+    }
+  },
+  "environment_grid": {
+    "width": 10,
+    "height": 10,
+    "tiles": {
+      "1,1": {"collision": true, "game_object": "wall"},
+      "1,2": {"collision": true, "game_object": "wall"},
+      "1,3": {"collision": true, "game_object": "wall"},
+      "1,7": {"collision": true, "game_object": "wall"},
+      "1,8": {"collision": true, "game_object": "wall"},
+      "1,9": {"collision": true, "game_object": "wall"},
+      "5,5": {"collision": true, "game_object": "fountain"},
+      "3,3": {"world": "neighborhood", "sector": "main_square", "arena": "cafe", "game_object": "table"},
+      "7,7": {"world": "neighborhood", "sector": "park", "arena": "bench", "game_object": "bench"}
+    }
+  },
+  "agents": [
+    {
+      "profile": {
+        "agent_id": "isabella",
+        "name": "Isabella Rodriguez",
+        "age": 28,
+        "background": "Community organizer who loves bringing people together for celebrations.",
+        "role": "party_planner",
+        "personality": "warm and enthusiastic",
+        "skills": {
+          "event_planning": "expert",
+          "social_coordination": "advanced"
+        },
+        "goals": [
+          "Host a memorable Valentine's Day party",
+          "Make sure Maria and Klaus feel welcome"
+        ],
+        "relationships": {
+          "maria": "Close friend from college",
+          "klaus": "Neighbor, wants to get to know better"
+        }
+      },
+      "status": {
+        "agent_id": "isabella",
+        "display_name": "Isabella",
+        "role": "party_planner",
+        "location": "home",
+        "grid_position": [2, 2],
+        "activity": "planning party",
+        "attributes": {
+          "energy": {"value": 85, "unit": "%", "label": "Energy"},
+          "enthusiasm": {"value": 90, "unit": "%", "label": "Enthusiasm"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "maria",
+        "name": "Maria Santos",
+        "age": 27,
+        "background": "Artist who enjoys intimate gatherings and meaningful conversations.",
+        "role": "artist",
+        "personality": "thoughtful and creative",
+        "skills": {
+          "painting": "expert",
+          "conversation": "advanced"
+        },
+        "goals": [
+          "Spend quality time with friends",
+          "Find inspiration for new artwork"
+        ],
+        "relationships": {
+          "isabella": "Best friend since college",
+          "klaus": "Acquaintance through Isabella"
+        }
+      },
+      "status": {
+        "agent_id": "maria",
+        "display_name": "Maria",
+        "role": "artist",
+        "location": "studio",
+        "grid_position": [8, 2],
+        "activity": "painting",
+        "attributes": {
+          "energy": {"value": 75, "unit": "%", "label": "Energy"},
+          "creativity": {"value": 88, "unit": "%", "label": "Creativity"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "klaus",
+        "name": "Klaus Mueller",
+        "age": 30,
+        "background": "Software engineer who is somewhat introverted but appreciates genuine connections.",
+        "role": "engineer",
+        "personality": "reserved but kind",
+        "skills": {
+          "programming": "expert",
+          "cooking": "intermediate"
+        },
+        "goals": [
+          "Make new friends in the neighborhood",
+          "Step out of comfort zone socially"
+        ],
+        "relationships": {
+          "isabella": "Friendly neighbor",
+          "maria": "Haven't met yet"
+        }
+      },
+      "status": {
+        "agent_id": "klaus",
+        "display_name": "Klaus",
+        "role": "engineer",
+        "location": "apartment",
+        "grid_position": [2, 8],
+        "activity": "working from home",
+        "attributes": {
+          "energy": {"value": 70, "unit": "%", "label": "Energy"},
+          "social_comfort": {"value": 45, "unit": "%", "label": "Social Comfort"}
+        }
+      }
+    }
+  ]
+}
