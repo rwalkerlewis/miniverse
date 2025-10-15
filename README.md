@@ -6,94 +6,96 @@ Miniverse is a Python library for creating simulations where LLM-powered agents 
 
 - **Deterministic physics** (controllable simulation rules)
 - **Emergent behavior** (LLM-driven agent decisions)
-- **Branching scenarios** (explore alternate timelines)
+- **Flexible architecture** (swap cognition modules, persistence strategies)
 
-## Quick Example
+## Quick Start
+
+Building a simulation takes three steps:
+
+### 1. Define scenario (JSON file)
+
+```json
+{
+  "name": "Workshop Operations",
+  "description": "Three-person maintenance crew coordinating tasks",
+  "agents": [
+    {
+      "profile": {
+        "agent_id": "lead",
+        "name": "Morgan Reyes",
+        "role": "floor_lead",
+        "background": "Floor lead ensuring throughput and safety",
+        "goals": ["Keep operations smooth", "Reduce task backlog"]
+      },
+      "status": {
+        "location": "ops",
+        "attributes": {"energy": 80, "stress": 35}
+      }
+    }
+  ],
+  "resources": {"power_kwh": 120.0, "task_backlog": 6},
+  "environment": {"temperature_c": 22.0}
+}
+```
+
+### 2. Define physics (Python)
 
 ```python
-from datetime import datetime
-
-from miniverse import (
-    AgentProfile,
-    AgentStatus,
-    EnvironmentState,
-    Orchestrator,
-    ResourceState,
-    SimulationRules,
-    Stat,
-    WorldState,
-)
-
+from miniverse import SimulationRules, WorldState
 
 class WorkshopRules(SimulationRules):
-    """Deterministic physics for a three-agent workshop."""
+    """Deterministic physics: resources degrade, agents recover energy."""
 
     def apply_tick(self, state: WorldState, tick: int) -> WorldState:
         updated = state.model_copy(deep=True)
 
-        # Shared resources degrade each tick.
-        power = updated.resources.get_metric("power_kwh", default=120.0, unit="kWh")
+        # Resources degrade
+        power = updated.resources.get_metric("power_kwh", default=120.0)
         power.value = max(0.0, float(power.value) - 2.5)
 
-        # Active agents spend energy; resting agents recover.
+        # Agents recover energy when resting
         for agent in updated.agents:
-            energy = agent.get_attribute("energy", default=75, unit="%")
-            if (agent.activity or "").lower() == "rest":
+            energy = agent.get_attribute("energy", default=75)
+            if agent.activity == "rest":
                 energy.value = min(100.0, float(energy.value) + 4)
             else:
                 energy.value = max(0.0, float(energy.value) - 3)
 
         updated.tick = tick
         return updated
+```
 
+### 3. Run simulation
 
-world_state = WorldState(
-    tick=0,
-    timestamp=datetime.utcnow(),
-    environment=EnvironmentState(
-        metrics={"temperature": Stat(value=21.0, unit="°C", label="Ambient Temp")}
-    ),
-    resources=ResourceState(
-        metrics={"power_kwh": Stat(value=120.0, unit="kWh", label="Battery Reserve")}
-    ),
-    agents=[
-        AgentStatus(
-            agent_id="lead",
-            display_name="Morgan Reyes",
-            role="floor_lead",
-            location="operations",
-            activity="coordination",
-            attributes={
-                "energy": Stat(value=82, unit="%"),
-                "stress": Stat(value=34, unit="%"),
-            },
-        )
-    ],
-)
+```python
+from miniverse import Orchestrator, ScenarioLoader
+from miniverse.cognition import AgentCognition, LLMPlanner, LLMExecutor, LLMReflectionEngine
 
-lead_profile = AgentProfile(
-    agent_id="lead",
-    name="Morgan Reyes",
-    age=32,
-    background="Sales floor lead keeping the team aligned during a busy promotion.",
-    role="floor_lead",
-    personality="driven",
-    skills={"coaching": "expert", "analytics": "advanced"},
-    goals=["Hit daily targets", "Keep queue times low"],
-    relationships={},
-)
+# Load scenario
+loader = ScenarioLoader()
+world_state, agents = loader.load("workshop")
 
+# Configure LLM-driven cognition for each agent
+cognition_map = {
+    agent.agent_id: AgentCognition(
+        planner=LLMPlanner(),
+        executor=LLMExecutor(),  # Pure LLM decision-making
+        reflection=LLMReflectionEngine()
+    )
+    for agent in agents
+}
+
+# Run simulation
 orchestrator = Orchestrator(
     world_state=world_state,
-    agents={"lead": lead_profile},
-    world_prompt="You are the Workshop Engine...",
-    agent_prompts={"lead": "You coordinate the workshop floor..."},
-    llm_provider="openai",
-    llm_model="gpt-5-nano",
+    agents={a.agent_id: a for a in agents},
     simulation_rules=WorkshopRules(),
+    agent_cognition=cognition_map,
+    llm_provider="openai",
+    llm_model="gpt-5-nano"
 )
 
-result = await orchestrator.run(num_ticks=30)
+result = await orchestrator.run(num_ticks=20)
 ```
 
 ### Workshop example scripts
@@ -250,22 +252,25 @@ action = await llm_call(
 # → AgentAction(action_type="inspect", target="station_b", reasoning="...")
 ```
 
-### 3. Branching Scenarios
+### 3. Persistence & Analysis
 
-Save state at any tick and explore alternatives:
+Choose your storage backend:
 
 ```python
-# Save state at critical moment
-checkpoint = orchestrator.save_checkpoint(tick=25)
+from miniverse import JsonPersistence, PostgresPersistence
 
-# Branch A: Supervisor escalates to maintenance
-result_a = await orchestrator.run_from(checkpoint, {"lead": "escalate maintenance"})
+# JSON files (durable storage)
+persistence = JsonPersistence("./simulation_runs")
 
-# Branch B: Supervisor delays the repair
-result_b = await orchestrator.run_from(checkpoint, {"lead": "delay repair"})
+# PostgreSQL (production analytics)
+persistence = PostgresPersistence(
+    database_url="postgresql://localhost/miniverse"
+)
 
-# Compare outcomes
-compare_branches(result_a, result_b)
+orchestrator = Orchestrator(
+    ...,
+    persistence=persistence
+)
 ```
 
 ## Project Status
@@ -282,7 +287,8 @@ compare_branches(result_a, result_b)
 - Extended example suite covering factories, emergency ops, retail, research habitats
 
 🧭 **Planned**
-- Branch explorer utilities
+- Branching scenarios (explore alternate timelines)
+- Advanced memory retrieval (BM25, semantic embeddings)
 - Additional deterministic helper modules (queuing, energy budgeting)
 
 See `docs/README.md` for the latest documentation index and research references.

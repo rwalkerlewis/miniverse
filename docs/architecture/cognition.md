@@ -18,35 +18,42 @@ Agents in Miniverse run on a shared cognition contract so simulations can swap p
 
 All components are dependency-injected: users can provide their own implementations per agent ID, or rely on the default stack (currently no-op placeholders).
 
-## Prompt Stages (planned)
+## Prompt Stages (implemented)
 
-1. **Plan Prompt**
+The cognition stack supports three main LLM-driven stages, all currently implemented:
+
+1. **Plan Prompt** ✅ `LLMPlanner`
    - Trigger: beginning of simulation, at the start of a new day, or when scratchpad plan is exhausted.
    - Input context: agent profile, goals, retrieved memories (topical), environment summary, prior plan state.
    - Output: structured plan (e.g., list of steps with time windows). Stored in scratchpad.
+   - Implementation: `miniverse/cognition/llm.py` (`LLMPlanner`)
 
-2. **Execute Prompt**
-   - Trigger: every tick (or when agent is “active”).
+2. **Execute Prompt** ✅ `LLMExecutor`
+   - Trigger: every tick (or when agent is "active").
    - Input context: perception, current plan step, scratchpad, relevant memories.
    - Output: `AgentAction` JSON (work, communicate, move, etc.).
+   - Implementation: `miniverse/cognition/llm.py` (`LLMExecutor`)
 
-3. **Reflection Prompt**
+3. **Reflection Prompt** ✅ `LLMReflectionEngine`
    - Trigger: when accumulated poignancy/importance crosses a threshold or at scheduled intervals (e.g., end of day).
    - Input context: recent memories, plan outcomes, environment events, scratchpad state.
    - Output: reflection text stored as `AgentMemory` with `memory_type="reflection"`, optionally updating scratchpad/goals.
+   - Implementation: `miniverse/cognition/llm.py` (`LLMReflectionEngine`)
 
-4. **Conversation Prompt** *(optional)*
-   - Trigger: when an action requires messaging or social coordination.
-   - Output: structured communication payload appended to action `communication` field.
+4. **Conversation Prompt** *(handled via Execute)*
+   - Conversations are generated as part of the Execute stage via the `communication` field in `AgentAction`.
+   - No separate module needed - executors decide when to communicate and what to say.
 
 ## Orchestrator Integration
 
-- The orchestrator now stores an `AgentCognition` bundle per agent (`Orchestrator.__init__(..., agent_cognition=...)`).
-- Upcoming work will extend the tick loop:
-  1. Ensure each agent’s scratchpad has an up-to-date plan (calling planner when needed).
-  2. Use executor to produce actions instead of `get_agent_action` directly (LLM prompts will live inside executor).
-  3. After processing events, pass recent memories + scratchpad into the reflection engine to emit diary entries.
-- Default implementations keep the old behavior (no plans, rest actions, no reflections) so existing simulations continue to run until the new modules are filled in.
+The orchestrator fully integrates the cognition stack:
+
+1. ✅ **Planning**: Each agent's scratchpad maintains an up-to-date plan. Orchestrator calls planner when plan is exhausted or at configured cadence.
+2. ✅ **Execution**: Orchestrator uses executor to produce actions. LLM prompts live inside `LLMExecutor`; deterministic logic in custom executors.
+3. ✅ **Reflection**: After processing events, orchestrator passes recent memories + scratchpad into reflection engine to emit diary entries.
+4. ✅ **Cadence control**: `CognitionCadence` allows throttling planner/reflection frequency (e.g., plan every 6 ticks, reflect every 3).
+
+All modules are dependency-injected via `Orchestrator.__init__(..., agent_cognition=...)`. Users can mix LLM and deterministic modules per agent.
 
 ### Prompt Rendering
 

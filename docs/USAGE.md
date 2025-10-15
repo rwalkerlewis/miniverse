@@ -84,27 +84,84 @@ Miniverse ships two sets of implementations:
 1. **Deterministic (example)** – see `examples/workshop/run.py` (`DeterministicPlanner`, `DeterministicExecutor`, `DeterministicReflection`).
 2. **LLM-backed** – `LLMPlanner` and `LLMReflectionEngine` in `miniverse/cognition/llm.py`. They render templates, call the LLM via `call_llm_with_retries`, and parse structured JSON responses.
 
-You can mix-and-match per agent:
+## Choosing Cognition Modules: Deterministic vs LLM
 
+Miniverse supports three patterns for agent cognition. Choose based on your simulation goals:
+
+### Pattern 1: Pure Deterministic (No LLM)
+
+**Use case:** Testing, CI/CD, baseline comparison, Monte Carlo sweeps
+
+**Characteristics:**
+- Fast (no network latency)
+- Reproducible (same seed → same behavior)
+- Zero API costs
+- Predictable actions based on hardcoded rules
+
+**Example:**
 ```python
-from miniverse.cognition import AgentCognition, Scratchpad, LLMPlanner, SimpleExecutor, LLMReflectionEngine
+from miniverse.cognition import AgentCognition, Scratchpad
+
+# Define custom deterministic executor with hardcoded logic
+class FixedStrategyExecutor:
+    async def choose_action(self, agent_id, perception, scratchpad, *, plan, plan_step, context):
+        # Simple rule: if backlog > 50, do fulfillment; else inventory
+        backlog = perception.visible_resources.get("backlog", {}).get("value", 0)
+        action_type = "fulfillment" if backlog > 50 else "inventory"
+        return AgentAction(
+            agent_id=agent_id,
+            tick=perception.tick,
+            action_type=action_type,
+            reasoning=f"Backlog at {backlog}"
+        )
 
 cognition_map = {
-    "lead": AgentCognition(
-        planner=LLMPlanner(template_name="plan_workshop", prompt_library=my_library),
-        executor=SimpleExecutor(),
-        reflection=LLMReflectionEngine(template_name="reflect_workshop", prompt_library=my_library),
-        scratchpad=Scratchpad(state={"execute_prompt_template": "execute_workshop"}),
-        prompt_library=my_library,
-    ),
-    "tech": AgentCognition(
-        planner=DeterministicPlanner(role_plans),
-        executor=DeterministicExecutor(),
-        reflection=DeterministicReflection(),
-        scratchpad=Scratchpad(),
-    ),
+    "worker1": AgentCognition(
+        planner=SimplePlanner(),  # Returns empty plan
+        executor=FixedStrategyExecutor(),  # Hardcoded rules
+        reflection=SimpleReflectionEngine(),  # No-op
+        scratchpad=Scratchpad()
+    )
 }
 ```
+
+### Pattern 2: Pure LLM (AI-Driven)
+
+**Use case:** Emergent behavior, adaptive strategies, realistic social simulation
+
+**Characteristics:**
+- Intelligent decisions based on full context
+- Agents adapt to changing conditions
+- Creative, unpredictable responses
+- Requires API keys and network access
+
+**Example:**
+```python
+from miniverse.cognition import (
+    AgentCognition,
+    LLMPlanner,
+    LLMExecutor,  # NEW - pure LLM executor
+    LLMReflectionEngine,
+    Scratchpad
+)
+
+cognition_map = {
+    "supervisor": AgentCognition(
+        planner=LLMPlanner(template_name="warehouse_plan"),
+        executor=LLMExecutor(template_name="warehouse_execute"),  # LLM decides every action
+        reflection=LLMReflectionEngine(template_name="warehouse_reflect"),
+        scratchpad=Scratchpad()
+    )
+}
+```
+
+**Key difference:** `LLMExecutor` REQUIRES LLM configuration (raises error if missing). Use when you want guaranteed AI-driven behavior.
+
+<!--
+### Pattern 3: Hybrid (LLM Planning + Deterministic Execution)
+
+**Note:** This pattern uses `SimpleExecutor` which has confusing dual behavior (calls LLM if configured, falls back to "rest" if not). We're deprecating this pattern in favor of clear Pure Deterministic or Pure LLM approaches. For now, use one of the two patterns above.
+-->
 
 `PromptLibrary` and `render_prompt` handle the template substitution using data from `PromptContext` (profile, perception, plan, memories, scratchpad state). Default templates live in `miniverse/cognition/prompts.py` and already include JSON examples.
 
