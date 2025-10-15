@@ -19,7 +19,27 @@ from miniverse.schemas import WorldState, AgentAction
 
 
 def format_resources_generic(state: WorldState) -> str:
-    """Return a human-readable summary of resource metrics."""
+    """Format resource metrics as human-readable summary for orchestrator output.
+
+    Converts resource Stat objects into concise display format for console/logs.
+    Default formatter used by SimulationRules.format_resource_summary() unless
+    subclasses provide domain-specific formatting.
+
+    Formatting rules:
+    - Uses stat.label if available, otherwise prettifies key name
+    - Floats >= 10 show 1 decimal place (e.g., "23.5")
+    - Floats < 10 show 2 decimal places (e.g., "3.14")
+    - Includes unit suffix if present (e.g., "kWh", "%", "kg")
+    - Returns empty string if no resources (avoids printing "Resources: " header)
+
+    Example output:
+    "Oxygen=85.3 kg, Power=12.5 kWh, Water=95.0%"
+
+    Design rationale:
+    - Generic formatter supports any resource metrics (no domain assumptions)
+    - Precision varies by magnitude for readability (avoid "23.45678901 kg")
+    - Comma-separated format matches common dashboard conventions
+    """
 
     if not state.resources.metrics:
         return ""
@@ -28,14 +48,17 @@ def format_resources_generic(state: WorldState) -> str:
     parts: list[str] = []
 
     for key, stat in resources.items():
+        # Use explicit label or generate from key ("oxygen_kg" → "Oxygen Kg")
         label = stat.label or key.replace("_", " ").title()
         value = stat.value
 
+        # Format floats with appropriate precision for readability
         if isinstance(value, float):
             formatted_value = f"{value:.1f}" if abs(value) >= 10 else f"{value:.2f}"
         else:
             formatted_value = str(value)
 
+        # Append unit if present (e.g., "kWh", "%")
         unit = stat.unit or ""
         suffix = f" {unit}" if unit else ""
         parts.append(f"{label}={formatted_value}{suffix}")
@@ -44,23 +67,40 @@ def format_resources_generic(state: WorldState) -> str:
 
 
 class SimulationRules(ABC):
-    """
-    Abstract base class for defining the deterministic physics of a simulation world.
+    """Abstract base class for defining deterministic physics in a simulation world.
 
-    This interface separates controllable physics (Python code) from emergent behavior
-    (LLM agent decisions). Users implement this to define how their world works.
+    SimulationRules implements the core Miniverse principle: "If it can be calculated,
+    calculate it (don't ask the LLM)." This interface separates controllable physics
+    (Python code) from emergent behavior (LLM agent decisions).
 
-    Examples of what goes in SimulationRules:
+    Core responsibilities:
+    1. apply_tick() - Passive world evolution (resource consumption, degradation)
+    2. validate_action() - Physical constraints enforcement (capacity, skills)
+    3. Lifecycle hooks - on_simulation_start(), on_simulation_end()
+
+    Environment tier relationship:
+    - Tier 0 (KPI-only): Simple rules, no spatial logic
+    - Tier 1 (Logical): Room capacity, adjacency constraints
+    - Tier 2 (Spatial): Collision detection, pathfinding, line-of-sight
+
+    What BELONGS in SimulationRules (deterministic physics):
     - Resource consumption rates (oxygen, power, food)
-    - Equipment degradation over time
+    - Equipment degradation over time (health *= 0.999 per tick)
     - Physical constraints (room capacity, distance limits)
-    - Probabilistic events (dust storms, equipment failures)
-    - Time progression effects
+    - Probabilistic events with seeds (dust storms, equipment failures)
+    - Time progression effects (day/night cycles, seasonal changes)
 
-    Examples of what does NOT go in SimulationRules:
-    - Agent decision-making (that's LLM)
-    - Communication content (that's LLM)
-    - Creative responses (that's LLM)
+    What does NOT belong in SimulationRules (LLM territory):
+    - Agent decision-making ("what should I do?")
+    - Communication content ("what should I say?")
+    - Creative responses ("how do I feel about this?")
+    - Social dynamics (handled through agent memory and perception)
+
+    Design pattern: SimulationRules subclasses are dependency-injected into Orchestrator.
+    This enables swapping physics implementations without changing agent code (Mars base
+    vs factory simulation vs office environment - same agent framework, different rules).
+
+    Example implementation: See miniverse/implementations/mars_rules.py
     """
 
     @abstractmethod

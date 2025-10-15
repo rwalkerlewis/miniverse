@@ -73,7 +73,9 @@ class SimplePlanner:
     """Placeholder planner returning an empty plan.
 
     Acts as a temporary default so the orchestrator can require a planner
-    reference before the real implementation is ready.
+    reference before the real implementation is ready. Agents using SimplePlanner
+    rely entirely on executor logic (reactive behavior) rather than multi-step plans.
+    Useful for testing, deterministic simulations, or purely reactive agents.
     """
 
     async def generate_plan(
@@ -84,6 +86,8 @@ class SimplePlanner:
         world_context: Any,
         context: PromptContext,
     ) -> Plan:
+        # Return empty plan. Orchestrator will provide None plan_step to executor,
+        # signaling executor to use fallback logic (rest, wander, reactive actions).
         return Plan()
 
 

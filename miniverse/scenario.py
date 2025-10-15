@@ -1,8 +1,45 @@
 """
-Scenario loading and management.
+Scenario loading and management for JSON-defined simulation initialization.
 
-Scenarios define the initial state of a simulation including agents,
-environment, resources, and optional starting events.
+This module provides ScenarioLoader for converting JSON scenario files into WorldState
+and AgentProfile objects. Scenarios define the initial conditions for a simulation:
+- Agent profiles (personality, skills, relationships)
+- Agent starting status (location, health, activity)
+- Environment state (temperature, time, weather)
+- Resource levels (oxygen, power, food)
+- Optional starting events (system failures, alerts)
+- Optional environment graph (Tier 1 logical locations)
+- Optional environment grid (Tier 2 spatial tiles)
+
+Design philosophy:
+- Scenarios are data (JSON), not code - enables non-programmers to create simulations
+- Validation ensures required fields present (prevents runtime errors)
+- Flexible schema via metadata fields (scenarios can extend without code changes)
+- Stat auto-conversion (simple values → full Stat objects with labels/units)
+
+Scenario file structure:
+```json
+{
+  "name": "Mars Base Alpha",
+  "description": "...",
+  "initial_timestamp": "2157-03-15T08:00:00",
+  "agents": [
+    {
+      "profile": {"agent_id": "alice", "name": "Alice", ...},
+      "status": {"location": "habitat", "attributes": {...}}
+    }
+  ],
+  "environment": {"metrics": {"temperature": -60, ...}},
+  "resources": {"metrics": {"oxygen_kg": 850.0, ...}},
+  "environment_graph": {"nodes": {...}, "adjacency": {...}},
+  "initial_events": [...]
+}
+```
+
+Usage:
+    loader = ScenarioLoader()
+    world_state, agent_profiles = loader.load("mars_base")
+    # Pass to Orchestrator to start simulation
 """
 
 import json
@@ -29,29 +66,63 @@ from .environment import (
 
 
 class ScenarioLoader:
-    """Load and validate simulation scenarios from JSON files."""
+    """Load and validate simulation scenarios from JSON files.
+
+    ScenarioLoader handles all JSON parsing, validation, and conversion of scenario data
+    into Pydantic models (WorldState, AgentProfile). Scenarios provide declarative
+    initialization - users define initial state in JSON rather than writing Python code.
+
+    Directory structure:
+    - Default: {PROJECT_ROOT}/examples/scenarios/
+    - Override via constructor: ScenarioLoader(Path("/custom/scenarios"))
+    - Scenario files: {scenario_name}.json (e.g., "mars_base.json")
+
+    Validation:
+    - Required fields: name, description, agents, environment, resources
+    - Each agent must have both "profile" and "status" blocks
+    - At least one agent required (can't simulate empty world)
+    - Raises ValueError if validation fails (early failure better than cryptic runtime errors)
+
+    Stat auto-conversion:
+    - Simple values (850.0) → Stat(value=850.0)
+    - Full Stat objects ({"value": 850, "unit": "kg"}) → Stat model
+    - Enables both concise and detailed scenario definitions
+    """
 
     def __init__(self, scenarios_dir: Optional[Path] = None):
         """Initialize scenario loader.
 
         Args:
             scenarios_dir: Directory containing scenario files.
-                          Defaults to project root /scenarios
+                          Defaults to {PROJECT_ROOT}/examples/scenarios
         """
         self.scenarios_dir = scenarios_dir or (Config.PROJECT_ROOT / "examples" / "scenarios")
 
     def load(self, scenario_name: str) -> Tuple[WorldState, List[AgentProfile]]:
-        """Load a scenario by name.
+        """Load a scenario by name from JSON file.
+
+        Main entry point for scenario loading. Reads JSON file, validates structure,
+        parses agents/environment/resources, and constructs WorldState + AgentProfile list.
+
+        Data flow:
+        1. Read {scenario_name}.json from scenarios directory
+        2. Validate required fields (raises ValueError if invalid)
+        3. Parse agent profiles and status for each agent
+        4. Build initial WorldState from environment/resources/events
+        5. Return (WorldState, [AgentProfile, ...]) tuple
 
         Args:
             scenario_name: Name of scenario (without .json extension)
+                          Example: "mars_base" loads "mars_base.json"
 
         Returns:
-            Tuple of (initial WorldState, list of AgentProfiles)
+            Tuple of (initial WorldState at tick 0, list of AgentProfiles)
+            Ready to pass to Orchestrator for simulation
 
         Raises:
-            FileNotFoundError: If scenario file doesn't exist
-            ValueError: If scenario JSON is invalid
+            FileNotFoundError: If scenario file doesn't exist in scenarios_dir
+            ValueError: If scenario JSON missing required fields or malformed
+            json.JSONDecodeError: If file contains invalid JSON
         """
         scenario_path = self.scenarios_dir / f"{scenario_name}.json"
 
@@ -156,13 +227,33 @@ class ScenarioLoader:
         )
 
     def _parse_metrics(self, raw: Dict[str, Any]) -> Dict[str, Stat]:
-        """Convert raw metric dict into Stat objects."""
+        """Convert raw metric dict into Stat objects.
+
+        Auto-converts between concise and detailed metric formats:
+        - Simple: {"oxygen_kg": 850.0} → {"oxygen_kg": Stat(value=850.0)}
+        - Detailed: {"oxygen_kg": {"value": 850, "unit": "kg", "label": "Oxygen"}}
+                   → {"oxygen_kg": Stat(value=850, unit="kg", label="Oxygen")}
+
+        This flexibility enables:
+        - Quick prototypes (simple values)
+        - Production scenarios (full Stat objects with units/labels/metadata)
+        - Mixed formats in same scenario (use detail where needed)
+
+        Args:
+            raw: Raw metrics dictionary from JSON
+
+        Returns:
+            Dict mapping metric keys to Stat objects
+        """
 
         metrics: Dict[str, Stat] = {}
         for key, value in raw.items():
+            # Check if value is already a Stat-like dict (has "value" field)
             if isinstance(value, dict) and "value" in value:
+                # Full Stat object - unpack fields into Stat constructor
                 metrics[key] = Stat(**value)
             else:
+                # Simple value - wrap in Stat with just value field
                 metrics[key] = Stat(value=value)
         return metrics
 

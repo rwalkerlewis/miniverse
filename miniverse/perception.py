@@ -1,16 +1,39 @@
 """
-Perception building module for Varela simulation.
+Perception construction module implementing Stanford partial observability pattern.
 
-Implements partial observability - agents only know what they can actually perceive:
-- Their own status (health, stress, energy)
-- Their current location
-- Base-wide resource levels (displayed on screens)
-- System alerts (high-severity events)
-- Direct messages sent to them
-- Recent memories (last 10 observations)
+This module builds AgentPerception objects that filter complete WorldState into what
+a specific agent can realistically observe. Partial observability is a cornerstone
+of the Stanford Generative Agents research - believable behavior requires information
+asymmetry, not omniscience.
 
-Based on Stanford Generative Agents research - partial observability is critical
-for realistic agent behavior.
+Perception filtering rules (what agents CAN perceive):
+- Their own status (health, stress, energy) - introspection
+- Their current location - spatial awareness
+- Base-wide resource levels (displayed on screens/dashboards) - public information
+- System alerts (severity >= 5) - broadcast alerts
+- Direct messages sent to them - social communication
+- Recent memories (last 10) - context for decision-making
+
+Perception filtering rules (what agents CANNOT perceive):
+- Other agents' internal attributes (health, stress) unless communicated
+- Events in distant locations (unless high severity triggers broadcast)
+- Complete event history (only recent_events buffer)
+- Future state or deterministic rule outcomes
+
+Design rationale:
+- Enforces information asymmetry (enables secrets, rumors, misunderstandings)
+- Prevents "meta-gaming" where agents act on info they shouldn't have
+- Creates emergent coordination (agents must communicate to share information)
+- Mirrors Stanford finding: "Partial observability essential for believability"
+
+Usage:
+    perception = build_agent_perception(
+        agent_id="alice",
+        world_state=current_state,
+        recent_actions=last_tick_actions,
+        recent_memories=memory_stream[-10:]
+    )
+    # perception now contains ONLY what alice can perceive
 """
 
 from typing import List
@@ -24,22 +47,61 @@ def build_agent_perception(
     recent_actions: List[AgentAction],
     recent_memories: List[str],
 ) -> AgentPerception:
-    """
-    Build partial observability perception for a specific agent.
+    """Build partial observability perception for a specific agent.
+
+    Constructs an AgentPerception by filtering the complete WorldState through the lens
+    of what this agent can realistically perceive. This is the critical information
+    bottleneck that creates emergent coordination and believable behavior.
+
+    Data flow:
+    1. Find agent's current status in world state (or raise if missing)
+    2. Deep copy agent's own attributes (introspection)
+    3. Deep copy shared resources (public dashboards)
+    4. Deep copy environment metrics (ambient conditions)
+    5. Filter events to high-severity broadcasts (severity >= 5)
+    6. Extract messages addressed to this agent from recent actions
+    7. Include recent memories for context
+    8. Return filtered AgentPerception object
+
+    Deep copying rationale:
+    - Perception snapshots are immutable (prevent accidental mutations)
+    - Agent cognition cannot modify world state through perception reference
+    - Enables safe parallel processing (multiple agents, same world state)
+
+    Message filtering:
+    - Only messages with communication.to == agent_id are included
+    - Prevents eavesdropping on private communications
+    - Enables private coordination vs public announcements
+
+    System alert filtering:
+    - Severity threshold of 5 determines broadcast vs local events
+    - Example: Severity 3 "minor equipment noise" - not broadcast
+    - Example: Severity 8 "oxygen system failure" - broadcast to all
 
     Args:
         agent_id: ID of agent to build perception for
-        world_state: Current complete world state
-        recent_actions: Recent actions from all agents (for extracting messages)
-        recent_memories: Recent memory strings for this agent (last 10)
+        world_state: Current complete world state (omniscient view)
+        recent_actions: Recent actions from ALL agents (for message extraction)
+        recent_memories: Recent memory strings for THIS agent (last 10)
 
     Returns:
         AgentPerception with only what this agent can perceive
 
     Raises:
-        ValueError: If agent_id not found in world state
+        ValueError: If agent_id not found in world state (likely logic error)
+
+    Example:
+        >>> perception = build_agent_perception(
+        ...     agent_id="alice",
+        ...     world_state=current_state,
+        ...     recent_actions=last_tick_actions,
+        ...     recent_memories=["Repaired oxygen tank", "Spoke with Bob"]
+        ... )
+        >>> # perception.personal_attributes contains only Alice's health/stress
+        >>> # perception.messages contains only messages TO Alice
+        >>> # perception.system_alerts contains only severity >= 5 events
     """
-    # Find this agent's status
+    # Find this agent's status in the world state
     agent_status = None
     for agent in world_state.agents:
         if agent.agent_id == agent_id:
@@ -47,32 +109,40 @@ def build_agent_perception(
             break
 
     if agent_status is None:
+        # Agent not found - likely caller error (typo in agent_id, or agent removed from state)
         raise ValueError(f"Agent {agent_id} not found in world state")
 
-    # Clone metric maps so perceptions remain decoupled from world state
+    # Deep copy agent's own attributes (introspection - agents know their own state)
+    # Clone prevents agent cognition from accidentally mutating world state
     personal_attributes = {
         key: stat.model_copy(deep=True)
         for key, stat in agent_status.attributes.items()
     }
 
+    # Deep copy shared resources (public information - displayed on dashboards)
+    # All agents see same resource state (oxygen levels, power, etc.)
     visible_resources = {
         key: stat.model_copy(deep=True)
         for key, stat in world_state.resources.metrics.items()
     }
 
+    # Deep copy environment metrics (ambient conditions - temperature, time, weather)
+    # All agents perceive same environmental state
     environment_snapshot = {
         key: stat.model_copy(deep=True)
         for key, stat in world_state.environment.metrics.items()
     }
 
-    # Extract system alerts (only high-severity events)
+    # Extract system alerts (only high-severity events broadcast to all agents)
+    # Severity threshold of 5: minor events are local, major events are broadcast
     system_alerts = [
         event.description
         for event in world_state.recent_events
         if event.severity is not None and event.severity >= 5
     ]
 
-    # Extract messages sent to this agent from recent actions
+    # Extract messages sent TO this agent from recent actions
+    # Filters out messages to other agents (no eavesdropping)
     messages = []
     for action in recent_actions:
         if action.communication and action.communication.get("to") == agent_id:
@@ -83,7 +153,8 @@ def build_agent_perception(
                 }
             )
 
-    # Use provided recent memories (already filtered to last 10)
+    # Use provided recent memories (already filtered to last 10 by memory strategy)
+    # Provides context for decision-making without overwhelming LLM prompt
     recent_observations = recent_memories
 
     return AgentPerception(

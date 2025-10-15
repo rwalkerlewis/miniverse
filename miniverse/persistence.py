@@ -1,18 +1,41 @@
 """
-PersistenceStrategy interface for storing simulation state.
+PersistenceStrategy interface for pluggable storage backends.
 
-This module provides the abstract base class for implementing storage backends.
-Users can choose to run simulations entirely in-memory (no database required)
-or implement custom persistence strategies for PostgreSQL, files, or other backends.
+This module provides the abstract PersistenceStrategy interface and three concrete
+implementations for storing simulation state. Persistence is OPTIONAL - simulations
+can run entirely in-memory with no database or file system dependencies.
+
+Core principle: "Library should work without any storage backend (in-memory default)."
+
+Three included implementations:
+1. InMemoryPersistence - Dict-based storage, data lost on exit (testing, prototyping)
+2. JsonPersistence - File-based storage, human-readable JSON (small simulations)
+3. PostgresPersistence - Database storage, scalable and queryable (production)
 
 Key responsibilities:
-- Save world state at each tick
-- Retrieve world state by tick number
-- Store agent actions
-- Store agent memories
-- Query simulation history
+- Save/retrieve WorldState snapshots by tick
+- Store agent actions for replay and analysis
+- Store agent memories for memory stream persistence
+- Track run metadata (configuration, status, timing)
+- Handle async operations (enables concurrent persistence during simulation)
 
-Design principle: Library should work without any storage backend (in-memory default).
+Async design rationale:
+- Persistence happens concurrently with simulation (don't block agent cognition)
+- Database I/O can be slow - async prevents blocking entire tick
+- initialize() and close() manage connection lifecycle (pools, files, etc.)
+
+Usage pattern:
+    # Choose persistence backend
+    persistence = InMemoryPersistence()  # or JsonPersistence(), PostgresPersistence()
+
+    # Initialize before simulation
+    await persistence.initialize()
+
+    # Use during simulation
+    await persistence.save_state(run_id, tick, world_state)
+
+    # Clean up after simulation
+    await persistence.close()
 """
 
 import asyncio
@@ -38,18 +61,32 @@ except ImportError:  # pragma: no cover - asyncpg may not be installed for json/
 
 
 class PersistenceStrategy(ABC):
-    """
-    Abstract base class for simulation state persistence.
+    """Abstract base class for simulation state persistence.
 
-    This interface allows users to choose how (or if) they want to store
-    simulation data. Default implementation (InMemoryPersistence) requires
-    no database setup.
+    PersistenceStrategy defines the interface that all storage backends must implement.
+    This enables pluggable persistence - swap backends without changing simulation code.
 
-    Use cases:
-    - InMemoryPersistence: Fast prototyping, testing, no storage needed
-    - PostgresPersistence: Full historical data, analysis, replay
-    - FilePersistence: Simple JSON/pickle files for small simulations
-    - CloudPersistence: S3, Google Cloud Storage, etc.
+    Async interface rationale:
+    - All methods are async to support I/O-bound operations (database, files)
+    - Enables concurrent persistence (save state while running next tick)
+    - initialize() and close() manage connection pools, file handles, etc.
+    - Async is no-op for InMemoryPersistence but critical for database backends
+
+    Method categories:
+    1. Lifecycle: initialize(), close()
+    2. Run metadata: save_run_metadata(), update_run_status()
+    3. State snapshots: save_state(), get_state()
+    4. Actions: save_action(), save_actions(), get_actions()
+    5. Memories: save_memory(), get_recent_memories()
+
+    Concrete implementations:
+    - InMemoryPersistence: Fast, ephemeral, no dependencies (testing/prototyping)
+    - JsonPersistence: Human-readable files, small simulations, easy debugging
+    - PostgresPersistence: Scalable database, complex queries, production-ready
+    - Custom: Implement this interface for S3, Redis, MongoDB, etc.
+
+    Design pattern: Strategy pattern - behavior varies (in-memory vs database)
+    but interface remains consistent. Orchestrator depends on interface, not implementation.
     """
 
     @abstractmethod
@@ -246,20 +283,36 @@ class PersistenceStrategy(ABC):
 
 
 class InMemoryPersistence(PersistenceStrategy):
-    """
-    In-memory persistence implementation (no database required).
+    """In-memory persistence using Python dicts (no database, no files).
 
-    Stores all simulation data in Python dictionaries. Data is lost when
-    the process exits. Perfect for:
-    - Rapid prototyping
-    - Testing
-    - Short simulations where history isn't needed
-    - Environments without database access
+    InMemoryPersistence stores all simulation data in process memory using Python
+    dictionaries. Data is ephemeral - lost when process exits. Zero dependencies,
+    instant initialization, perfect for testing and prototyping.
 
-    Not suitable for:
-    - Long-running simulations with large history
-    - Multi-process simulations
-    - Simulations that need to be replayed later
+    Storage structure:
+    - runs: Dict[UUID, SimulationRun] - run metadata
+    - states: Dict[(run_id, tick), WorldState] - state snapshots by (run, tick) key
+    - actions: Dict[(run_id, tick), List[AgentAction]] - actions by (run, tick) key
+    - memories: Dict[(run_id, agent_id), List[AgentMemory]] - memories by (run, agent) key
+
+    Perfect for:
+    - Rapid prototyping (no setup, just import and use)
+    - Unit testing (fast, isolated, no cleanup needed)
+    - Short simulations (< 100 ticks, few agents)
+    - Environments without database/file access (sandboxed, containers)
+    - Learning and experimentation
+
+    NOT suitable for:
+    - Long-running simulations (unbounded memory growth)
+    - Large-scale simulations (100+ agents, 1000+ ticks)
+    - Multi-process simulations (no shared memory)
+    - Persistence across restarts (data lost on exit)
+    - Analysis and replay (no query capabilities)
+
+    Performance characteristics:
+    - Save: O(1) dict insert
+    - Retrieve: O(1) dict lookup
+    - Memory: O(ticks * agents) - linear growth, no cleanup
     """
 
     def __init__(self):
@@ -427,7 +480,46 @@ class InMemoryPersistence(PersistenceStrategy):
 
 
 class PostgresPersistence(PersistenceStrategy):
-    """PostgreSQL-backed persistence implementation."""
+    """PostgreSQL-backed persistence for production simulations.
+
+    PostgresPersistence stores all simulation data in a PostgreSQL database using
+    async connection pooling (asyncpg). Enables complex queries, historical analysis,
+    and multi-process simulations sharing the same database.
+
+    Database schema:
+    - simulation_runs: Run metadata (id, start_time, status, config)
+    - world_states: State snapshots (run_id, tick, state JSONB)
+    - agent_actions: Action history (run_id, agent_id, tick, action JSONB)
+    - agent_memories: Memory streams (run_id, agent_id, tick, content, importance)
+
+    Schema setup:
+    - Run scripts/init_db.py to create tables
+    - Or use CREATE TABLE statements from schema file
+    - Connection pool managed by asyncpg (max connections, automatic reconnect)
+
+    Perfect for:
+    - Production simulations (100+ ticks, 10+ agents)
+    - Historical analysis (SQL queries, aggregations, time-series)
+    - Multi-process simulations (shared database, no race conditions)
+    - Persistence across restarts (resume failed simulations)
+    - Complex queries (find all runs where X happened)
+
+    NOT suitable for:
+    - Quick prototypes (requires database setup)
+    - Testing (slower than in-memory, requires cleanup)
+    - Offline environments (needs running Postgres instance)
+
+    Performance characteristics:
+    - Save: O(1) database insert with connection pooling
+    - Retrieve: O(1) indexed query (run_id + tick index)
+    - Memory: Minimal (data stored in database, not process memory)
+    - Disk: JSONB compression (smaller than JSON files)
+
+    Connection management:
+    - initialize() creates connection pool (reusable connections)
+    - close() releases pool (clean shutdown)
+    - Pool size configurable via asyncpg.create_pool(max_size=...)
+    """
 
     def __init__(self, database_url: Optional[str] = None):
         if asyncpg is None:  # pragma: no cover - handled during runtime when dependency missing
@@ -624,7 +716,61 @@ class PostgresPersistence(PersistenceStrategy):
 
 
 class JsonPersistence(PersistenceStrategy):
-    """Persistence strategy that stores data as JSON files on disk."""
+    """File-based persistence using JSON for human-readable storage.
+
+    JsonPersistence stores simulation data as JSON files in a directory structure.
+    Files are human-readable, easy to inspect, and work well for small simulations.
+    No database required - just filesystem access.
+
+    Directory structure:
+    ```
+    {base_path}/
+      {run_id}/
+        run.json                  # SimulationRun metadata
+        states/
+          00000.json              # WorldState at tick 0
+          00001.json              # WorldState at tick 1
+          ...
+        actions/
+          00000.json              # List[AgentAction] at tick 0
+          00001.json              # List[AgentAction] at tick 1
+          ...
+        memories/
+          alice.jsonl             # JSONL stream of memories for alice
+          bob.jsonl               # JSONL stream of memories for bob
+          ...
+    ```
+
+    File format details:
+    - States/actions: Pretty-printed JSON (indent=2) for readability
+    - Memories: JSONL (JSON Lines) - one memory per line, append-only
+    - Tick padding: 5 digits (00000-99999) for lexicographic sorting
+
+    Perfect for:
+    - Small simulations (< 100 ticks, few agents)
+    - Debugging (inspect state at any tick by opening JSON file)
+    - Version control (commit scenario runs to git)
+    - Sharing results (zip directory, send to colleague)
+    - No database setup (just filesystem)
+
+    NOT suitable for:
+    - Large simulations (100+ agents, 1000+ ticks → thousands of files)
+    - High performance (file I/O slower than database)
+    - Concurrent access (no locking, race conditions possible)
+    - Complex queries (need to parse all files)
+
+    Performance characteristics:
+    - Save: O(1) file write, async to avoid blocking
+    - Retrieve: O(1) file read with known tick number
+    - Memory: Minimal (data on disk, not in memory)
+    - Disk: Larger than database (pretty-printed JSON, no compression)
+
+    Async operations:
+    - All file I/O runs in thread pool (asyncio.to_thread)
+    - Prevents blocking simulation during disk writes
+    - initialize() creates base directory
+    - close() is no-op (no cleanup needed)
+    """
 
     def __init__(self, base_path: Path | str = "simulation_runs"):
         self.base_path = Path(base_path)

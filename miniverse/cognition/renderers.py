@@ -23,6 +23,10 @@ def render_prompt(
 ) -> RenderedPrompt:
     """Render a prompt template using the supplied context.
 
+    Performs simple placeholder replacement to inject context data into prompt templates.
+    Supports multiple format options (JSON, text summary, etc.) to accommodate different
+    LLM reasoning styles and token budgets.
+
     Parameters
     ----------
     template:
@@ -34,18 +38,26 @@ def render_prompt(
         Whether to fall back to ``DEFAULT_PROMPTS`` when template is missing.
     """
 
+    # Resolve template reference. If None and defaults enabled, use default execution
+    # template. This allows callers to pass None without explicitly specifying template.
     if template is None and include_default:
         template = DEFAULT_PROMPTS.get("execute_tick")
     elif template is None:
         raise ValueError("Prompt template not provided and defaults disabled")
 
-    context_json = context.to_json()
-    summary = context.summary()
-    perception_json = context.perception_json()
-    plan_json = context.plan_json()
-    memories_text = context.memories_text()
-    scratchpad_json = context.scratchpad_json()
+    # Generate all available context formats. Templates choose which placeholders to use
+    # based on their needs (compact text vs detailed JSON). Pre-generating all formats
+    # simplifies template authoring - no need to call context methods inside templates.
+    context_json = context.to_json()  # Full context as JSON (agent profile, perception, world, memories, plan)
+    summary = context.summary()  # Human-readable text summary (location, plan steps, recent conversation)
+    perception_json = context.perception_json()  # Just perception as JSON (what agent observes)
+    plan_json = context.plan_json()  # Just plan as JSON (current step, remaining steps)
+    memories_text = context.memories_text()  # Recent memories as bulleted text list
+    scratchpad_json = context.scratchpad_json()  # Scratchpad state as JSON (working memory)
 
+    # Build replacement map for placeholder substitution. Placeholders use {{double_brace}}
+    # syntax to avoid conflicts with JSON braces. String replacement is simple and fast;
+    # no need for complex templating engines (Jinja, Mustache) for this use case.
     replacements: Dict[str, str] = {
         "{{context_json}}": context_json,
         "{{context_summary}}": summary,
@@ -55,9 +67,14 @@ def render_prompt(
         "{{scratchpad_json}}": scratchpad_json,
     }
 
+    # Extract system and user prompt components from template. Templates separate system
+    # (role definition, constraints) from user (immediate task) to align with LLM APIs.
     system = template.system
     user = template.user
 
+    # Perform placeholder replacement in both system and user prompts. We iterate through
+    # all replacements even if template only uses subset - unused placeholders remain
+    # as-is (no harm). Multiple passes not needed since placeholders don't nest.
     for placeholder, value in replacements.items():
         system = system.replace(placeholder, value)
         user = user.replace(placeholder, value)

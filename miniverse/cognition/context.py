@@ -116,6 +116,15 @@ async def build_prompt_context(
 
 
 def _sanitize(value: Any) -> Any:
+    """Recursively sanitize values for JSON serialization.
+
+    Handles Plan objects (convert to dict), nested dicts/lists (recurse), primitives
+    (pass through), and non-serializable objects (convert to string repr). This ensures
+    scratchpad state (which may contain arbitrary Python objects) can be safely serialized
+    to JSON for prompt templates.
+    """
+    # Special case: Plan objects have steps and metadata. Convert to dict representation
+    # for JSON serialization. Try-except handles cases where attributes don't exist.
     if hasattr(value, "steps") and hasattr(value, "metadata"):
         try:
             return {
@@ -127,12 +136,16 @@ def _sanitize(value: Any) -> Any:
             }
         except Exception:  # pragma: no cover - best effort sanitization
             pass
+    # Recursively sanitize dict values. Preserves structure while converting nested objects.
     if isinstance(value, dict):
         return {key: _sanitize(val) for key, val in value.items()}
+    # Recursively sanitize list elements
     if isinstance(value, list):
         return [_sanitize(item) for item in value]
+    # Primitives are JSON-safe - pass through unchanged
     if isinstance(value, (str, int, float, bool)) or value is None:
         return value
+    # Non-serializable objects - convert to string representation as fallback
     return repr(value)
 
 
