@@ -8,7 +8,13 @@ from .schemas import (
     GridTileState,
     LocationNodeState,
 )
-from .helpers import GraphOccupancy, shortest_path, grid_shortest_path
+from .helpers import (
+    GraphOccupancy,
+    shortest_path,
+    grid_shortest_path,
+    validate_grid_move,
+    validate_graph_move,
+)
 
 __all__ = [
     "EnvironmentGraph",
@@ -22,4 +28,6 @@ __all__ = [
     "GraphOccupancy",
     "shortest_path",
     "grid_shortest_path",
+    "validate_grid_move",
+    "validate_graph_move",
 ]

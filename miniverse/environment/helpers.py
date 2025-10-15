@@ -143,3 +143,103 @@ def grid_shortest_path(grid: EnvironmentGrid, start: Tuple[int, int], goal: Tupl
             queue.append((nb, new_path))
     # No path exists - goal blocked or disconnected
     return None
+
+
+def validate_grid_move(
+    grid: EnvironmentGrid,
+    current_pos: Tuple[int, int],
+    target_pos: Tuple[int, int],
+    *,
+    max_distance: Optional[int] = None,
+) -> bool:
+    """Validate whether an agent can move from current_pos to target_pos on the grid.
+
+    Checks three constraints:
+    1. Target position is within grid bounds
+    2. Target position is walkable (no collision)
+    3. A valid path exists from current to target (respecting obstacles)
+    4. Optional: path length <= max_distance (single-tick movement limit)
+
+    Args:
+        grid: The environment grid containing collision data
+        current_pos: Agent's current (row, col) position
+        target_pos: Desired (row, col) destination
+        max_distance: Optional maximum path length (e.g., 1 for single-step moves)
+
+    Returns:
+        True if move is valid and reachable, False otherwise
+
+    Usage in SimulationRules:
+        if not validate_grid_move(grid, agent_pos, action.target_pos, max_distance=1):
+            return False  # reject action
+    """
+
+    # Check bounds - target must be within grid dimensions
+    if not (0 <= target_pos[0] < grid.height and 0 <= target_pos[1] < grid.width):
+        return False
+
+    # Check walkability - target cell must not have collision=True
+    if not grid.is_walkable(target_pos[0], target_pos[1]):
+        return False
+
+    # Check reachability - path must exist considering obstacles
+    # BFS handles all collision detection internally via is_walkable checks
+    path = grid_shortest_path(grid, current_pos, target_pos)
+    if path is None:
+        return False  # no valid path exists (blocked by walls/obstacles)
+
+    # Check distance constraint if specified (e.g., single-tick movement limit)
+    # Path length includes both start and end, so subtract 1 for actual steps
+    if max_distance is not None and len(path) - 1 > max_distance:
+        return False  # path exists but too far for single action
+
+    return True
+
+
+def validate_graph_move(
+    graph: EnvironmentGraph,
+    occupancy: GraphOccupancy,
+    current_node: str,
+    target_node: str,
+    agent_id: str,
+    *,
+    require_adjacent: bool = True,
+) -> bool:
+    """Validate whether an agent can move from current_node to target_node in a logical graph.
+
+    Checks three constraints:
+    1. Target node exists in the graph
+    2. Target node has capacity for the agent (or agent already there)
+    3. Optional: nodes are adjacent (single-hop movement)
+
+    Args:
+        graph: The environment graph containing nodes and adjacency
+        occupancy: GraphOccupancy tracker maintaining current agent counts
+        current_node: Agent's current location ID
+        target_node: Desired destination node ID
+        agent_id: The agent attempting the move
+        require_adjacent: If True, only allow moves to directly connected nodes
+
+    Returns:
+        True if move is valid, False otherwise
+
+    Usage in SimulationRules:
+        if not validate_graph_move(graph, occupancy, agent.location, action.target, agent.id):
+            return False  # reject action
+    """
+
+    # Check target node exists
+    if target_node not in graph.nodes:
+        return False
+
+    # Check capacity at target node (returns True if agent already there or room available)
+    if not occupancy.can_enter(target_node, agent_id):
+        return False
+
+    # Check adjacency constraint if required (prevents teleportation across graph)
+    if require_adjacent and current_node != target_node:
+        # Allow move if nodes are directly connected via adjacency list
+        if target_node not in graph.neighbors(current_node):
+            return False
+
+    return True
