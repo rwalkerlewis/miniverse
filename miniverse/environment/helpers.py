@@ -147,8 +147,8 @@ def grid_shortest_path(grid: EnvironmentGrid, start: Tuple[int, int], goal: Tupl
 
 def validate_grid_move(
     grid: EnvironmentGrid,
-    current_pos: Tuple[int, int],
-    target_pos: Tuple[int, int],
+    current_pos: Tuple[int, int] | List[int],
+    target_pos: Tuple[int, int] | List[int],
     *,
     max_distance: Optional[int] = None,
 ) -> bool:
@@ -162,8 +162,8 @@ def validate_grid_move(
 
     Args:
         grid: The environment grid containing collision data
-        current_pos: Agent's current (row, col) position
-        target_pos: Desired (row, col) destination
+        current_pos: Agent's current (row, col) position (tuple or list)
+        target_pos: Desired (row, col) destination (tuple or list)
         max_distance: Optional maximum path length (e.g., 1 for single-step moves)
 
     Returns:
@@ -173,18 +173,21 @@ def validate_grid_move(
         if not validate_grid_move(grid, agent_pos, action.target_pos, max_distance=1):
             return False  # reject action
     """
+    # Normalize to tuples for consistent indexing
+    current = tuple(current_pos) if isinstance(current_pos, list) else current_pos
+    target = tuple(target_pos) if isinstance(target_pos, list) else target_pos
 
     # Check bounds - target must be within grid dimensions
-    if not (0 <= target_pos[0] < grid.height and 0 <= target_pos[1] < grid.width):
+    if not (0 <= target[0] < grid.height and 0 <= target[1] < grid.width):
         return False
 
     # Check walkability - target cell must not have collision=True
-    if not grid.is_walkable(target_pos[0], target_pos[1]):
+    if not grid.is_walkable(target[0], target[1]):
         return False
 
     # Check reachability - path must exist considering obstacles
     # BFS handles all collision detection internally via is_walkable checks
-    path = grid_shortest_path(grid, current_pos, target_pos)
+    path = grid_shortest_path(grid, current, target)
     if path is None:
         return False  # no valid path exists (blocked by walls/obstacles)
 

@@ -280,14 +280,14 @@ class ScenarioLoader:
 
         # Parse optional grid_position for Tier-2 spatial scenarios.
         # Accepts [row, col] list, (row, col) tuple, or {"row": int, "col": int} dict.
-        # Returns None if missing or malformed (Tier-0/Tier-1 scenarios skip this field).
+        # Returns list[int] for schema compatibility (OpenAI doesn't support Tuple schemas).
         grid_position = None
         if "grid_position" in data:
             raw_pos = data["grid_position"]
             if isinstance(raw_pos, (list, tuple)) and len(raw_pos) == 2:
-                grid_position = (int(raw_pos[0]), int(raw_pos[1]))
+                grid_position = [int(raw_pos[0]), int(raw_pos[1])]
             elif isinstance(raw_pos, dict) and "row" in raw_pos and "col" in raw_pos:
-                grid_position = (int(raw_pos["row"]), int(raw_pos["col"]))
+                grid_position = [int(raw_pos["row"]), int(raw_pos["col"])]
 
         return AgentStatus(
             agent_id=data.get("agent_id", fallback_agent_id),

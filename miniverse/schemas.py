@@ -150,12 +150,16 @@ class AgentStatus(BaseModel):
     # For Tier-0/Tier-1 environments, location is a named zone (e.g., "habitat", "workshop")
     # For Tier-2 grids, location may reference a semantic area while grid_position holds coordinates
     location: Optional[str] = Field(None, description="Current location or zone")
-    # Grid position for Tier-2 spatial environments (row, col). None for Tier-0/Tier-1.
+    # Grid position for Tier-2 spatial environments [row, col]. None for Tier-0/Tier-1.
     # Enables collision detection, pathfinding, and proximity-based partial observability.
     # Scenarios can maintain both location (semantic name) and grid_position (spatial coords)
-    # to support hybrid systems (e.g., "kitchen" at (12, 34))
-    grid_position: Optional[Tuple[int, int]] = Field(
-        None, description="Optional (row, col) coordinates for Tier-2 grid environments"
+    # to support hybrid systems (e.g., "kitchen" at [12, 34])
+    # Using List instead of Tuple for OpenAI function schema compatibility
+    grid_position: Optional[List[int]] = Field(
+        None,
+        description="Optional [row, col] coordinates for Tier-2 grid environments",
+        min_length=2,
+        max_length=2,
     )
     # Activity tracks what agent is doing this tick (updated by world engine after action selection)
     activity: Optional[str] = Field(None, description="Current activity or task")
