@@ -69,18 +69,20 @@ class WorkshopRules(SimulationRules):
 
 ```python
 from miniverse import Orchestrator, ScenarioLoader
-from miniverse.cognition import AgentCognition, LLMPlanner, LLMExecutor, LLMReflectionEngine
+from miniverse.cognition import AgentCognition, LLMPlanner, LLMExecutor, LLMReflectionEngine, Scratchpad
 
 # Load scenario
 loader = ScenarioLoader()
 world_state, agents = loader.load("workshop")
 
 # Configure LLM-driven cognition for each agent
+# (Only executor is required - planner/reflection are optional enhancements)
 cognition_map = {
     agent.agent_id: AgentCognition(
-        planner=LLMPlanner(),
-        executor=LLMExecutor(),  # Pure LLM decision-making
-        reflection=LLMReflectionEngine()
+        executor=LLMExecutor(),  # Required - LLM makes decisions each tick
+        planner=LLMPlanner(),  # Optional - generates multi-step plans
+        reflection=LLMReflectionEngine(),  # Optional - synthesizes insights
+        scratchpad=Scratchpad()  # Optional - needed if using planner
     )
     for agent in agents
 }

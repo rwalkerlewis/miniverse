@@ -232,9 +232,9 @@ class ThresholdExecutor:
 - Influence future planning and execution decisions
 - Create agent "learning" and adaptation over time
 
-**Deterministic alternative:** Simple heuristics
+**Deterministic alternative:** Custom heuristic reflection or None
 ```python
-class SimpleReflectionEngine:
+class HeuristicReflectionEngine:
     async def maybe_reflect(self, agent_id, scratchpad, recent_memories, *, trigger_context, context):
         if trigger_context.get("tick", 0) % 3 != 0:
             return []  # Only reflect every 3 ticks
@@ -247,6 +247,8 @@ class SimpleReflectionEngine:
             content = "Operations proceeding normally"
 
         return [ReflectionResult(content=content, importance=6)]
+
+# Or simply: reflection=None (skip reflection phase entirely)
 ```
 
 ---
@@ -326,16 +328,17 @@ cognition = AgentCognition(
 3. Worker agents (LLM or deterministic) respond to messages
 
 ```python
-# Supervisor
+# Supervisor (with planning)
 supervisor_cognition = AgentCognition(
+    executor=LLMExecutor(template_name="supervisor_broadcast"),
     planner=LLMPlanner(),
-    executor=LLMExecutor(template_name="supervisor_broadcast")
+    scratchpad=Scratchpad()  # Needed for plan state
 )
 
-# Workers
+# Workers (reactive, no planning)
 worker_cognition = AgentCognition(
-    planner=SimplePlanner(),
     executor=LLMExecutor(template_name="worker_respond")
+    # No planner - workers just react to supervisor messages
 )
 ```
 

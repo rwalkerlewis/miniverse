@@ -86,21 +86,21 @@ Miniverse ships two sets of implementations:
 
 ## Choosing Cognition Modules: Deterministic vs LLM
 
-Miniverse supports three patterns for agent cognition. Choose based on your simulation goals:
+**Key concept:** Only `executor` is required. Planner, reflection, and scratchpad are **optional enhancements** that can be added independently based on your needs.
 
-### Pattern 1: Pure Deterministic (No LLM)
+### Pattern 1: Minimal Deterministic (Just Executor)
 
-**Use case:** Testing, CI/CD, baseline comparison, Monte Carlo sweeps
+**Use case:** Simple reactive agents, testing, CI/CD, baseline comparison
 
 **Characteristics:**
-- Fast (no network latency)
+- Fastest (no network latency, no planning overhead)
 - Reproducible (same seed → same behavior)
 - Zero API costs
-- Predictable actions based on hardcoded rules
+- Predictable actions based on hardcoded if/then logic
 
 **Example:**
 ```python
-from miniverse.cognition import AgentCognition, Scratchpad
+from miniverse.cognition import AgentCognition
 
 # Define custom deterministic executor with hardcoded logic
 class FixedStrategyExecutor:
@@ -117,51 +117,89 @@ class FixedStrategyExecutor:
 
 cognition_map = {
     "worker1": AgentCognition(
-        planner=SimplePlanner(),  # Returns empty plan
-        executor=FixedStrategyExecutor(),  # Hardcoded rules
-        reflection=SimpleReflectionEngine(),  # No-op
-        scratchpad=Scratchpad()
+        executor=FixedStrategyExecutor()  # Only executor - purely reactive agent
     )
 }
 ```
 
-### Pattern 2: Pure LLM (AI-Driven)
+### Pattern 2: Simple Reactive LLM
 
-**Use case:** Emergent behavior, adaptive strategies, realistic social simulation
+**Use case:** LLM agents that don't need planning or memory synthesis
 
 **Characteristics:**
-- Intelligent decisions based on full context
-- Agents adapt to changing conditions
-- Creative, unpredictable responses
-- Requires API keys and network access
+- Agent reacts intelligently to current state
+- No long-term planning or reflection overhead
+- Good for short simulations or simple decision-making
+
+**Example:**
+```python
+from miniverse.cognition import AgentCognition, LLMExecutor
+
+cognition_map = {
+    "worker1": AgentCognition(
+        executor=LLMExecutor()  # LLM makes decisions, no planning/reflection
+    )
+}
+```
+
+### Pattern 3: LLM with Planning
+
+**Use case:** Agents that need multi-step coherence and goal pursuit
+
+**Characteristics:**
+- LLM generates daily/hourly plans
+- Actions align with long-term goals
+- Requires scratchpad to store plan state
 
 **Example:**
 ```python
 from miniverse.cognition import (
     AgentCognition,
     LLMPlanner,
-    LLMExecutor,  # NEW - pure LLM executor
-    LLMReflectionEngine,
+    LLMExecutor,
     Scratchpad
 )
 
 cognition_map = {
     "supervisor": AgentCognition(
+        executor=LLMExecutor(template_name="warehouse_execute"),
         planner=LLMPlanner(template_name="warehouse_plan"),
-        executor=LLMExecutor(template_name="warehouse_execute"),  # LLM decides every action
-        reflection=LLMReflectionEngine(template_name="warehouse_reflect"),
-        scratchpad=Scratchpad()
+        scratchpad=Scratchpad()  # Needed to store plan state
     )
 }
 ```
 
-**Key difference:** `LLMExecutor` REQUIRES LLM configuration (raises error if missing). Use when you want guaranteed AI-driven behavior.
+### Pattern 4: Full Stanford-Style Agent
 
-<!--
-### Pattern 3: Hybrid (LLM Planning + Deterministic Execution)
+**Use case:** Long-running simulations with emergent social behavior
 
-**Note:** This pattern uses `SimpleExecutor` which has confusing dual behavior (calls LLM if configured, falls back to "rest" if not). We're deprecating this pattern in favor of clear Pure Deterministic or Pure LLM approaches. For now, use one of the two patterns above.
--->
+**Characteristics:**
+- Planning + Execution + Reflection (Stanford Generative Agents pattern)
+- Agents synthesize insights from accumulated experiences
+- Reflections stored as high-importance memories
+- Most realistic but highest LLM cost
+
+**Example:**
+```python
+from miniverse.cognition import (
+    AgentCognition,
+    LLMPlanner,
+    LLMExecutor,
+    LLMReflectionEngine,
+    Scratchpad
+)
+
+cognition_map = {
+    "agent1": AgentCognition(
+        executor=LLMExecutor(template_name="agent_execute"),
+        planner=LLMPlanner(template_name="agent_plan"),
+        reflection=LLMReflectionEngine(template_name="agent_reflect"),
+        scratchpad=Scratchpad()  # Stores plan state + working memory
+    )
+}
+```
+
+**Note:** All LLM modules (LLMPlanner, LLMExecutor, LLMReflectionEngine) raise clear errors if LLM not configured. Use `planner=None` / `reflection=None` to explicitly skip those phases.
 
 `PromptLibrary` and `render_prompt` handle the template substitution using data from `PromptContext` (profile, perception, plan, memories, scratchpad state). Default templates live in `miniverse/cognition/prompts.py` and already include JSON examples.
 
