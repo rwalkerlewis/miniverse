@@ -45,11 +45,23 @@ class Executor(Protocol):
 
 
 class SimpleExecutor:
-    """Fallback executor delegating to the legacy `get_agent_action` call.
+    """Executor with LLM capability and deterministic fallback.
 
-    Bridges new cognition stack (Plan, PlanStep, PromptContext) with legacy LLM call.
-    Renders prompt template using context, then delegates to get_agent_action. This
-    maintains backward compatibility while allowing gradual migration to new prompt system.
+    Behavior:
+    - If LLM configured (llm_provider and llm_model present): Calls LLM via get_agent_action()
+      for intelligent, context-aware action decisions
+    - If no LLM configured: Returns AgentAction(action_type="rest") as safe deterministic fallback
+
+    Use cases:
+    - Code that should work both with and without LLM configuration (testing, CI/CD)
+    - Gradual migration from deterministic to LLM-driven simulations
+    - Examples that support both modes via --llm flag
+
+    For pure LLM (no fallback): Use LLMExecutor instead (raises error if LLM missing).
+    For pure deterministic: Create custom executor with hardcoded logic (see workshop example).
+
+    This maintains backward compatibility with existing examples while bridging legacy
+    get_agent_action() with new prompt template system.
     """
 
     async def choose_action(

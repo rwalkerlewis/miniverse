@@ -14,7 +14,7 @@ from .runtime import AgentCognition, AgentCognitionMap, build_default_cognition
 from .context import PromptContext, build_prompt_context
 from .prompts import PromptLibrary, PromptTemplate, DEFAULT_PROMPTS
 from .renderers import render_prompt, RenderedPrompt
-from .llm import LLMPlanner, LLMReflectionEngine
+from .llm import LLMPlanner, LLMReflectionEngine, LLMExecutor
 from .cadence import (
     CognitionCadence,
     PlannerCadence,
@@ -45,6 +45,7 @@ __all__ = [
     "render_prompt",
     "RenderedPrompt",
     "LLMPlanner",
+    "LLMExecutor",
     "LLMReflectionEngine",
     "CognitionCadence",
     "PlannerCadence",

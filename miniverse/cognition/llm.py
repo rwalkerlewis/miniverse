@@ -1,4 +1,4 @@
-"""LLM-backed implementations for planner and reflection engines."""
+"""LLM-backed implementations for planner, executor, and reflection engines."""
 
 from __future__ import annotations
 
@@ -7,8 +7,10 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
 
 from miniverse.llm_calls import call_llm_with_retries
+from miniverse.schemas import AgentAction, AgentPerception
 
 from .context import PromptContext
+from .executor import Executor
 from .planner import Plan, PlanStep, Planner
 from .prompts import DEFAULT_PROMPTS, PromptLibrary
 from .reflection import ReflectionEngine, ReflectionResult
@@ -187,3 +189,95 @@ class LLMReflectionEngine(ReflectionEngine):
             )
             for item in response.reflections
         ]
+
+
+class LLMExecutor(Executor):
+    """Executor that calls LLM for action selection on every tick.
+
+    Pure LLM-driven executor with NO deterministic fallback. Unlike SimpleExecutor
+    (which returns "rest" action when LLM is unavailable), LLMExecutor REQUIRES
+    LLM configuration and raises ValueError if missing.
+
+    Use cases:
+    - When you want guaranteed LLM-driven agent behavior
+    - Social simulations where emergent decisions are critical
+    - Scenarios where agents must adapt to unpredictable conditions
+
+    For deterministic fallback behavior, use SimpleExecutor instead.
+    For pure deterministic logic, create custom executor (e.g., RuleBasedExecutor).
+
+    Example:
+        # Pure LLM cognition stack
+        cognition = AgentCognition(
+            planner=LLMPlanner(template_name="warehouse_plan"),
+            executor=LLMExecutor(template_name="warehouse_execute"),
+            reflection=LLMReflectionEngine(template_name="warehouse_reflect"),
+            scratchpad=Scratchpad(),
+        )
+
+    Args:
+        template_name: Name of execution prompt template in library (default: "execute_tick")
+        prompt_library: Custom prompt library (optional, falls back to defaults)
+    """
+
+    def __init__(
+        self,
+        *,
+        template_name: str = "execute_tick",
+        prompt_library: Optional[PromptLibrary] = None,
+    ) -> None:
+        # Template name identifies which execution prompt to use. Common patterns:
+        # - "execute_tick": General-purpose action selection
+        # - "execute_warehouse": Domain-specific (inventory vs fulfillment decisions)
+        # - "execute_social": Communication-focused actions
+        self.template_name = template_name
+        # Custom prompt library for scenario-specific execution styles
+        self.prompt_library = prompt_library
+
+    async def choose_action(
+        self,
+        agent_id: str,
+        perception: AgentPerception,
+        scratchpad: Scratchpad,
+        *,
+        plan: Plan,
+        plan_step: PlanStep | None,
+        context: PromptContext,
+    ) -> AgentAction:
+        # Extract LLM credentials from context. These come from Orchestrator initialization.
+        provider = context.extra.get("llm_provider")
+        model = context.extra.get("llm_model")
+
+        # LLMExecutor is strict: if no LLM configured, it's a configuration error.
+        # This is intentional - forces users to be explicit about LLM vs deterministic modes.
+        if not provider or not model:
+            raise ValueError(
+                f"LLMExecutor requires LLM configuration (agent: {agent_id}). "
+                f"Set LLM_PROVIDER and LLM_MODEL environment variables, or use SimpleExecutor "
+                f"for automatic fallback to deterministic actions when LLM unavailable."
+            )
+
+        # Resolve prompt library with three-level fallback (same as planner/reflection)
+        library = self.prompt_library or context.extra.get("prompt_library") or DEFAULT_PROMPTS
+        try:
+            # Look up execution template. Execution prompts guide LLM to choose actions
+            # based on current perception, plan step, and recent memories.
+            template = library.get(self.template_name)
+        except KeyError:
+            # Template not found - fall back to default tick execution template
+            template = DEFAULT_PROMPTS.get("execute_tick")
+
+        # Render template with context. Replaces placeholders like {{perception_json}},
+        # {{plan_step_description}}, {{memories_text}} with actual agent data.
+        rendered = render_prompt(template, context, include_default=False)
+
+        # Call LLM with retry logic. LLM generates structured AgentAction response
+        # matching Pydantic schema (action_type, target, parameters, reasoning, communication).
+        # Retries up to 3 times if validation fails, providing schema feedback to LLM.
+        return await call_llm_with_retries(
+            system_prompt=rendered.system,
+            user_prompt=rendered.user,
+            llm_provider=provider,
+            llm_model=model,
+            response_model=AgentAction,
+        )
