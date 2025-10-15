@@ -21,6 +21,14 @@ from miniverse import (
     Stat,
     WorldState,
 )
+from miniverse.cognition.cadence import (
+    CognitionCadence,
+    PlannerCadence,
+    ReflectionCadence,
+    TickInterval,
+    PLANNER_LAST_TICK_KEY,
+    REFLECTION_LAST_TICK_KEY,
+)
 from miniverse.schemas import AgentMemory
 
 
@@ -188,3 +196,79 @@ async def test_cognition_pipeline(monkeypatch):
     assert cognition.executor.calls[0][0] == "step-1"
     assert cognition.reflection.calls == 1
     assert any(mem.memory_type == "reflection" for mem in orchestrator.memory.records)
+
+
+@pytest.mark.asyncio
+async def test_cognition_cadence_respects_intervals(monkeypatch):
+    world_state = WorldState(
+        tick=0,
+        timestamp=datetime.now(timezone.utc),
+        environment=EnvironmentState(metrics={}),
+        resources=ResourceState(metrics={}),
+        agents=[
+            AgentStatus(
+                agent_id="alpha",
+                display_name="Agent Alpha",
+                role="operator",
+                location="ops",
+                activity=None,
+                attributes={},
+            )
+        ],
+    )
+
+    profile = AgentProfile(
+        agent_id="alpha",
+        name="Agent Alpha",
+        age=30,
+        background="Test agent",
+        role="operator",
+        personality="steady",
+        skills={},
+        goals=["Execute plan"],
+        relationships={},
+    )
+
+    planner = PlannerStub()
+    executor = ExecutorStub()
+    reflection = ReflectionStub()
+
+    cadence = CognitionCadence(
+        planner=PlannerCadence(interval=TickInterval(every=2, offset=1)),
+        reflection=ReflectionCadence(
+            interval=TickInterval(every=3, offset=1),
+            require_new_memories=True,
+        ),
+    )
+
+    cognition = AgentCognition(
+        planner=planner,
+        executor=executor,
+        reflection=reflection,
+        scratchpad=Scratchpad(),
+        cadence=cadence,
+    )
+
+    orchestrator = Orchestrator(
+        world_state=world_state,
+        agents={"alpha": profile},
+        world_prompt="Test world",
+        agent_prompts={"alpha": "You are methodical."},
+        llm_provider="openai",
+        llm_model="gpt-5-nano",
+        simulation_rules=DummyRules(),
+        memory=RecordingMemory(),
+        agent_cognition={"alpha": cognition},
+    )
+
+    async def fake_world_update(current_state, actions, tick, *args, **kwargs):
+        return current_state.model_copy(update={"tick": tick})
+
+    monkeypatch.setattr("miniverse.orchestrator.process_world_update", fake_world_update)
+
+    await orchestrator.run(num_ticks=4)
+
+    assert planner.calls == 2  # ticks 1 and 3
+    assert reflection.calls == 2  # ticks 1 and 4 (require_new_memories=True satisfied)
+    assert cognition.scratchpad.state.get(PLANNER_LAST_TICK_KEY) == 3
+    assert cognition.scratchpad.state.get(REFLECTION_LAST_TICK_KEY) == 4

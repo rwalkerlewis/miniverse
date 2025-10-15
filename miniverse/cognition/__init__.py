@@ -15,6 +15,13 @@ from .context import PromptContext, build_prompt_context
 from .prompts import PromptLibrary, PromptTemplate, DEFAULT_PROMPTS
 from .renderers import render_prompt, RenderedPrompt
 from .llm import LLMPlanner, LLMReflectionEngine
+from .cadence import (
+    CognitionCadence,
+    PlannerCadence,
+    ReflectionCadence,
+    TickInterval,
+    tick_to_time_block,
+)
 
 __all__ = [
     "Scratchpad",
@@ -39,4 +46,9 @@ __all__ = [
     "RenderedPrompt",
     "LLMPlanner",
     "LLMReflectionEngine",
+    "CognitionCadence",
+    "PlannerCadence",
+    "ReflectionCadence",
+    "TickInterval",
+    "tick_to_time_block",
 ]

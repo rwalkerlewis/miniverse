@@ -33,7 +33,7 @@ _Last updated: 2025-03-16_
 
 1. **Structured LLM error feedback** – Surface validation failures (missing fields, wrong types) directly in retry prompts and user logs so malformed JSON is easier to correct.
 2. **Planner scheduling & time blocks** – Add utilities to run planners/reflections on configurable intervals (e.g., once per “day” or when scratchpad is empty) and expose helpers for scenarios to declare their tick → time mapping.
-3. **Memory metadata & retrieval** – Extend `AgentMemory` with importance/tags/embedding hooks and provide retrieval strategies beyond recency.
+3. **Memory metadata & retrieval** – ✅ Simple/importance-weighted streams now capture tags/metadata and expose weighted retrieval. Next step: plug in pluggable embedding/BM25 adapters and expose memory clearing on persistence backends.
 4. **Environment tier polish** – Finish Tier‑1/ Tier‑2 helpers (capacity enforcement, pathfinding) and ensure scenario loader ergonomics for spatial maps.
 5. **Advanced example** – Reproduce the Stanford Valentine’s Day scenario (Tier‑2 grid, richer memory usage) as a proof point for emergent coordination.
 6. **Docsite & tutorials** – Expand docs into a structured guide (“build your first sim”, advanced prompts, custom memory/persistence) with cross-links to examples.

@@ -8,7 +8,7 @@ clear place to hang configuration.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict, Optional
 
 from .executor import Executor, SimpleExecutor
@@ -16,6 +16,7 @@ from .planner import Planner, SimplePlanner
 from .reflection import ReflectionEngine, SimpleReflectionEngine
 from .scratchpad import Scratchpad
 from .prompts import PromptLibrary, DEFAULT_PROMPTS
+from .cadence import CognitionCadence
 
 
 @dataclass
@@ -27,6 +28,7 @@ class AgentCognition:
     reflection: ReflectionEngine
     scratchpad: Scratchpad
     prompt_library: PromptLibrary = DEFAULT_PROMPTS
+    cadence: CognitionCadence = field(default_factory=CognitionCadence)
 
 
 def build_default_cognition() -> AgentCognition:
@@ -50,6 +52,7 @@ def build_default_cognition() -> AgentCognition:
         reflection=SimpleReflectionEngine(),
         scratchpad=Scratchpad(),
         prompt_library=DEFAULT_PROMPTS,
+        cadence=CognitionCadence(),
     )
 
 

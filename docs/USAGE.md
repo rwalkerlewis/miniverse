@@ -108,6 +108,38 @@ cognition_map = {
 
 `PromptLibrary` and `render_prompt` handle the template substitution using data from `PromptContext` (profile, perception, plan, memories, scratchpad state). Default templates live in `miniverse/cognition/prompts.py` and already include JSON examples.
 
+### Controlling Planner/Reflection Cadence
+
+Use `CognitionCadence` to throttle how often planners and reflection engines execute. The orchestrator stores the last run tick in each agent's scratchpad, so you don't have to manage bookkeeping yourself:
+
+```python
+from miniverse.cognition import (
+    AgentCognition,
+    CognitionCadence,
+    PlannerCadence,
+    ReflectionCadence,
+    TickInterval,
+)
+
+cadence = CognitionCadence(
+    planner=PlannerCadence(interval=TickInterval(every=2, offset=1)),
+    reflection=ReflectionCadence(
+        interval=TickInterval(every=3, offset=1),
+        require_new_memories=True,
+    ),
+)
+
+cognition = AgentCognition(
+    planner=my_planner,
+    executor=my_executor,
+    reflection=my_reflection,
+    scratchpad=Scratchpad(),
+    cadence=cadence,
+)
+```
+
+Need to translate ticks into higher-level units (day/shift/sprint)? Call `tick_to_time_block(tick=tick, ticks_per_block=8, block_label="shift")` inside your prompts or analytics helpers to expose the block index and per-block offset.
+
 ---
 
 ## 4. Configure the Orchestrator
@@ -156,6 +188,8 @@ final_state = result["final_state"]
 
 The workshop example shows CI-friendly usage (deterministic by default) and an LLM mode toggled via CLI (`--llm`). Pass `--debug` to log planner/executor/reflection payloads (including provider/model info) and `--analysis` to emit per-tick summaries (backlog deltas, average energy/stress).
 
+Structured schema errors are also surfaced automatically. If an LLM response fails validation, the retry loop prints each offending field (with the received value preview) and appends the same checklist to the next prompt so the model corrects itself without guesswork.
+
 If you need additional diagnostics, pass `tick_listeners` to the orchestrator. Each listener receives `(tick, previous_state, new_state, actions)`—the workshop example wires `TickAnalyzer` (see `examples/workshop/run.py`) to print per-tick backlog deltas and aggregate stats.
 
 For a dialogue-centric walkthrough, see `examples/standup/run.py`. That scenario emits structured `communication` payloads, prints per-tick transcripts, and uses the same `--llm` / `--debug` / `--analysis` switches to compare deterministic and LLM-driven stand-ups.
@@ -165,7 +199,7 @@ Key tuning points are documented inline (`StandupPlanner.ROLE_STEPS`, `StandupEx
 
 ## 6. Expand or Customize
 
-- **Memory retrieval:** `SimpleMemoryStream` provides recency + keyword matching. Implement a custom `MemoryStrategy` if you need BM25 or embeddings.
+- **Memory retrieval:** `SimpleMemoryStream` offers recency with lightweight keyword boosting; `ImportanceWeightedMemory` blends recency and importance so critical events stay near the top. Both store `tags`/`metadata`, which you can populate when calling `add_memory` (the orchestrator now records action/communication/event tags by default).
 - **Branching timelines:** reserved fields (`branch_id`) let you experiment with Loom-style branching later.
 - **Testing:** mock `LLMPlanner`/`LLMReflectionEngine` for unit tests (see `tests/test_cognition_flow.py`).
 - **Docs to consult:**

@@ -21,7 +21,7 @@ from .persistence import (
     PostgresPersistence,
     JsonPersistence,
 )
-from .memory import MemoryStrategy, SimpleMemoryStream
+from .memory import MemoryStrategy, SimpleMemoryStream, ImportanceWeightedMemory
 from .cognition import (
     AgentCognition,
     AgentCognitionMap,
@@ -80,6 +80,7 @@ __all__ = [
     "JsonPersistence",
     "MemoryStrategy",
     "SimpleMemoryStream",
+    "ImportanceWeightedMemory",
     "AgentCognition",
     "AgentCognitionMap",
     "build_default_cognition",

@@ -41,7 +41,7 @@ class RecordingMemory(MemoryStrategy):
     """Simple memory implementation that records writes for assertions."""
 
     def __init__(self):
-        self.records = []
+        self.records: list[AgentMemory] = []
 
     async def initialize(self) -> None:  # pragma: no cover - trivial
         pass
@@ -73,17 +73,17 @@ class RecordingMemory(MemoryStrategy):
             branch_id=kwargs.get("branch_id"),
             created_at=datetime.now(timezone.utc),
         )
-        self.records.append((agent_id, memory_type, content))
+        self.records.append(memory)
         return memory
 
     async def get_recent_memories(self, run_id, agent_id, limit=10):
-        return [content for a_id, _type, content in self.records if a_id == agent_id][-limit:]
+        return [mem.content for mem in self.records if mem.agent_id == agent_id][-limit:]
 
     async def get_relevant_memories(self, run_id, agent_id, query, limit=5):  # pragma: no cover - unused
         return []
 
     async def clear_agent_memories(self, run_id, agent_id):  # pragma: no cover - unused
-        self.records = [record for record in self.records if record[0] != agent_id]
+        self.records = [record for record in self.records if record.agent_id != agent_id]
 
 
 @pytest.mark.asyncio
@@ -162,5 +162,5 @@ async def test_orchestrator_runs_single_tick(monkeypatch):
     assert rules.ticks_applied == [1]
     get_action_mock.assert_awaited()
     world_update_mock.assert_awaited()
-    assert any("Need to inspect" in record[2] for record in memory.records)
-    assert any("I told unknown" in record[2] for record in memory.records)
+    assert any("Need to inspect" in record.content for record in memory.records)
+    assert any(record.tags and "communication" in record.tags for record in memory.records)

@@ -73,6 +73,11 @@ class MemoryStrategy(ABC):
         memory_type: str,
         content: str,
         importance: int = 5,
+        *,
+        tags: Optional[List[str]] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+        embedding_key: Optional[str] = None,
+        branch_id: Optional[str] = None,
     ) -> AgentMemory:
         """
         Add a new memory for an agent.
@@ -84,6 +89,11 @@ class MemoryStrategy(ABC):
             memory_type: Type (observation, action, communication, reflection)
             content: Memory content (natural language)
             importance: Importance score 1-10 (5 = neutral)
+            tags: Optional labels that retrieval engines can use for
+                filtering/boosting (e.g., topics, entities)
+            metadata: Structured payload for advanced retrieval engines
+            embedding_key: Optional pointer to an external embedding entry
+            branch_id: Optional branching timeline identifier
 
         Returns:
             The created AgentMemory object
@@ -313,22 +323,39 @@ class SimpleMemoryStream(MemoryStrategy):
         if not terms:
             return await self.get_recent_memories(run_id, agent_id, limit)
 
-        # Fetch a larger window to score
-        candidate_memories = await self.persistence.get_recent_memories(run_id, agent_id, limit * 5)
+        # Fetch a broader window so we can compute a lightweight score.
+        candidate_memories = await self.persistence.get_recent_memories(
+            run_id, agent_id, max(limit * 5, limit)
+        )
+        if not candidate_memories:
+            return []
+
+        most_recent_tick = candidate_memories[0].tick
         scores: List[tuple[float, str]] = []
 
         for mem in candidate_memories:
             text = mem.content.lower()
             tag_text = " ".join(mem.tags).lower()
             score = 0.0
+
             for term in terms:
                 if term in text:
                     score += 2.0
                 if term in tag_text:
                     score += 1.0
-            if score > 0.0:
-                score += mem.importance * 0.1
-                scores.append((score, mem.content))
+
+            if score <= 0.0:
+                continue
+
+            # Favor fresher memories without ignoring high-importance items.
+            recency_delta = max(most_recent_tick - mem.tick, 0)
+            recency_boost = 1.0 / (1.0 + recency_delta)
+            score += recency_boost
+
+            # Importance gives a gentle push so high-salience items stay near the top.
+            score += mem.importance * 0.1
+
+            scores.append((score, mem.content))
 
         if not scores:
             return await self.get_recent_memories(run_id, agent_id, limit)
@@ -355,28 +382,26 @@ class SimpleMemoryStream(MemoryStrategy):
 
 
 class ImportanceWeightedMemory(MemoryStrategy):
-    """
-    Memory retrieval weighted by recency + importance.
+    """Memory retrieval weighted by both recency and importance."""
 
-    Based on Stanford Generative Agents paper:
-    - Score = w_recency * recency(m) + w_importance * importance(m)
-    - Return top-k memories by score
-
-    To be implemented in future phase (Phase 7+).
-    """
-
-    def __init__(self, persistence, recency_weight: float = 0.7, importance_weight: float = 0.3):
-        """
-        Initialize importance-weighted memory.
-
-        Args:
-            persistence: PersistenceStrategy instance
-            recency_weight: Weight for recency (0-1)
-            importance_weight: Weight for importance (0-1)
-        """
+    def __init__(
+        self,
+        persistence,
+        *,
+        recency_weight: float = 0.65,
+        importance_weight: float = 0.35,
+        window: int = 100,
+    ) -> None:
         self.persistence = persistence
         self.recency_weight = recency_weight
         self.importance_weight = importance_weight
+        self.window = max(window, 1)
+
+    async def initialize(self) -> None:  # pragma: no cover - delegate to persistence
+        pass
+
+    async def close(self) -> None:  # pragma: no cover - delegate to persistence
+        pass
 
     async def add_memory(
         self,
@@ -386,15 +411,37 @@ class ImportanceWeightedMemory(MemoryStrategy):
         memory_type: str,
         content: str,
         importance: int = 5,
+        *,
+        tags: Optional[List[str]] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+        embedding_key: Optional[str] = None,
+        branch_id: Optional[str] = None,
     ) -> AgentMemory:
-        """Add memory (implementation pending)."""
-        raise NotImplementedError("ImportanceWeightedMemory not yet implemented")
+        import uuid
+
+        memory = AgentMemory(
+            id=uuid.uuid4(),
+            run_id=run_id,
+            agent_id=agent_id,
+            tick=tick,
+            memory_type=memory_type,
+            content=content,
+            importance=importance,
+            tags=tags or [],
+            metadata=metadata or {},
+            embedding_key=embedding_key,
+            branch_id=branch_id,
+            created_at=datetime.now(),
+        )
+
+        await self.persistence.save_memory(run_id, memory)
+        return memory
 
     async def get_recent_memories(
         self, run_id: UUID, agent_id: str, limit: int = 10
     ) -> List[str]:
-        """Get memories (implementation pending)."""
-        raise NotImplementedError("ImportanceWeightedMemory not yet implemented")
+        memories = await self.persistence.get_recent_memories(run_id, agent_id, limit)
+        return [m.content for m in memories]
 
     async def get_relevant_memories(
         self,
@@ -403,9 +450,62 @@ class ImportanceWeightedMemory(MemoryStrategy):
         query: str,
         limit: int = 5,
     ) -> List[str]:
-        """Get relevant memories (implementation pending)."""
-        raise NotImplementedError("ImportanceWeightedMemory not yet implemented")
+        # Grab a fixed window and score each entry using a convex combination of
+        # normalized recency and importance. A non-empty query boosts keyword matches.
+        candidate_memories = await self.persistence.get_recent_memories(
+            run_id, agent_id, self.window
+        )
+        if not candidate_memories:
+            return []
+
+        most_recent_tick = candidate_memories[0].tick
+        normalized_query = query.lower().strip()
+        terms = [term for term in normalized_query.replace(",", " ").split() if term]
+
+        scored: List[tuple[float, str]] = []
+        for mem in candidate_memories:
+            # Recency normalized to [0, 1].
+            recency_delta = max(most_recent_tick - mem.tick, 0)
+            recency = 1.0 / (1.0 + recency_delta)
+            importance = mem.importance / 10.0
+            base_score = (
+                self.recency_weight * recency
+                + self.importance_weight * importance
+            )
+
+            if not terms:
+                scored.append((base_score, mem.content))
+                continue
+
+            text = mem.content.lower()
+            tag_blob = " ".join(mem.tags).lower()
+            keyword_score = 0.0
+            for term in terms:
+                if term in text:
+                    keyword_score += 1.5
+                if term in tag_blob:
+                    keyword_score += 0.75
+
+            if keyword_score <= 0.0:
+                continue
+
+            scored.append((base_score + keyword_score, mem.content))
+
+        if not scored:
+            # Fall back to generic recency/importance ordering if no keyword match.
+            scored = [
+                (
+                    self.recency_weight
+                    * (1.0 / (1.0 + max(most_recent_tick - mem.tick, 0)))
+                    + self.importance_weight * (mem.importance / 10.0),
+                    mem.content,
+                )
+                for mem in candidate_memories[: limit * 2]
+            ]
+
+        scored.sort(key=lambda item: item[0], reverse=True)
+        return [content for _, content in scored[:limit]]
 
     async def clear_agent_memories(self, run_id: UUID, agent_id: str) -> None:
-        """Clear memories (implementation pending)."""
-        raise NotImplementedError("ImportanceWeightedMemory not yet implemented")
+        # Persistence layer does not yet expose bulk-delete semantics.
+        pass
