@@ -1,0 +1,221 @@
+"""
+SimulationRules interface for defining deterministic physics in Miniverse simulations.
+
+This module provides the abstract base class for implementing world physics rules.
+Users subclass SimulationRules to define how their world evolves each tick
+through deterministic Python code (not LLM interpretation).
+
+Key responsibilities:
+- Apply one tick of deterministic physics (resource consumption, degradation, etc.)
+- Validate whether agent actions are physically possible
+- Generate probabilistic events (weather, equipment failures, etc.)
+
+Design principle: If it can be calculated, calculate it (don't ask LLM).
+"""
+
+from abc import ABC, abstractmethod
+
+from miniverse.schemas import WorldState, AgentAction
+
+
+def format_resources_generic(state: WorldState) -> str:
+    """Return a human-readable summary of resource metrics."""
+
+    if not state.resources.metrics:
+        return ""
+
+    resources = state.resources.metrics
+    parts: list[str] = []
+
+    for key, stat in resources.items():
+        label = stat.label or key.replace("_", " ").title()
+        value = stat.value
+
+        if isinstance(value, float):
+            formatted_value = f"{value:.1f}" if abs(value) >= 10 else f"{value:.2f}"
+        else:
+            formatted_value = str(value)
+
+        unit = stat.unit or ""
+        suffix = f" {unit}" if unit else ""
+        parts.append(f"{label}={formatted_value}{suffix}")
+
+    return ", ".join(parts)
+
+
+class SimulationRules(ABC):
+    """
+    Abstract base class for defining the deterministic physics of a simulation world.
+
+    This interface separates controllable physics (Python code) from emergent behavior
+    (LLM agent decisions). Users implement this to define how their world works.
+
+    Examples of what goes in SimulationRules:
+    - Resource consumption rates (oxygen, power, food)
+    - Equipment degradation over time
+    - Physical constraints (room capacity, distance limits)
+    - Probabilistic events (dust storms, equipment failures)
+    - Time progression effects
+
+    Examples of what does NOT go in SimulationRules:
+    - Agent decision-making (that's LLM)
+    - Communication content (that's LLM)
+    - Creative responses (that's LLM)
+    """
+
+    @abstractmethod
+    def apply_tick(self, state: WorldState, tick: int) -> WorldState:
+        """
+        Apply one tick of deterministic physics rules to the world state.
+
+        This method runs BEFORE agent actions are gathered in the simulation loop.
+        It handles passive world evolution: resource consumption, degradation,
+        time progression, random events, etc.
+
+        Important: This should be pure Python logic. No LLM calls. The behavior
+        should be deterministic (given the same state and tick, produce same output)
+        or use controlled randomness (with seed for reproducibility).
+
+        Args:
+            state: Current world state at the start of this tick
+            tick: Current tick number (0-indexed)
+
+        Returns:
+            Updated world state with physics applied
+
+        Example implementation:
+            new_state = state.model_copy(deep=True)
+
+            # Consume oxygen: agents * 0.0000096 kg/s * 10 seconds
+            oxygen_consumed = len(new_state.agents) * 0.0000096 * 10
+            new_state.resources.oxygen_kg -= oxygen_consumed
+
+            # Degrade equipment
+            for agent in new_state.agents:
+                agent.health *= 0.999  # 0.1% degradation per tick
+
+            # Probabilistic dust storm
+            if random.random() < 0.001:  # 0.1% chance per tick
+                new_state.events.append(create_dust_storm_event(tick))
+
+            return new_state
+        """
+        pass
+
+    @abstractmethod
+    def validate_action(self, action: AgentAction, state: WorldState) -> bool:
+        """
+        Check if an agent action is physically possible given current world state.
+
+        This method is called after agents propose actions but before those actions
+        are processed. It enforces physical constraints without requiring LLM calls.
+
+        Important: This should be fast and deterministic. No LLM calls.
+
+        Args:
+            action: The action an agent wants to take
+            state: Current world state
+
+        Returns:
+            True if action is valid and can be executed, False otherwise
+
+        Example implementation:
+            if action.action_type == "repair":
+                # Check if agent has required skill
+                agent = get_agent_by_id(state, action.agent_id)
+                if "repair" not in agent.skills:
+                    return False
+
+                # Check if spare parts available
+                if state.resources.spare_parts <= 0:
+                    return False
+
+                return True
+
+            elif action.action_type == "move":
+                # Check if destination exists and has capacity
+                target_room = action.parameters.get("room")
+                if target_room not in state.environment.rooms:
+                    return False
+
+                room_capacity = state.environment.rooms[target_room]["capacity"]
+                current_occupants = count_agents_in_room(state, target_room)
+                if current_occupants >= room_capacity:
+                    return False
+
+                return True
+
+            # Default: allow action
+            return True
+        """
+        pass
+
+    def get_tick_duration_seconds(self) -> int:
+        """
+        Get the duration of one tick in simulated seconds.
+
+        Override this method to customize tick duration for your simulation.
+        Research suggests 10-30 seconds works well for human-scale activities.
+
+        Returns:
+            Number of simulated seconds per tick (default: 10)
+
+        Examples:
+            - 1 second: Real-time simulation
+            - 10 seconds: Human activity (default)
+            - 60 seconds: Strategic planning
+            - 3600 seconds: Macro-level simulation
+        """
+        return 10
+
+    def on_simulation_start(self, state: WorldState) -> WorldState:
+        """
+        Hook called once at simulation start, before first tick.
+
+        Override this method to perform any initialization logic needed
+        for your simulation rules.
+
+        Args:
+            state: Initial world state
+
+        Returns:
+            Potentially modified world state
+
+        Example:
+            # Set up initial equipment states
+            state.environment.equipment_health = {
+                "life_support": 100.0,
+                "power_generator": 100.0,
+            }
+            return state
+        """
+        return state
+
+    def on_simulation_end(self, state: WorldState, tick: int) -> WorldState:
+        """
+        Hook called once at simulation end, after final tick.
+
+        Override this method to perform any cleanup or final calculations
+        needed for your simulation.
+
+        Args:
+            state: Final world state
+            tick: Final tick number
+
+        Returns:
+            Potentially modified world state
+
+        Example:
+            # Calculate final statistics
+            state.metadata["total_oxygen_consumed"] = calculate_total(state)
+            return state
+        """
+        return state
+
+    def format_resource_summary(self, state: WorldState) -> str:
+        """Return a printable resource summary for the orchestrator output.
+
+        Subclasses can override to provide domain-specific labels or metrics.
+        """
+
+        return format_resources_generic(state)

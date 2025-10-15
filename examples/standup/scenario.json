@@ -1,0 +1,151 @@
+{
+  "name": "Product Team Stand-up",
+  "description": "Three teammates align on daily goals and blockers in a shared chat.",
+  "initial_timestamp": "2160-03-21T09:00:00",
+  "environment": {
+    "metrics": {
+      "meeting_channel": {
+        "value": "#daily-sync",
+        "label": "Stand-up Channel"
+      }
+    }
+  },
+  "resources": {
+    "metrics": {
+      "alignment_score": {
+        "value": 75,
+        "unit": "%",
+        "label": "Team Alignment"
+      },
+      "open_blockers": {
+        "value": 2,
+        "label": "Open Blockers"
+      }
+    }
+  },
+  "agents": [
+    {
+      "profile": {
+        "agent_id": "pm",
+        "name": "Avery Kim",
+        "age": 34,
+        "background": "Product manager focusing on roadmap alignment and stakeholder updates.",
+        "role": "product_manager",
+        "personality": "organized",
+        "skills": {
+          "facilitation": "expert",
+          "analysis": "advanced"
+        },
+        "goals": [
+          "Keep the team aligned on priorities",
+          "Unblock teammates quickly"
+        ],
+        "relationships": {
+          "eng": "Relies on implementation updates",
+          "design": "Coordinates on UX decisions"
+        }
+      },
+      "status": {
+        "agent_id": "pm",
+        "display_name": "Avery",
+        "role": "product_manager",
+        "location": "chat_channel",
+        "activity": null,
+        "attributes": {
+          "energy": {
+            "value": 78,
+            "unit": "%",
+            "label": "Energy"
+          },
+          "stress": {
+            "value": 32,
+            "unit": "%",
+            "label": "Stress"
+          }
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "eng",
+        "name": "Jordan Singh",
+        "age": 29,
+        "background": "Backend engineer shipping the workflow service.",
+        "role": "engineer",
+        "personality": "analytical",
+        "skills": {
+          "backend": "expert",
+          "infra": "advanced"
+        },
+        "goals": [
+          "Ship the workflow automation feature",
+          "Communicate risks early"
+        ],
+        "relationships": {
+          "pm": "Reports progress",
+          "design": "Collaborates on UI contracts"
+        }
+      },
+      "status": {
+        "agent_id": "eng",
+        "display_name": "Jordan",
+        "role": "engineer",
+        "location": "chat_channel",
+        "activity": null,
+        "attributes": {
+          "energy": {
+            "value": 70,
+            "unit": "%",
+            "label": "Energy"
+          },
+          "stress": {
+            "value": 40,
+            "unit": "%",
+            "label": "Stress"
+          }
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "design",
+        "name": "Mila Ortega",
+        "age": 31,
+        "background": "Designer leading the new dashboard experience.",
+        "role": "designer",
+        "personality": "empathetic",
+        "skills": {
+          "ux": "expert",
+          "research": "advanced"
+        },
+        "goals": [
+          "Deliver the dashboard mockups",
+          "Clarify data requirements"
+        ],
+        "relationships": {
+          "pm": "Aligns on priorities",
+          "eng": "Coordinates on handoffs"
+        }
+      },
+      "status": {
+        "agent_id": "design",
+        "display_name": "Mila",
+        "role": "designer",
+        "location": "chat_channel",
+        "activity": null,
+        "attributes": {
+          "energy": {
+            "value": 82,
+            "unit": "%",
+            "label": "Energy"
+          },
+          "stress": {
+            "value": 28,
+            "unit": "%",
+            "label": "Stress"
+          }
+        }
+      }
+    }
+  ]
+}
