@@ -274,13 +274,27 @@ class ScenarioLoader:
     def _parse_agent_status(
         self, data: Dict[str, Any], fallback_agent_id: str
     ) -> AgentStatus:
+        # Parse per-agent metrics (health, stress, etc.) into Stat objects.
+        # Auto-converts simple values → Stat(value=...) or detailed dicts → Stat objects.
         attributes = self._parse_metrics(data.get("attributes", {}))
+
+        # Parse optional grid_position for Tier-2 spatial scenarios.
+        # Accepts [row, col] list, (row, col) tuple, or {"row": int, "col": int} dict.
+        # Returns None if missing or malformed (Tier-0/Tier-1 scenarios skip this field).
+        grid_position = None
+        if "grid_position" in data:
+            raw_pos = data["grid_position"]
+            if isinstance(raw_pos, (list, tuple)) and len(raw_pos) == 2:
+                grid_position = (int(raw_pos[0]), int(raw_pos[1]))
+            elif isinstance(raw_pos, dict) and "row" in raw_pos and "col" in raw_pos:
+                grid_position = (int(raw_pos["row"]), int(raw_pos["col"]))
 
         return AgentStatus(
             agent_id=data.get("agent_id", fallback_agent_id),
             display_name=data.get("display_name"),
             role=data.get("role"),
             location=data.get("location"),
+            grid_position=grid_position,
             activity=data.get("activity"),
             attributes=attributes,
             tags=data.get("tags", []),

@@ -16,7 +16,7 @@ from miniverse.environment import (
     EnvironmentGraphState,
     EnvironmentGridState,
 )
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 from datetime import datetime
 from uuid import UUID
 
@@ -147,7 +147,16 @@ class AgentStatus(BaseModel):
     display_name: Optional[str] = Field(None, description="Optional override for printing")
     role: Optional[str] = Field(None, description="Short summary of agent role")
     # Location enables spatial reasoning and partial observability (agents only see nearby entities)
+    # For Tier-0/Tier-1 environments, location is a named zone (e.g., "habitat", "workshop")
+    # For Tier-2 grids, location may reference a semantic area while grid_position holds coordinates
     location: Optional[str] = Field(None, description="Current location or zone")
+    # Grid position for Tier-2 spatial environments (row, col). None for Tier-0/Tier-1.
+    # Enables collision detection, pathfinding, and proximity-based partial observability.
+    # Scenarios can maintain both location (semantic name) and grid_position (spatial coords)
+    # to support hybrid systems (e.g., "kitchen" at (12, 34))
+    grid_position: Optional[Tuple[int, int]] = Field(
+        None, description="Optional (row, col) coordinates for Tier-2 grid environments"
+    )
     # Activity tracks what agent is doing this tick (updated by world engine after action selection)
     activity: Optional[str] = Field(None, description="Current activity or task")
     # Attributes store per-agent metrics (health, stress, focus, quota_met, etc.)
