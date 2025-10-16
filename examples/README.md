@@ -2,9 +2,17 @@
 
 This directory contains examples and tutorials for learning Miniverse.
 
-## Tutorial Notebook (Recommended starting point)
+## 🚀 Start Here: Welcome Notebook
 
-**`tutorial.ipynb`** - Interactive Jupyter notebook teaching Miniverse from scratch.
+**`welcome.ipynb`** - 5-minute Mars habitat simulation showing what Miniverse does.
+
+See 3 LLM-powered agents coordinate on Mars base operations. Watch them plan, communicate, and adapt. Then peek under the hood to see how it works.
+
+**Perfect for:** First-time users who want to see the library in action before diving into details.
+
+## Tutorial Notebooks
+
+**`tutorial.ipynb`** - Reference guide for primitives and implementation details (Stat, Plan, Memory, etc.).
 
 ### Setup for Notebook
 
