@@ -14,12 +14,12 @@ KEY CONCEPT:
 
 REQUIRES:
 - LLM_PROVIDER environment variable (e.g., "openai")
-- LLM_MODEL environment variable (e.g., "gpt-4")
+- LLM_MODEL environment variable (e.g., "gpt-5-nano")
 - API key for your provider (e.g., OPENAI_API_KEY)
 
 RUN:
     export LLM_PROVIDER=openai
-    export LLM_MODEL=gpt-4
+    export LLM_MODEL=gpt-5-nano
     export OPENAI_API_KEY=your_key
     uv run python -m examples.workshop.05_stochastic.run
 """
@@ -130,7 +130,7 @@ async def main():
         print("❌ LLM configuration missing!")
         print("\nPlease set environment variables:")
         print("  export LLM_PROVIDER=openai")
-        print("  export LLM_MODEL=gpt-4")
+        print("  export LLM_MODEL=gpt-5-nano")
         print("  export OPENAI_API_KEY=your_key")
         return
 
