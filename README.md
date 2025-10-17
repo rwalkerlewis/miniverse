@@ -49,16 +49,22 @@ class WorkshopRules(SimulationRules):
     def apply_tick(self, state: WorldState, tick: int) -> WorldState:
         updated = state.model_copy(deep=True)
 
-        # Resources degrade
+        # Resources degrade over time
         power = updated.resources.get_metric("power_kwh", default=120.0)
+        # Reduce power by 2.5 kWh per tick, but never below 0
+        # max(0.0, ...) ensures power can't go negative
         power.value = max(0.0, float(power.value) - 2.5)
 
-        # Agents recover energy when resting
+        # Agents recover energy when resting, lose energy when active
         for agent in updated.agents:
             energy = agent.get_attribute("energy", default=75)
             if agent.activity == "rest":
+                # Resting: gain 4 energy points, but cap at 100
+                # min(100.0, ...) ensures energy can't exceed maximum
                 energy.value = min(100.0, float(energy.value) + 4)
             else:
+                # Active: lose 3 energy points, but never below 0
+                # max(0.0, ...) ensures energy can't go negative
                 energy.value = max(0.0, float(energy.value) - 3)
 
         updated.tick = tick
@@ -277,23 +283,64 @@ orchestrator = Orchestrator(
 
 ## Project Status
 
-**Current Focus**: Generic schema, deterministic hooks, and diverse examples
+**Current Focus**: Testing information diffusion fix and architectural improvements
 
-✅ **Working today**
-- Generic `Stat`-based schema (no baked-in domain fields)
-- Tenacity-backed LLM retries with schema feedback
-- In-memory/JSON/PostgreSQL persistence strategies
+✅ **Working Today (v0.1)**
+- **Core Architecture**: Memory stream, reflection, planning, execution
+- **Communication Actions**: Agents can send messages with proper formatting
+- **Information Diffusion**: ✨ **FIXED!** Recipients now receive communication memories (2025-10-16)
+- **Persistence**: Three backends (InMemory, JSON, PostgreSQL) with pluggable interface
+- **Environment Tiers**: Abstract KPIs (Tier 0), Logical graphs (Tier 1), Spatial grids (Tier 2)
+- **Cognition Stack**: Protocols for swappable planner/executor/reflection with deterministic and LLM implementations
+- **Examples**: Workshop (operations with deterministic rules) ✅
+- **DEBUG_LLM**: Comprehensive logging of all LLM prompts and responses
+- **Test Coverage**: 27 passing tests including new information diffusion tests
 
-🚧 **In progress**
-- Scenario and documentation refresh (more domain templates)
-- Extended example suite covering factories, emergency ops, retail, research habitats
+🔧 **Recent Fixes** (2025-10-16)
+- **Critical Bug**: Added recipient memory creation for communication actions
+  - Before: Only senders remembered sending messages
+  - After: Both senders and recipients get appropriate memories
+  - Impact: Enables Stanford-style information diffusion patterns
+  - Tests: `tests/test_information_diffusion.py`
+  - Details: See `ISSUES.md` for full analysis
 
-🧭 **Planned**
-- Branching scenarios (explore alternate timelines)
-- Advanced memory retrieval (BM25, semantic embeddings)
-- Additional deterministic helper modules (queuing, energy budgeting)
+⚠️ **Known Limitations**
+- **LLM Non-Determinism**: Agent behavior varies between runs (expected with temperature > 0)
+- **Memory Retrieval**: SimpleMemoryStream uses basic keyword matching (consider ImportanceWeightedMemory for production)
+- See `ISSUES.md` for architectural improvements in progress
 
-See `docs/README.md` for the latest documentation index and research references.
+🚧 **In Progress**
+- Valentine's Day scenario testing with information diffusion fix
+- Architectural improvements (dual memory retrieval, perception simplification)
+- Stanford Generative Agents comparison study
+
+🔧 **Planned Enhancements (Phase 2-4)**
+
+### Phase 2: Stanford-Quality Memory Retrieval
+- **Embedding-based relevance scoring**: Add `EmbeddingMemoryStream` with cosine similarity
+- **Three-factor retrieval**: `α_recency * recency + α_importance * importance + α_relevance * embedding_similarity`
+- **Pluggable embeddings**: Support sentence-transformers (local) or OpenAI API
+- **Why**: Current keyword matching works but misses semantic relationships. Stanford uses embeddings for "relevance" component.
+
+### Phase 3: Hierarchical Environment Model
+- **Semantic containment tree**: `house → kitchen → stove` relationships for natural language location queries
+- **Action grounding helpers**: LLM-based recursive location resolution (e.g., "get coffee" → find coffee machine)
+- **Partial environment trees**: Each agent maintains subgraph of world they've explored
+- **Why**: Enables more natural agent reasoning about space. Current flat locations work but require explicit naming.
+
+### Phase 4: Enhanced Cognitive Fidelity
+- **Reflection tree structure**: Citations linking reflections to source memories (enable "why did I think X?" introspection)
+- **Reaction decision loop**: "Should I react to this observation?" check with plan regeneration on surprises
+- **Hierarchical planning**: Three-tier decomposition (daily → hourly → 5-15min chunks) for realistic long-term behavior
+- **Why**: Increases agent believability and enables more complex emergent coordination patterns.
+
+### Future (Post-1.0)
+- Branching scenarios (explore alternate timelines with Loom-style interface)
+- Advanced memory retrieval (BM25, hybrid search, memory decay)
+- Additional deterministic helper modules (queuing theory, energy budgeting, resource optimization)
+- Large-scale performance testing (100+ agents)
+
+See `plan.md` for detailed roadmap and `docs/README.md` for research foundations.
 
 ## Example
 
@@ -303,16 +350,13 @@ Legacy examples are preserved under `examples/_legacy/` for reference.
 
 ## Documentation
 
-- **[Architecture](docs/overview/architecture.md)** - System design and principles
-- **[Cognition Stack](docs/architecture/cognition.md)** - Planner/executor/reflection flow and staged prompts
-- **[Environment Tiers](docs/architecture/environment.md)** - Logical graphs and spatial grids
-- **[Roadmap](docs/overview/roadmap.md)** - Near-, mid-, and long-term priorities
-- **[Specification](docs/overview/specification.md)** - Data models and API contracts
-- **[Core Schemas](docs/overview/schemas.md)** - World and persona structures
-- **[Docs index](docs/README.md)** - Full documentation catalog
-- **[RESEARCH.md](docs/RESEARCH.md)** - Academic foundations
+- **[ISSUES.md](ISSUES.md)** - Current status, known issues, and next steps ⭐
 - **[Engineering Plan](plan.md)** - Repo orientation and workflow
-- **[Next Steps](NEXT_STEPS.md)** - Current strategic work packages
+- **[CLAUDE.md](CLAUDE.md)** - Development guide and codebase orientation
+- **[Cognition Stack](docs/architecture/cognition.md)** - Planner/executor/reflection flow
+- **[Environment Tiers](docs/architecture/environment.md)** - Logical graphs and spatial grids
+- **[RESEARCH.md](docs/RESEARCH.md)** - Academic foundations
+- **[Debugging Archive](docs/debugging/)** - 2025-10-16 session investigation notes
 
 ## Research Foundation
 

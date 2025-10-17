@@ -7,12 +7,13 @@ Authoritative instructions for working on the **Miniverse** codebase.
 ## Quick Orientation
 
 - **README.md** – Installation, examples, quick start, and high-level architecture.
-- **NEXT_STEPS.md** – Strategic roadmap with work packages (WP1-WP7).
+- **ISSUES.md** – Current status, known issues, architectural improvements, and next steps. ⭐ Start here for context!
 - **plan.md** – Engineering workflow, repo orientation, and immediate priorities.
 - **docs/architecture/** – Deep dives on cognition stack and environment tiers.
 - **docs/USAGE.md** – Step-by-step guide for building new simulations.
 - **docs/RESEARCH.md** – Academic foundations (Stanford Generative Agents, AgentTorch, etc.).
 - **docs/research/agent-simulations/stanford-comparison.md** – Gap analysis vs. Stanford's Reverie.
+- **docs/debugging/** – Session investigation notes (2025-10-16 debugging archive).
 - **docs/archive/** – Historical context only; do not resurrect old patterns.
 
 If something isn't covered in these sources, ask before implementing new patterns.
@@ -29,7 +30,7 @@ Miniverse is a **generalist agent-based simulation library** designed to replica
 - **Pluggable persistence** (in-memory, JSON, PostgreSQL)
 - **Modular cognition stack** (scratchpad, planner, executor, reflection engine)
 
-**Current Status**: Core architecture is in place. The workshop example demonstrates both deterministic and LLM-driven modes. Actively working toward Stanford scenario replication (Valentine's Day party).
+**Current Status**: Core architecture is in place. The workshop example demonstrates both deterministic and LLM-driven modes. **Information diffusion fixed (2025-10-16)** – recipients now receive communication memories, enabling Stanford-style information propagation. Valentine's Day party scenario ready for testing.
 
 ---
 
@@ -116,9 +117,20 @@ uv run python examples/workshop/monte_carlo.py --runs 100 --ticks 20 --base-seed
 # Initialize PostgreSQL (optional)
 createdb miniverse
 uv run python scripts/init_db.py
+
+# Debugging tools (set environment variables)
+DEBUG_LLM=true uv run python examples/workshop/run.py --llm --ticks 3
+# → Shows all LLM prompts and responses
+
+DEBUG_PERCEPTION=true uv run python examples/workshop/run.py --llm --ticks 3
+# → Shows what each agent perceives each tick (memories, messages, alerts)
 ```
 
 Configure LLM providers via environment variables (`LLM_PROVIDER`, `LLM_MODEL`, `OPENAI_API_KEY`, etc.).
+
+**Debugging Environment Variables**:
+- `DEBUG_LLM=true` – Log all LLM prompts and responses (comprehensive cognition debugging)
+- `DEBUG_PERCEPTION=true` – Log what each agent perceives each tick (memory/message visibility)
 
 ---
 

@@ -321,12 +321,16 @@ class Orchestrator:
             # Tick 1 has no previous actions - agents start with clean slate
             recent_actions = []
 
-        # Pull recent memories formatted as strings for perception context. These are
-        # displayed in the agent's "observable world" section to ground their decisions
-        # in past experiences. Limit to 10 to avoid token bloat while maintaining recency.
-        recent_memory_strings = await self.memory.get_recent_memories(
+        # Retrieve structured memory objects (AgentMemory instances) once.
+        # We'll use these for both perception (as strings) and prompt context (as objects).
+        # This eliminates the dual-fetch pattern that was confusing and inefficient.
+        recent_agent_memories = await self.persistence.get_recent_memories(
             self.run_id, agent_id, limit=10
         )
+
+        # Convert memories to strings for perception's recent_observations field.
+        # Perception displays these in human-readable format for agent decision-making.
+        recent_memory_strings = [m.content for m in recent_agent_memories]
 
         # Build partial observability view (Stanford Generative Agents pattern).
         # Perception includes: agent's own status, nearby entities, visible locations,
@@ -339,13 +343,24 @@ class Orchestrator:
             recent_memory_strings,
         )
 
-        # Retrieve structured memory objects (AgentMemory instances) for prompt context.
-        # Note: we fetch memories twice - once as strings for perception, once as structured
-        # objects for prompt context. This dual retrieval supports both human-readable
-        # perception and machine-readable prompt templates.
-        recent_agent_memories = await self.persistence.get_recent_memories(
-            self.run_id, agent_id, limit=10
-        )
+        # DEBUG_PERCEPTION: Log what agent perceives (parallel to DEBUG_LLM)
+        import os
+        if os.getenv("DEBUG_PERCEPTION"):
+            print(f"\n[DEBUG_PERCEPTION] {agent_name} (tick {tick})")
+            print(f"  Recent memories ({len(recent_memory_strings)}):")
+            for i, mem in enumerate(recent_memory_strings[:5], 1):  # Show first 5
+                preview = mem[:80] + "..." if len(mem) > 80 else mem
+                print(f"    {i}. {preview}")
+            if len(recent_memory_strings) > 5:
+                print(f"    ... and {len(recent_memory_strings) - 5} more")
+            print(f"  Messages ({len(perception.messages)}):")
+            for msg in perception.messages:
+                preview = msg["message"][:60] + "..." if len(msg["message"]) > 60 else msg["message"]
+                print(f"    - From {msg['from']}: {preview}")
+            if not perception.messages:
+                print(f"    (none)")
+            print(f"  System alerts: {len(perception.system_alerts)}")
+            print()
 
         # Use custom prompt library if agent's cognition provides one, otherwise fall back
         # to system defaults. Prompt library contains templates for planning, execution,
@@ -539,11 +554,13 @@ class Orchestrator:
             )
             new_memories.setdefault(action.agent_id, []).append(memory)
 
-            # Store communications as memories
+            # Store communications as memories FOR BOTH SENDER AND RECIPIENT
             if action.communication:
                 recipient = action.communication.get("to", "unknown")
                 message = action.communication.get("message") or action.communication.get("content", "")
-                memory = await self.memory.add_memory(
+
+                # Sender memory: "I told X: message"
+                sender_memory = await self.memory.add_memory(
                     run_id=self.run_id,
                     agent_id=action.agent_id,
                     tick=tick,
@@ -555,21 +572,48 @@ class Orchestrator:
                         "message": message,
                         "recipient": recipient,
                         "action_type": action.action_type,
+                        "role": "sender",
                     },
                 )
-                new_memories.setdefault(action.agent_id, []).append(memory)
+                new_memories.setdefault(action.agent_id, []).append(sender_memory)
+
+                # RECIPIENT memory: "X told me: message"
+                # This is the CRITICAL fix for information diffusion!
+                # Recipients need to remember messages they received.
+                if recipient != "unknown" and recipient in self.agents:
+                    sender_name = self.agents[action.agent_id].name
+                    recipient_memory = await self.memory.add_memory(
+                        run_id=self.run_id,
+                        agent_id=recipient,
+                        tick=tick,
+                        memory_type="communication",
+                        content=f"{sender_name} told me: {message}",
+                        importance=7,  # Slightly higher - receiving information is important
+                        tags=["communication", f"from:{action.agent_id}"],
+                        metadata={
+                            "message": message,
+                            "sender": action.agent_id,
+                            "sender_name": sender_name,
+                            "action_type": action.action_type,
+                            "role": "recipient",
+                        },
+                    )
+                    new_memories.setdefault(recipient, []).append(recipient_memory)
 
         # Store events as observations for affected agents
         for event in state.recent_events:
             if event.tick == tick:  # Only new events
                 for agent_id in event.affected_agents:
+                    # Events may not have severity; default to 5 (medium importance)
+                    importance = event.severity if event.severity is not None else 5
+
                     memory = await self.memory.add_memory(
                         run_id=self.run_id,
                         agent_id=agent_id,
                         tick=tick,
                         memory_type="observation",
                         content=event.description,
-                        importance=event.severity,
+                        importance=importance,
                         tags=[
                             "event",
                             f"severity:{event.severity}" if event.severity is not None else "severity:unknown",
@@ -765,10 +809,9 @@ class Orchestrator:
 
             prompt_library = cognition.prompt_library or DEFAULT_PROMPTS
 
-            # Pull memory strings for perception context (same as action selection)
-            recent_memory_strings = await self.memory.get_recent_memories(
-                self.run_id, agent_id, limit=10
-            )
+            # Convert first 10 memories to strings for perception's recent_observations.
+            # Reflection uses broader window (20) for context but perception shows recent subset.
+            recent_memory_strings = [m.content for m in recent_memories[:10]]
 
             # Build minimal perception for reflection. Reflections focus on internal state
             # (memories, plans, goals) rather than environment, so pass empty actions list.

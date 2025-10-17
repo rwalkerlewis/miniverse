@@ -367,18 +367,13 @@ class SimpleMemoryStream(MemoryStrategy):
         """
         Clear all memories for an agent.
 
-        Note: This requires the persistence layer to support clearing.
-        For InMemoryPersistence, this is straightforward. For database
-        persistence, this would need to delete records.
+        Delegates to persistence layer which handles the actual deletion.
 
         Args:
             run_id: Simulation run identifier
             agent_id: Agent identifier
         """
-        # This would need support in PersistenceStrategy interface
-        # For now, this is a placeholder - would need to add
-        # clear_memories() method to PersistenceStrategy
-        pass
+        await self.persistence.clear_agent_memories(run_id, agent_id)
 
 
 class ImportanceWeightedMemory(MemoryStrategy):
@@ -507,5 +502,13 @@ class ImportanceWeightedMemory(MemoryStrategy):
         return [content for _, content in scored[:limit]]
 
     async def clear_agent_memories(self, run_id: UUID, agent_id: str) -> None:
-        # Persistence layer does not yet expose bulk-delete semantics.
-        pass
+        """
+        Clear all memories for an agent.
+
+        Delegates to persistence layer which handles the actual deletion.
+
+        Args:
+            run_id: Simulation run identifier
+            agent_id: Agent identifier
+        """
+        await self.persistence.clear_agent_memories(run_id, agent_id)

@@ -192,25 +192,6 @@ class PersistenceStrategy(ABC):
         pass
 
     @abstractmethod
-    async def get_actions_for_tick(
-        self, run_id: UUID, tick: int
-    ) -> List[AgentAction]:
-        """
-        Retrieve all agent actions for a specific tick.
-
-        Args:
-            run_id: Unique run identifier
-            tick: Tick number
-
-        Returns:
-            List of agent actions (empty if none found)
-
-        Raises:
-            Exception: If retrieval fails
-        """
-        pass
-
-    @abstractmethod
     async def save_memory(self, run_id: UUID, memory: AgentMemory) -> None:
         """
         Save an agent memory.
@@ -267,8 +248,6 @@ class PersistenceStrategy(ABC):
         """
         Get all actions for a tick.
 
-        Alias for get_actions_for_tick() for naming consistency.
-
         Args:
             run_id: Unique run identifier
             tick: Tick number
@@ -278,6 +257,35 @@ class PersistenceStrategy(ABC):
 
         Raises:
             Exception: If retrieval fails
+        """
+        pass
+
+    @abstractmethod
+    async def clear_agent_memories(self, run_id: UUID, agent_id: str) -> None:
+        """
+        Clear all memories for a specific agent in a run.
+
+        Args:
+            run_id: Unique run identifier
+            agent_id: Agent identifier
+
+        Raises:
+            Exception: If clearing fails
+        """
+        pass
+
+    @abstractmethod
+    async def delete_run(self, run_id: UUID) -> None:
+        """
+        Delete an entire simulation run and all associated data.
+
+        Removes: run metadata, world states, actions, memories.
+
+        Args:
+            run_id: Unique run identifier
+
+        Raises:
+            Exception: If deletion fails
         """
         pass
 
@@ -403,21 +411,6 @@ class InMemoryPersistence(PersistenceStrategy):
             self.actions[key] = []
         self.actions[key].append(action)
 
-    async def get_actions_for_tick(
-        self, run_id: UUID, tick: int
-    ) -> List[AgentAction]:
-        """
-        Retrieve actions for a tick from memory.
-
-        Args:
-            run_id: Run identifier
-            tick: Tick number
-
-        Returns:
-            List of actions (empty if none)
-        """
-        return self.actions.get((run_id, tick), [])
-
     async def save_memory(self, run_id: UUID, memory: AgentMemory) -> None:
         """
         Save agent memory to memory storage.
@@ -467,16 +460,53 @@ class InMemoryPersistence(PersistenceStrategy):
 
     async def get_actions(self, run_id: UUID, tick: int) -> List[AgentAction]:
         """
-        Alias for get_actions_for_tick.
+        Retrieve actions for a tick from memory.
 
         Args:
             run_id: Run identifier
             tick: Tick number
 
         Returns:
-            List of actions for the tick
+            List of actions (empty if none)
         """
-        return await self.get_actions_for_tick(run_id, tick)
+        return self.actions.get((run_id, tick), [])
+
+    async def clear_agent_memories(self, run_id: UUID, agent_id: str) -> None:
+        """
+        Clear all memories for a specific agent.
+
+        Args:
+            run_id: Run identifier
+            agent_id: Agent identifier
+        """
+        key = (run_id, agent_id)
+        if key in self.memories:
+            self.memories[key] = []
+
+    async def delete_run(self, run_id: UUID) -> None:
+        """
+        Delete entire simulation run and all associated data.
+
+        Args:
+            run_id: Run identifier
+        """
+        # Remove run metadata
+        self.runs.pop(run_id, None)
+
+        # Remove states
+        state_keys = [key for key in self.states if key[0] == run_id]
+        for key in state_keys:
+            del self.states[key]
+
+        # Remove actions
+        action_keys = [key for key in self.actions if key[0] == run_id]
+        for key in action_keys:
+            del self.actions[key]
+
+        # Remove memories
+        memory_keys = [key for key in self.memories if key[0] == run_id]
+        for key in memory_keys:
+            del self.memories[key]
 
 
 class PostgresPersistence(PersistenceStrategy):
@@ -633,11 +663,6 @@ class PostgresPersistence(PersistenceStrategy):
         async with self.pool.acquire() as conn:
             await conn.executemany(query, records)
 
-    async def get_actions_for_tick(
-        self, run_id: UUID, tick: int
-    ) -> List[AgentAction]:
-        return await self.get_actions(run_id, tick)
-
     async def get_actions(self, run_id: UUID, tick: int) -> List[AgentAction]:
         assert self.pool is not None, "Persistence not initialized"
 
@@ -652,6 +677,32 @@ class PostgresPersistence(PersistenceStrategy):
             rows = await conn.fetch(query, run_id, tick)
 
         return [AgentAction.model_validate_json(row["action"]) for row in rows]
+
+    async def clear_agent_memories(self, run_id: UUID, agent_id: str) -> None:
+        assert self.pool is not None, "Persistence not initialized"
+
+        query = """
+            DELETE FROM agent_memories
+            WHERE run_id = $1 AND agent_id = $2
+        """
+
+        async with self.pool.acquire() as conn:
+            await conn.execute(query, run_id, agent_id)
+
+    async def delete_run(self, run_id: UUID) -> None:
+        assert self.pool is not None, "Persistence not initialized"
+
+        queries = [
+            "DELETE FROM agent_memories WHERE run_id = $1",
+            "DELETE FROM agent_actions WHERE run_id = $1",
+            "DELETE FROM world_states WHERE run_id = $1",
+            "DELETE FROM simulation_runs WHERE id = $1",
+        ]
+
+        async with self.pool.acquire() as conn:
+            async with conn.transaction():
+                for query in queries:
+                    await conn.execute(query, run_id)
 
     async def save_memory(self, run_id: UUID, memory: AgentMemory) -> None:
         assert self.pool is not None, "Persistence not initialized"
@@ -835,11 +886,6 @@ class JsonPersistence(PersistenceStrategy):
             path.write_text, json.dumps(payload, indent=2), "utf-8"
         )
 
-    async def get_actions_for_tick(
-        self, run_id: UUID, tick: int
-    ) -> List[AgentAction]:
-        return await self.get_actions(run_id, tick)
-
     async def get_actions(self, run_id: UUID, tick: int) -> List[AgentAction]:
         path = self._run_dir(run_id) / "actions" / f"{tick:05d}.json"
         if not path.exists():
@@ -847,6 +893,17 @@ class JsonPersistence(PersistenceStrategy):
 
         payload = await asyncio.to_thread(json.loads, path.read_text("utf-8"))
         return [AgentAction.model_validate(item) for item in payload]
+
+    async def clear_agent_memories(self, run_id: UUID, agent_id: str) -> None:
+        path = self._run_dir(run_id) / "memories" / f"{agent_id}.jsonl"
+        if path.exists():
+            await asyncio.to_thread(path.unlink)
+
+    async def delete_run(self, run_id: UUID) -> None:
+        import shutil
+        run_dir = self._run_dir(run_id)
+        if run_dir.exists():
+            await asyncio.to_thread(shutil.rmtree, run_dir)
 
     async def save_memory(self, run_id: UUID, memory: AgentMemory) -> None:
         directory = self._run_dir(run_id) / "memories"

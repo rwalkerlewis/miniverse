@@ -1,6 +1,6 @@
 # Miniverse Project Plan
 
-_Last updated: 2025-10-14_
+_Last updated: 2025-10-16_
 
 ## 1. Current Snapshot
 
@@ -30,30 +30,29 @@ _Last updated: 2025-10-14_
 - **Persistence & memory**: Injected strategies (in-memory by default); `SimpleMemoryStream` stores ordered memories for perception/prompts.
 - **Examples**: Workshop (physics-oriented) and Stand-up (social conversation) cover both KPI updates and communication logging.
 
-## 4. Recent Progress (Session 2025-10-14)
+## 4. Recent Progress (Session 2025-10-16)
 
 ### ✅ Completed
-1. **Structured LLM error feedback** – ValidationFeedback dataclass with rich error details, field paths, types, input previews (miniverse/llm_utils.py)
-2. **Planner scheduling & time blocks** – CognitionCadence with TickInterval for configurable planner/reflection execution (miniverse/cognition/cadence.py)
-3. **Memory metadata & retrieval** – Extended AgentMemory with tags/metadata, ImportanceWeightedMemory with recency+importance scoring (miniverse/memory.py)
-4. **Environment tier polish** – ✅ Complete:
-   - Grid position tracking in AgentStatus (List[int] for OpenAI schema compatibility)
-   - Move validation helpers (validate_grid_move, validate_graph_move)
-   - BFS pathfinding with collision detection
-   - Scenario loader parses grid positions
-5. **Stanford scenario foundation** – Created simplified Valentine's Day party scenario with 3 agents on 10x10 grid (examples/scenarios/stanford.json)
+1. **DEBUG_LLM logging feature** – Added comprehensive LLM prompt/response logging for debugging
+2. **Prompt template fix** – Added communicate action example to `execute_tick` template (messages now have proper format)
+3. **Root cause investigation** – Identified that message format was issue, but deeper memory/perception problem remains
+4. **Documentation consolidation** – Created ISSUES.md with all findings and next steps
+5. ✨ **CRITICAL BUG FIX: Information diffusion** – Added recipient memory creation (orchestrator.py:542-586)
+   - Recipients now receive memories when sent messages
+   - Both sender and recipient get appropriate memory entries
+   - Added `tests/test_information_diffusion.py` with 2 passing tests
+   - All 27 tests passing (no regressions)
+6. **Comprehensive code review** – Identified 4 architectural issues (documented in ISSUES.md)
 
-### 🚧 In Progress
-6. **Stanford demo execution** – Runner script created but **hanging on initialization**. Issue identified: LLM layer problem during orchestrator setup or first tick. Workshop/standup examples work fine (deterministic mode completes instantly), so issue is specific to stanford runner setup.
+### 🚀 Unblocked
+7. **Information diffusion** – ✅ FIXED! Recipients now get memories
+8. **Valentine's scenario** – Ready to test with fix
 
-### 📋 Outstanding Work
-7. **Debug Stanford LLM layer issue** – PRIORITY: Orchestrator hangs even in deterministic mode. Needs investigation:
-   - Check if SimplePlanner/SimpleExecutor/SimpleReflectionEngine have bugs
-   - Compare stanford runner initialization vs workshop/standup
-   - Test minimal orchestrator with grid scenario
-8. **Docsite & tutorials** – Expand docs into structured guide ("build your first sim", advanced prompts, custom memory/persistence)
-9. **Tooling** – Add CLI/testing conveniences (lint config, benchmarking harness for cognition latency)
-10. **Notebooks** – Publish Jupyter notebooks (e.g., stand-up conversation walkthrough)
+### 📋 Immediate Next Steps
+9. **Test Valentine's Scenario** – Run `examples/valentines_party.ipynb` with fix and verify information diffusion works
+10. **Eliminate dual memory retrieval** – Single fetch in orchestrator (Issue A1)
+11. **Add perception logging** – DEBUG_PERCEPTION mode parallel to DEBUG_LLM
+12. **Simplify perception builder** – Remove action-based message filtering (Issue A2)
 
 ## 5. Release Readiness (PyPI)
 
@@ -86,12 +85,77 @@ Before publishing `miniverse` to PyPI:
 
 **Uncommitted changes**: Stanford runner script (examples/stanford/run.py, rules.py) and grid_position schema fix (List[int] instead of Tuple[int, int])
 
-## 8. Next Steps (Priority Order)
+## 8. Validated Roadmap (Post-Gap Analysis)
 
-1. **Debug Stanford runner hang** – Root cause: likely SimplePlanner/SimpleExecutor returning invalid data or infinite loop. Action: Add print statements, compare with workshop deterministic path.
-2. **Fix grid_position schema** – Commit List[int] change (OpenAI compatibility fix)
-3. **Complete Stanford demo** – Get deterministic mode working first, then test LLM mode
-4. **PyPI prep** – Once Stanford validates architecture, proceed with packaging/release
+### ✅ Phase 0: Current Architecture (COMPLETE)
+- Memory stream with importance/recency scoring
+- Reflection engine with periodic synthesis
+- Planning system with scratchpad
+- Executor for action generation
+- Dialogue/communication structured payloads
+- Partial observability in perception
+- Tier 0/1/2 environment support
+- Three persistence backends (InMemory, JSON, Postgres)
+
+### 🎯 Phase 1: Example Validation (NOW - 1-2 days)
+**Goal**: Validate current architecture works for both canonical examples
+
+1. **Fix welcome.ipynb (Mars habitat)** – Test incrementally, fix bugs, ensure clean execution
+2. **Create/fix Valentine's Day party notebook** – Micro-replication of Stanford scenario showing:
+   - Information diffusion (party invitation spreads)
+   - Memory retrieval (agents remember who told them)
+   - Planning & coordination (agents show up at same time/place)
+   - **Documented limitations**: keyword matching vs embeddings, flat locations vs tree
+3. **Fix tutorial.ipynb** – Basic library walkthrough
+
+### 🔧 Phase 2: Stanford-Quality Memory Retrieval (2-3 weeks)
+**Goal**: Match Stanford's three-factor memory retrieval
+
+1. **Embedding-based relevance scoring**:
+   - Add `EmbeddingMemoryStream` strategy class
+   - Support sentence-transformers (local) or OpenAI embeddings API
+   - Store embeddings in persistence layer (new column/field)
+   - Implement cosine similarity calculation
+   - Combined score: `α_recency * recency + α_importance * importance + α_relevance * cosine_sim`
+2. **Plugin architecture**: Users can swap `SimpleMemoryStream` → `EmbeddingMemoryStream` without code changes
+3. **Benchmarking**: Compare retrieval quality (keyword vs embedding) on Stanford scenarios
+
+### 🌳 Phase 3: Hierarchical Environment Model (2-3 weeks)
+**Goal**: Enable natural language location specification and action grounding
+
+1. **Extend EnvironmentGraph for semantic containment**:
+   - Add parent-child relationships (house → kitchen → stove)
+   - Tree traversal utilities (`find_object`, `render_subtree_to_nl`)
+   - Each agent maintains partial tree (subgraph of world)
+2. **Action grounding utilities** in `miniverse/environment/helpers.py`:
+   - LLM-based recursive location selection
+   - Fallback to keyword matching
+   - Integration with existing Executor (no new module needed)
+3. **Backward compatibility**: Tier 2 grid and flat location dicts still work
+
+### 🎭 Phase 4: Enhanced Cognitive Fidelity (2-3 weeks)
+**Goal**: Match Stanford's full cognitive loop
+
+1. **Reflection tree structure**:
+   - Add `source_memory_ids` to `AgentMemory` schema
+   - Update reflection engine to parse and store citations
+   - Enable "why did I conclude X?" introspection
+2. **Reaction decision loop**:
+   - Add "should I react?" check to orchestrator tick flow
+   - Plan regeneration on unexpected observations
+   - More dynamic, responsive agents
+3. **Hierarchical plan decomposition**:
+   - Add `substeps` to `PlanStep` schema
+   - Three-tier planning: daily → hourly → 5-15min chunks
+   - Better interruption and replanning
+
+### 📦 Phase 5: PyPI Release (1 week)
+**Goal**: Public release with polished documentation
+
+1. Complete `pyproject.toml` metadata
+2. Add CI/CD (GitHub Actions for tests)
+3. Host documentation (ReadTheDocs or mkdocs)
+4. Publish to PyPI as `miniverse` v0.1.0
 
 ## 9. Contacts
 

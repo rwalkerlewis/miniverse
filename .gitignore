@@ -31,4 +31,6 @@ docs/archive/
 # reference research
 reference-work/
 examples/_legacy/
-docs/examples/
+# Mac OS
+.DS_Store
+**/.DS_Store

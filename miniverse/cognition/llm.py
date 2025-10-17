@@ -93,6 +93,21 @@ class LLMPlanner(Planner):
         # {{memories_text}} with actual context data. Returns system and user prompts.
         rendered = render_prompt(template, context, include_default=False)
 
+        # Debug logging: Show LLM prompts if enabled
+        import os
+        debug_llm = os.getenv('DEBUG_LLM', '').lower() in ('1', 'true', 'yes')
+        if debug_llm:
+            print(f"\n{'='*80}")
+            print(f"[LLM PLANNER] Agent: {agent_id}")
+            print(f"{'='*80}")
+            print(f"\n[SYSTEM PROMPT]")
+            print(f"{'-'*80}")
+            print(rendered.system)
+            print(f"\n[USER PROMPT]")
+            print(f"{'-'*80}")
+            print(rendered.user)
+            print(f"{'='*80}\n")
+
         # Call LLM with retry logic. LLM generates structured response matching
         # LLMPlanResponse schema (list of steps with descriptions and metadata).
         # Retries up to 3 times with validation feedback if schema doesn't match.
@@ -103,6 +118,17 @@ class LLMPlanner(Planner):
             llm_model=model,
             response_model=LLMPlanResponse,
         )
+
+        # Debug logging: Show LLM response
+        if debug_llm:
+            print(f"\n[LLM RESPONSE]")
+            print(f"{'-'*80}")
+            print(f"Steps generated: {len(response.steps)}")
+            for i, step in enumerate(response.steps, 1):
+                print(f"  {i}. {step.description}")
+                if step.metadata:
+                    print(f"     Metadata: {step.metadata}")
+            print(f"{'='*80}\n")
 
         # Convert LLM response (Pydantic models) to internal Plan/PlanStep dataclasses.
         # This decouples LLM response schema from internal planning representation,
@@ -176,6 +202,21 @@ class LLMReflectionEngine(ReflectionEngine):
         # (20 vs 10) to identify longer-term patterns.
         rendered = render_prompt(template, context, include_default=False)
 
+        # Debug logging: Show LLM prompts if enabled
+        import os
+        debug_llm = os.getenv('DEBUG_LLM', '').lower() in ('1', 'true', 'yes')
+        if debug_llm:
+            print(f"\n{'='*80}")
+            print(f"[LLM REFLECTION] Agent: {agent_id}")
+            print(f"{'='*80}")
+            print(f"\n[SYSTEM PROMPT]")
+            print(f"{'-'*80}")
+            print(rendered.system)
+            print(f"\n[USER PROMPT]")
+            print(f"{'-'*80}")
+            print(rendered.user)
+            print(f"{'='*80}\n")
+
         # Call LLM with retry logic. LLM generates structured response containing list
         # of reflections. Each reflection has content (text), importance (1-10), and
         # optional metadata (tags, categories, etc.).
@@ -186,6 +227,17 @@ class LLMReflectionEngine(ReflectionEngine):
             llm_model=model,
             response_model=LLMReflectionResponse,
         )
+
+        # Debug logging: Show LLM response
+        if debug_llm:
+            print(f"\n[LLM RESPONSE]")
+            print(f"{'-'*80}")
+            print(f"Reflections generated: {len(response.reflections)}")
+            for i, refl in enumerate(response.reflections, 1):
+                print(f"  {i}. [Importance: {refl.importance}/10] {refl.content}")
+                if refl.metadata:
+                    print(f"     Metadata: {refl.metadata}")
+            print(f"{'='*80}\n")
 
         # Convert LLM response to ReflectionResult objects. Reflections are stored as
         # memories with elevated importance (typically 6-10 vs 5 for actions), making
@@ -280,13 +332,47 @@ class LLMExecutor(Executor):
         # {{plan_step_description}}, {{memories_text}} with actual agent data.
         rendered = render_prompt(template, context, include_default=False)
 
+        # Debug logging: Show LLM prompts if enabled
+        import os
+        debug_llm = os.getenv('DEBUG_LLM', '').lower() in ('1', 'true', 'yes')
+        if debug_llm:
+            print(f"\n{'='*80}")
+            print(f"[LLM EXECUTOR] Agent: {agent_id}")
+            print(f"{'='*80}")
+            print(f"\n[SYSTEM PROMPT]")
+            print(f"{'-'*80}")
+            print(rendered.system)
+            print(f"\n[USER PROMPT]")
+            print(f"{'-'*80}")
+            print(rendered.user)
+            print(f"{'='*80}\n")
+
         # Call LLM with retry logic. LLM generates structured AgentAction response
         # matching Pydantic schema (action_type, target, parameters, reasoning, communication).
         # Retries up to 3 times if validation fails, providing schema feedback to LLM.
-        return await call_llm_with_retries(
+        action = await call_llm_with_retries(
             system_prompt=rendered.system,
             user_prompt=rendered.user,
             llm_provider=provider,
             llm_model=model,
             response_model=AgentAction,
         )
+
+        # Debug logging: Show LLM response
+        if debug_llm:
+            print(f"\n[LLM RESPONSE]")
+            print(f"{'-'*80}")
+            print(f"Action: {action.action_type}")
+            if action.target:
+                print(f"Target: {action.target}")
+            if action.parameters:
+                print(f"Parameters: {action.parameters}")
+            print(f"Reasoning: {action.reasoning[:200]}..." if len(action.reasoning) > 200 else f"Reasoning: {action.reasoning}")
+            if action.communication:
+                print(f"Communication:")
+                print(f"  To: {action.communication.get('to', 'N/A')}")
+                msg = action.communication.get('message', '')
+                print(f"  Message: {msg[:150]}..." if len(msg) > 150 else f"  Message: {msg}")
+            print(f"{'='*80}\n")
+
+        return action
