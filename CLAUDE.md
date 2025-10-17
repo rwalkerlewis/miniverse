@@ -128,9 +128,17 @@ DEBUG_PERCEPTION=true uv run python examples/workshop/run.py --llm --ticks 3
 
 Configure LLM providers via environment variables (`LLM_PROVIDER`, `LLM_MODEL`, `OPENAI_API_KEY`, etc.).
 
-**Debugging Environment Variables**:
+**Environment Variables**:
 - `DEBUG_LLM=true` – Log all LLM prompts and responses (comprehensive cognition debugging)
 - `DEBUG_PERCEPTION=true` – Log what each agent perceives each tick (memory/message visibility)
+- `MINIVERSE_VERBOSE=true` – Show action reasoning and communication content (demo/research mode)
+- `MINIVERSE_NO_COLOR=true` – Disable color-coded output (for CI/CD or terminals without color support)
+
+**Color-Coded Output** (default enabled):
+- `[•]` Blue: Deterministic operations (physics, perception building)
+- `[AI]` Yellow: LLM calls (planner, executor, reflection)
+- `[✓]` Green: Success/completion
+- `[i]` Cyan: Metadata/reasoning (in verbose mode)
 
 ---
 

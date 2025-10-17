@@ -14,6 +14,7 @@ Coordinates the simulation loop:
 """
 
 import asyncio
+import os
 from typing import Any, Callable, List, Dict, Optional
 from uuid import UUID, uuid4
 
@@ -23,6 +24,13 @@ from .schemas import AgentProfile, WorldState, AgentAction, AgentMemory
 from .simulation_rules import SimulationRules, format_resources_generic
 from .persistence import PersistenceStrategy, InMemoryPersistence
 from .memory import MemoryStrategy, SimpleMemoryStream
+from .logging_utils import (
+    colored,
+    Color,
+    EMOJI_DETERMINISTIC,
+    EMOJI_LLM,
+    EMOJI_SUCCESS,
+)
 from .cognition import (
     AgentCognition,
     AgentCognitionMap,
@@ -209,11 +217,11 @@ class Orchestrator:
         # previous tick's physics. Example: resource consumption, environmental decay,
         # scheduled events. Physics is pure Python (fast, testable, deterministic).
         if self.simulation_rules:
-            print(f"  [Physics] Applying deterministic rules for tick {tick}...")
+            print(colored(f"  {EMOJI_DETERMINISTIC} [Physics] Applying deterministic rules for tick {tick}...", Color.BLUE))
             self.current_state = self.simulation_rules.apply_tick(
                 self.current_state, tick
             )
-            print(f"  [Physics] ✓ Physics applied")
+            print(colored(f"  {EMOJI_SUCCESS} [Physics] Physics applied", Color.GREEN))
 
         # 1. Gather agent actions in parallel. Each agent gets partial observability based on
         # their location and access rights. Running in parallel minimizes total LLM latency
@@ -309,7 +317,7 @@ class Orchestrator:
         """
         agent_name = self.agents[agent_id].name
         cognition = self.agent_cognition[agent_id]
-        print(f"  [{agent_name}] Building perception...")
+        print(colored(f"  {EMOJI_DETERMINISTIC} [{agent_name}] Building perception...", Color.BLUE))
 
         # Retrieve previous tick's actions to extract communications. Agents need to see
         # messages directed at them to maintain conversation continuity. Only fetch
@@ -435,7 +443,7 @@ class Orchestrator:
         # Delegate action selection to executor. Executor considers current plan step,
         # perception, memories, and world state to choose concrete action (move, interact,
         # communicate, rest). Executor may deviate from plan if circumstances changed.
-        print(f"  [{agent_name}] Choosing action via executor...")
+        print(colored(f"  {EMOJI_LLM} [{agent_name}] Choosing action via executor...", Color.YELLOW))
         action = await cognition.executor.choose_action(
             agent_id,
             perception,
@@ -444,7 +452,18 @@ class Orchestrator:
             plan_step=plan_step,
             context=context,
         )
-        print(f"  [{agent_name}] ✓ Got action: {action.action_type}")
+
+        # Show action details if verbose mode enabled
+        if os.getenv("MINIVERSE_VERBOSE"):
+            msg_preview = ""
+            if action.communication and action.communication.get("message"):
+                msg = action.communication["message"][:60]
+                msg_preview = f'\n    Message: "{msg}..."' if len(action.communication["message"]) > 60 else f'\n    Message: "{msg}"'
+            print(colored(f"    Reasoning: {action.reasoning[:80]}...", Color.CYAN))
+            if msg_preview:
+                print(colored(msg_preview, Color.CYAN))
+
+        print(colored(f"  {EMOJI_SUCCESS} [{agent_name}] Got action: {action.action_type}", Color.GREEN))
 
         # Ensure agent_id matches the requesting agent. LLM may hallucinate wrong agent_id
         # or executor may use templates that don't populate it correctly. Overwriting here
