@@ -38,9 +38,77 @@ from .cognition import (
     build_default_cognition,
     build_prompt_context,
     DEFAULT_PROMPTS,
+    LLMPlanner,
+    LLMExecutor,
+    LLMReflectionEngine,
 )
 from .cognition.cadence import PLANNER_LAST_TICK_KEY, REFLECTION_LAST_TICK_KEY
 from .cognition.planner import Plan, PlanStep
+
+
+# =============================
+# Module-level Exceptions
+# =============================
+
+class AgentActionsFailedError(Exception):
+    """Raised when one or more agent actions fail during a tick.
+
+    Contains a mapping of agent_id to the underlying exception for better
+    diagnostics, along with guidance on common remediation steps.
+    """
+
+    def __init__(self, *, tick: int, errors: Dict[str, Exception]) -> None:
+        self.tick = tick
+        self.errors = errors
+        message_lines = [
+            f"One or more agent actions failed at tick {tick}.",
+            "Agents that failed:",
+        ]
+        for agent_id, exc in errors.items():
+            message_lines.append(f"  - {agent_id}: {exc}")
+        message_lines.extend(
+            [
+                "\nRemediation tips:",
+                "  - Verify LLM configuration (LLM_PROVIDER, LLM_MODEL, API key)",
+                "  - Enable DEBUG_LLM=true to inspect prompts/responses",
+                "  - Enable DEBUG_PERCEPTION=true to inspect agent inputs",
+                "  - Enable MINIVERSE_VERBOSE=true to see reasoning",
+            ]
+        )
+        super().__init__("\n".join(message_lines))
+
+
+class WorldEngineUnavailableError(Exception):
+    """Raised when World Engine LLM is not configured but required."""
+
+    def __init__(self, *, tick: int, reason: str) -> None:
+        self.tick = tick
+        self.reason = reason
+        message = (
+            f"World Engine unavailable at tick {tick}: {reason}\n\n"
+            "Remediation tips:\n"
+            "  - Set LLM_PROVIDER and LLM_MODEL environment variables\n"
+            "  - Ensure API key env var is set for your provider\n"
+            "  - DEBUG_LLM=true to inspect prompts/responses if still failing"
+        )
+        super().__init__(message)
+
+
+class WorldEngineValidationError(Exception):
+    """Raised when World Engine LLM response fails validation after retries."""
+
+    def __init__(self, *, tick: int, underlying: Exception) -> None:
+        self.tick = tick
+        self.underlying = underlying
+        message = (
+            f"World Engine validation failed at tick {tick}: {underlying}\n\n"
+            "The LLM response remained invalid after retries.\n"
+            "Remediation tips:\n"
+            "  - DEBUG_LLM=true to inspect prompts and validation feedback\n"
+            "  - Review world prompt and response schema\n"
+            "  - Consider simplifying the request or adjusting constraints"
+        )
+        super().__init__(message)
 
 
 class Orchestrator:
@@ -130,11 +198,53 @@ class Orchestrator:
         # tag data with this ID so multiple runs can coexist in the same backend.
         self.run_id: UUID = uuid4()
 
+        # Preflight cache for one-time warnings per template
+        self._prompt_warnings_emitted: Dict[str, bool] = {}
+
+    # (no inner exception classes)
+
     def _get_scratchpad_state(self, cognition: AgentCognition) -> dict:
         """Safely get scratchpad state dict (returns empty dict if scratchpad is None)."""
         if cognition.scratchpad is None:
             return {}
         return cognition.scratchpad.state
+
+    def _preflight_prompt_templates(self) -> None:
+        """Warn once per missing template before the tick loop starts.
+
+        Checks planner/executor/reflection template names requested by each agent's
+        cognition. If a named template is missing from the configured prompt library,
+        logs a one-time warning and indicates which default will be used instead.
+        """
+        for agent_id, cognition in self.agent_cognition.items():
+            library = cognition.prompt_library or DEFAULT_PROMPTS
+
+            # Planner
+            if isinstance(cognition.planner, LLMPlanner):
+                name = getattr(cognition.planner, "template_name", "plan_daily")
+                if name not in library.templates and not self._prompt_warnings_emitted.get(f"planner:{name}"):
+                    print(
+                        f"  [Prompts] Agent '{agent_id}' planner template '{name}' not found; using default 'plan_daily'."
+                    )
+                    self._prompt_warnings_emitted[f"planner:{name}"] = True
+
+            # Executor
+            if isinstance(cognition.executor, LLMExecutor):
+                name = getattr(cognition.executor, "template_name", "execute_tick")
+                if name not in library.templates and not self._prompt_warnings_emitted.get(f"executor:{name}"):
+                    print(
+                        f"  [Prompts] Agent '{agent_id}' executor template '{name}' not found; using default 'execute_tick'."
+                    )
+                    self._prompt_warnings_emitted[f"executor:{name}"] = True
+
+            # Reflection
+            if isinstance(cognition.reflection, LLMReflectionEngine):
+                name = getattr(cognition.reflection, "template_name", "reflect_diary")
+                if name not in library.templates and not self._prompt_warnings_emitted.get(f"reflection:{name}"):
+                    print(
+                        f"  [Prompts] Agent '{agent_id}' reflection template '{name}' not found; using default 'reflect_diary'."
+                    )
+                    self._prompt_warnings_emitted[f"reflection:{name}"] = True
 
     def _set_scratchpad_value(self, cognition: AgentCognition, key: str, value: Any) -> None:
         """Safely set scratchpad value (no-op if scratchpad is None)."""
@@ -173,6 +283,9 @@ class Orchestrator:
 
             print(f"Starting simulation run {self.run_id}")
             print(f"Agents: {len(self.agents)}, Ticks: {num_ticks}\n")
+
+            # Preflight: warn early if requested prompt templates are missing
+            self._preflight_prompt_templates()
 
             # Main simulation loop. Each tick is independent - if one tick fails, we propagate
             # the exception immediately rather than continuing with corrupted state.
@@ -266,7 +379,7 @@ class Orchestrator:
             tick: Current tick number
 
         Returns:
-            List of agent actions (or default rest actions for failures)
+            List of agent actions
         """
         # Build perceptions and gather actions in parallel. Each agent's action decision is
         # independent (no coordination) so we run all agents concurrently to minimize total
@@ -283,20 +396,18 @@ class Orchestrator:
             *[task for _, task in tasks], return_exceptions=True
         )
 
-        # Handle failures by substituting default rest action. This ensures simulation always
-        # progresses even if LLM providers have outages. The world engine receives complete
-        # action lists, though failed agents effectively skip the tick.
-        valid_actions = []
+        # Fail-fast: if any agent action failed, raise an informative error with all failures.
+        valid_actions: List[AgentAction] = []
+        failures: Dict[str, Exception] = {}
         for i, result in enumerate(results):
             agent_id = tasks[i][0]
             if isinstance(result, Exception):
-                print(f"  Agent {agent_id} failed: {result}")
-                print(f"  Using default rest action for {agent_id}")
-                # Default action prevents cascading failures - world engine expects exactly
-                # one action per agent, so we provide a no-op rather than skipping.
-                valid_actions.append(self._default_action(agent_id, tick))
+                failures[agent_id] = result
             else:
                 valid_actions.append(result)
+
+        if failures:
+            raise AgentActionsFailedError(tick=tick, errors=failures)
 
         return valid_actions
 
@@ -507,10 +618,13 @@ class Orchestrator:
         # Tell world engine whether physics was already applied
         physics_applied = self.simulation_rules is not None
         if not self.llm_provider or not self.llm_model:
-            if not self._world_llm_warning_emitted:
-                print("  [World Engine] No LLM provider configured; using deterministic world update only.")
-                self._world_llm_warning_emitted = True
-            return self._apply_deterministic_world_update(tick, actions)
+            raise WorldEngineUnavailableError(
+                tick=tick,
+                reason=(
+                    "World Engine LLM is not configured (missing LLM_PROVIDER and/or LLM_MODEL). "
+                    "Set provider/model and API key, or disable world engine usage."
+                ),
+            )
 
         try:
             new_state = await process_world_update(
@@ -523,16 +637,7 @@ class Orchestrator:
                 physics_applied=physics_applied,
             )
         except Exception as exc:  # pragma: no cover - exercised during failed LLM responses
-            print(f"  [World Engine] Validation failed: {exc}")
-            print(
-                "  ⚠️ World engine response remained invalid after retries. "
-                "Falling back to deterministic physics for this tick."
-            )
-            print(
-                "  ⚠️ Simulation output may be incomplete for this tick; "
-                "review logs if this happens frequently."
-            )
-            return self._apply_deterministic_world_update(tick, actions)
+            raise WorldEngineValidationError(tick=tick, underlying=exc)
 
         print(f"  [World Engine] ✓ World state updated")
         return new_state

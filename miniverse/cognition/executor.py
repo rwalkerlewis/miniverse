@@ -101,17 +101,11 @@ class SimpleExecutor:
         system_prompt = "\n\n".join(system_blocks)
         user_prompt = rendered.user
 
-        # If no LLM configured, return deterministic rest action. This allows simulations
-        # to run without LLM (testing, physics-only mode).
+        # If no LLM configured, fail fast with informative error (no silent fallback).
         if not llm_provider or not llm_model:
-            return AgentAction(
-                agent_id=agent_id,
-                tick=perception.tick,
-                action_type="rest",
-                target=None,
-                parameters={},
-                reasoning="No LLM provider configured; defaulting to rest.",
-                communication=None,
+            raise ValueError(
+                "SimpleExecutor requires LLM configuration (llm_provider/llm_model) to operate. "
+                "To allow deterministic fallback, use a custom executor or future configurable policy."
             )
 
         # Delegate to legacy get_agent_action. This function makes LLM call with retry

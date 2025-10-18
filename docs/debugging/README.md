@@ -25,6 +25,12 @@ Centralized issue tracker with all findings, next steps, and open questions. **T
 
 ❌ **Still Broken**: Information diffusion (messages send but don't propagate to other agents)
 
+## Fail-Fast Agent Actions (2025-10-18)
+
+Agent action collection now fails fast instead of silently substituting a default rest action when an agent fails. If any agent errors on a tick, the run aborts with an informative error summarizing failing agents and remediation tips (check LLM configuration, enable DEBUG flags).
+
+Future work (not yet implemented): configurable fallback policy (strict_fail, noop/observe, rest, custom callback). For now, failures are surfaced immediately to avoid misleading results.
+
 🔍 **Under Investigation**: Memory/perception system - why aren't messages appearing in other agents' perceptions?
 
 ## How to Debug LLM Issues
