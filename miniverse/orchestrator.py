@@ -209,6 +209,31 @@ class Orchestrator:
             return {}
         return cognition.scratchpad.state
 
+    def _resolve_agent_id(self, name_or_id: str) -> Optional[str]:
+        """
+        Map agent name or ID to agent_id.
+
+        LLMs naturally use agent names ("Ayesha Khan") in communications,
+        but our agent dictionary is keyed by agent_id ("ayesha").
+        This helper resolves both formats.
+
+        Args:
+            name_or_id: Either agent_id ("ayesha") or display name ("Ayesha Khan")
+
+        Returns:
+            Agent ID if found, None otherwise
+        """
+        # Check if already an agent_id
+        if name_or_id in self.agents:
+            return name_or_id
+
+        # Search by display name
+        for agent_id, profile in self.agents.items():
+            if profile.name == name_or_id:
+                return agent_id
+
+        return None
+
     def _preflight_prompt_templates(self) -> None:
         """Warn once per missing template before the tick loop starts.
 
@@ -727,11 +752,16 @@ class Orchestrator:
                 # RECIPIENT memory: "X told me: message"
                 # This is the CRITICAL fix for information diffusion!
                 # Recipients need to remember messages they received.
-                if recipient != "unknown" and recipient in self.agents:
+
+                # Map recipient name to agent_id (LLMs use names like "Ayesha Khan",
+                # but our agent dict has keys like "ayesha")
+                recipient_id = self._resolve_agent_id(recipient)
+
+                if recipient_id and recipient_id != "unknown":
                     sender_name = self.agents[action.agent_id].name
                     recipient_memory = await self.memory.add_memory(
                         run_id=self.run_id,
-                        agent_id=recipient,
+                        agent_id=recipient_id,  # Use resolved agent_id, not raw name
                         tick=tick,
                         memory_type="communication",
                         content=f"{sender_name} told me: {message}",
@@ -745,10 +775,10 @@ class Orchestrator:
                             "role": "recipient",
                         },
                     )
-                    new_memories.setdefault(recipient, []).append(recipient_memory)
+                    new_memories.setdefault(recipient_id, []).append(recipient_memory)
 
                     if debug_memory:
-                        recipient_name = self.agents[recipient].name
+                        recipient_name = self.agents[recipient_id].name
                         print(colored(f"       Recipient memory stored: \"{recipient_name} received: ...\"", Color.CYAN))
 
         # Store events as observations for affected agents
