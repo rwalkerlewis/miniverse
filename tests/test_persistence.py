@@ -59,7 +59,7 @@ async def test_in_memory_persistence_round_trip():
     )
 
     await persistence.save_action(run_id, action)
-    actions = await persistence.get_actions_for_tick(run_id, 1)
+    actions = await persistence.get_actions(run_id, 1)
     assert actions and actions[0].reasoning == "Check anomalies"
 
     memory = AgentMemory(

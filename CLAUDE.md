@@ -12,7 +12,6 @@ Authoritative instructions for working on the **Miniverse** codebase.
 - **docs/architecture/** – Deep dives on cognition stack and environment tiers.
 - **docs/USAGE.md** – Step-by-step guide for building new simulations.
 - **docs/RESEARCH.md** – Academic foundations (Stanford Generative Agents, AgentTorch, etc.).
-- **docs/research/agent-simulations/stanford-comparison.md** – Gap analysis vs. Stanford's Reverie.
 - **docs/debugging/** – Session investigation notes (2025-10-16 debugging archive).
 - **docs/archive/** – Historical context only; do not resurrect old patterns.
 
@@ -120,18 +119,36 @@ uv run python scripts/init_db.py
 
 # Debugging tools (set environment variables)
 DEBUG_LLM=true uv run python examples/workshop/run.py --llm --ticks 3
-# → Shows all LLM prompts and responses
+# → Shows ALL LLM calls: planner prompts/responses, executor prompts/responses, reflection prompts/responses
+
+DEBUG_MEMORY=true uv run python examples/workshop/run.py --llm --ticks 3
+# → Shows memory creation and retrieval: who sent/received messages, what memories were stored, what was retrieved
 
 DEBUG_PERCEPTION=true uv run python examples/workshop/run.py --llm --ticks 3
 # → Shows what each agent perceives each tick (memories, messages, alerts)
+
+# Combine multiple debug flags for full visibility
+DEBUG_LLM=true DEBUG_MEMORY=true MINIVERSE_VERBOSE=true uv run python examples/workshop/run.py --llm --ticks 3
+# → Maximum debugging: see everything happening in the simulation
 ```
 
 Configure LLM providers via environment variables (`LLM_PROVIDER`, `LLM_MODEL`, `OPENAI_API_KEY`, etc.).
 
 **Environment Variables**:
-- `DEBUG_LLM=true` – Log all LLM prompts and responses (comprehensive cognition debugging)
-- `DEBUG_PERCEPTION=true` – Log what each agent perceives each tick (memory/message visibility)
-- `MINIVERSE_VERBOSE=true` – Show action reasoning and communication content (demo/research mode)
+- `DEBUG_LLM=true` – **Comprehensive LLM debugging**. Shows all prompts (system + user) and responses for:
+  - Planner (plan generation with all steps)
+  - Executor (action selection with reasoning and communication)
+  - Reflection (diary entries and insights)
+  - World Engine (state updates)
+- `DEBUG_MEMORY=true` – **Memory flow debugging**. Shows:
+  - Memory creation: sender/recipient memories for communications, action memories, event observations
+  - Memory retrieval: what memories each agent retrieved before planning/execution
+  - Importance scores and tick timestamps
+- `DEBUG_PERCEPTION=true` – **Perception visibility**. Shows what each agent perceives:
+  - Recent memories (first 5 shown)
+  - Incoming messages (from other agents)
+  - System alerts (high-severity events)
+- `MINIVERSE_VERBOSE=true` – **Action details**. Show action reasoning and communication content in simulation output (user-friendly demo mode)
 - `MINIVERSE_NO_COLOR=true` – Disable color-coded output (for CI/CD or terminals without color support)
 
 **Color-Coded Output** (default enabled):

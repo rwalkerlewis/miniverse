@@ -340,6 +340,18 @@ class Orchestrator:
         # Perception displays these in human-readable format for agent decision-making.
         recent_memory_strings = [m.content for m in recent_agent_memories]
 
+        # Get debug flag once at top of function
+        debug_memory = os.getenv("DEBUG_MEMORY")
+
+        # DEBUG_MEMORY: Show what memories agent retrieved
+        if debug_memory:
+            print(colored(f"\n  [DEBUG_MEMORY] {agent_name} - Retrieved {len(recent_agent_memories)} memories:", Color.CYAN))
+            for i, mem in enumerate(recent_agent_memories[:5], 1):  # Show first 5
+                mem_preview = mem.content[:80] + "..." if len(mem.content) > 80 else mem.content
+                print(colored(f"    {i}. [Tick {mem.tick}, Imp: {mem.importance}] {mem_preview}", Color.CYAN))
+            if len(recent_agent_memories) > 5:
+                print(colored(f"    ... and {len(recent_agent_memories) - 5} more", Color.CYAN))
+
         # Build partial observability view (Stanford Generative Agents pattern).
         # Perception includes: agent's own status, nearby entities, visible locations,
         # messages directed at them, and recent memory context. Agent cannot see
@@ -352,7 +364,6 @@ class Orchestrator:
         )
 
         # DEBUG_PERCEPTION: Log what agent perceives (parallel to DEBUG_LLM)
-        import os
         if os.getenv("DEBUG_PERCEPTION"):
             print(f"\n[DEBUG_PERCEPTION] {agent_name} (tick {tick})")
             print(f"  Recent memories ({len(recent_memory_strings)}):")
@@ -552,6 +563,12 @@ class Orchestrator:
             actions: Agent actions this tick
             state: New world state
         """
+        import os
+        debug_memory = os.getenv("DEBUG_MEMORY")
+
+        if debug_memory:
+            print(colored(f"\n  [DEBUG_MEMORY] Tick {tick} - Creating memories...", Color.CYAN))
+
         new_memories: Dict[str, List[AgentMemory]] = {}
 
         # Store actions as memories
@@ -596,6 +613,12 @@ class Orchestrator:
                 )
                 new_memories.setdefault(action.agent_id, []).append(sender_memory)
 
+                if debug_memory:
+                    sender_name = self.agents[action.agent_id].name
+                    msg_preview = message[:60] + "..." if len(message) > 60 else message
+                    print(colored(f"    💬 {sender_name} → {recipient}: \"{msg_preview}\"", Color.CYAN))
+                    print(colored(f"       Sender memory stored: \"I told {recipient}: ...\"", Color.CYAN))
+
                 # RECIPIENT memory: "X told me: message"
                 # This is the CRITICAL fix for information diffusion!
                 # Recipients need to remember messages they received.
@@ -618,6 +641,10 @@ class Orchestrator:
                         },
                     )
                     new_memories.setdefault(recipient, []).append(recipient_memory)
+
+                    if debug_memory:
+                        recipient_name = self.agents[recipient].name
+                        print(colored(f"       Recipient memory stored: \"{recipient_name} received: ...\"", Color.CYAN))
 
         # Store events as observations for affected agents
         for event in state.recent_events:
