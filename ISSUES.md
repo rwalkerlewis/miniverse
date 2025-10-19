@@ -1,476 +1,155 @@
 # Outstanding Issues
 
-**Last Updated**: 2025-10-16
-**Status**: Critical bug FIXED! Now addressing architectural improvements
+Last Updated: 2025-10-19
+
+This file lists only unresolved items aligned with the current architecture.
+
+## ✅ COMPLETED
+
+### A1: Dual Memory Retrieval in Orchestrator ✅
+**Status:** COMPLETED (2025-10-19)
+- Orchestrator now fetches memories once via `persistence.get_recent_memories()`
+- Derives both `recent_memory_strings` and `recent_messages` from same objects
+- Eliminates dual-fetch pattern and reduces DB load
+
+### A2: Perception Should Not Parse Actions for Messages ✅
+**Status:** COMPLETED (2025-10-19)
+- Removed `recent_actions` parameter from `build_agent_perception()`
+- Messages now sourced from memory-derived observations only
+- Updated orchestrator call sites and tests accordingly
+- Better separation of concerns: perception no longer depends on action parsing
 
 ---
 
-## ✅ FIXED: Information Diffusion Bug
+## OUTSTANDING ISSUES
 
-### Status
-**RESOLVED** - Root cause identified and fixed in orchestrator.py:542-586
+### A3: Memory Retrieval Quality
 
-### Root Cause
-Communication memories were only created for SENDERS, never for RECIPIENTS.
+Problem: `SimpleMemoryStream.get_relevant_memories()` uses naive substring matching.
 
-**The Bug** (orchestrator.py old code):
-```python
-if action.communication:
-    memory = await self.memory.add_memory(
-        agent_id=action.agent_id,  # ← Only sender!
-        content=f"I told {recipient}: {message}",
-    )
-```
+Impact:
+- Poor ranking for semantically similar queries
+- Users forced to write custom retrieval for quality scenarios
 
-**The Fix** (orchestrator.py new code):
-- Create sender memory: "I told X: message"
-- Create recipient memory: "X told me: message"  ← THIS WAS MISSING!
+Plan:
+- Short-term: Document `ImportanceWeightedMemory` as recommended default; provide an example adapter for embedding-based retrieval in docs
+- Mid-term: Implement a Stanford-style memory adapter (embedding + importance + recency) behind a common `MemoryStrategy` interface
+- Future: add fuzzy/BM25 hybrid retrieval as optional package
 
-### Verification
-- Added `tests/test_information_diffusion.py` with 2 passing tests
-- Added `tests/test_communication_flow.py` for end-to-end verification
-- All 26 tests passing (no regressions)
-- Fixed event severity validation (default to importance=5)
-- Valentine's notebook ready to run
-
-### Why This Broke Information Diffusion
-1. Isabella sends: "Hi Ayesha, party on Feb 14 at 5pm..."
-2. Memory created for Isabella: "I told Ayesha: ..."
-3. ❌ NO memory created for Ayesha
-4. When Ayesha's perception built: no party-related memories found
-5. Result: 0/5 agents aware despite properly formatted messages
-
-### The Fix in Action
-1. Isabella sends message to Ayesha
-2. Sender memory: agent_id="isabella", content="I told Ayesha: party..."
-3. **Recipient memory**: agent_id="ayesha", content="Isabella told me: party..."
-4. Ayesha's perception retrieves: "Isabella told me: party..."
-5. ✅ Information successfully diffused!
+Effort: 2–4 hours for docs/examples; more for algorithmic upgrade.
 
 ---
 
----
+### A4: Communication Data Duplication
 
-## 🟠 NEW: Architectural Issues Discovered During Code Review
+Problem: Messages are stored in actions and as sender/recipient memories.
 
-### Status
-**OPEN** - Non-blocking improvements for DX and performance
+Open Question:
+- Do we still need messages in the actions table now that memories are canonical?
 
-These issues don't break functionality but make the library harder to use and maintain.
+ Goal: Single source of truth for communication is the memory stream. Actions remain for action metadata, not message content.
 
-### Issue A1: Dual Memory Retrieval (orchestrator.py:327-348)
+ Unification Plan:
+ 1) Audit current usage of action-stored communication fields (search analytics and examples).
+ 2) If safe, stop persisting message content in `save_actions` for the `communication` field (keep the field in the in-memory `AgentAction` for prompts, but do not persist the message body in actions storage).
+ 3) Ensure orchestrator continues writing sender/recipient memories (already implemented) and update any consumers to read communication from memories only.
+ 4) Optionally persist a minimal reference in actions (e.g., communication=true, to=..., message_id) to correlate with memories, without duplicating content.
+ 5) Update docs: "Memories are canonical for communication; actions contain at most references."
 
-**Problem**: Same memories fetched twice in different formats
-```python
-# Line 327: Fetch as strings for perception
-recent_memory_strings = await self.memory.get_recent_memories(...)
+ Migration/Compatibility:
+ - No schema change required to `AgentAction`; change is in persistence behavior.
+ - Any reporting that reads messages from actions must switch to memory queries.
 
-# Line 346: Fetch as objects for prompt context (20 lines later!)
-recent_agent_memories = await self.persistence.get_recent_memories(...)
-```
+ Validation Checklist:
+ - Perception shows multi-tick messages sourced from memory only
+ - No double-counting in analytics (actions vs memories)
+ - Workshop/Valentines still run; transcripts/awareness validated from memories
 
-**Impact**:
-- Confusing for new contributors
-- Inefficient (2x database queries)
-- Easy to get out of sync
-- Unclear which one is "correct"
-
-**Proposed Fix**:
-Fetch once, convert once:
-```python
-# Single fetch
-recent_agent_memories = await self.persistence.get_recent_memories(...)
-recent_memory_strings = [m.content for m in recent_agent_memories]
-```
-
-**Effort**: 30 minutes
+Effort: Investigation ~1 hour; fix TBD.
 
 ---
 
-### Issue A2: Perception Builder Parses Actions for Messages (perception.py:144-154)
+### A5: World-Update Deterministic Processing Adoption
 
-**Problem**: Messages extracted from `recent_actions` parameter at perception-building time
+Context: Orchestrator supports `world_update_mode` (auto|deterministic|llm) and `SimulationRules.process_actions()` for deterministic world updates.
 
-**Why This Is Wrong**:
-1. Messages are ALREADY in memory stream (after our fix!)
-2. Perception builder shouldn't know about actions (separation of concerns)
-3. Only shows last-tick messages (older messages lost)
-4. Stanford pattern: messages are memories, retrieved via memory strategy
+Plan:
+- Migrate scenarios that have strict mechanics (e.g., vote tallying) to implement `process_actions()`
+- Keep LLM world-engine mode for narrative/event synthesis scenarios
 
-**Current Flow** (bad):
-```
-Tick N: Isabella → Ayesha message
-├─ Stored as sender memory
-├─ Stored as recipient memory (after fix)
-└─ Stored in actions table
-
-Tick N+1: Build Ayesha's perception
-├─ Fetch actions from tick N
-├─ Parse actions for messages
-└─ Show only tick-N messages (not tick N-1, N-2, etc.)
-```
-
-**Better Flow**:
-```
-Tick N: Isabella → Ayesha message
-├─ Stored as sender memory
-└─ Stored as recipient memory
-
-Tick N+1: Build Ayesha's perception
-└─ Memory strategy retrieves relevant communication memories
-    (could be from tick N, N-1, N-2 based on recency/importance)
-```
-
-**Proposed Fix**:
-1. Remove `recent_actions` parameter from `build_agent_perception()`
-2. Messages come from `recent_observations` (already populated from memory)
-3. Simplify perception.py significantly
-
-**Effort**: 1-2 hours (includes updating orchestrator call sites)
+Effort: Scenario-dependent.
 
 ---
 
-### Issue A3: SimpleMemoryStream Keyword Matching Too Weak (memory.py:318-364)
+### A6: Documentation Sweep (Follow-ups)
 
-**Problem**: `get_relevant_memories()` uses crude substring matching
+Problem: Older docs referenced `SimpleExecutor` and legacy fallback behavior.
 
-**Example Failure**:
-```python
-query = "party"
-matches = ["third party vendor", "Valentine's party", "party supplies"]
-# All match equally despite different relevance!
-```
+Plan:
+- Ensure all public docs and notebooks reference `LLMExecutor` for LLM mode and `RuleBasedExecutor` (or custom deterministic executors) for non-LLM mode
+- Keep WORLD_UPDATE_MODE guidance and preflight messages up-to-date
 
-**Impact**:
-- Poor retrieval quality for complex queries
-- Users forced to write custom strategies (like Valentine's notebook)
-- Doesn't match Stanford paper quality
-
-**Current Workaround**: Valentine's notebook implements custom EmbeddingMemoryStream
-
-**Proposed Fixes** (pick one):
-A. **Upgrade SimpleMemoryStream** with fuzzy matching / stemming
-B. **Promote ImportanceWeightedMemory** as recommended default
-C. **Document limitation** and show embedding example
-
-**Recommendation**: Option B + C
-- Make ImportanceWeightedMemory the documented default
-- Add fuzzy matching in future release
-- Keep SimpleMemoryStream for testing only
-
-**Effort**: 2-4 hours
+Status: In progress; remaining notebooks to verify.
 
 ---
 
-### Issue A4: Messages Stored in 3 Places (Conceptual Confusion)
+## Test/Build Status
 
-**Problem**: Communication data duplicated across:
-1. `actions` table (via save_actions)
-2. Sender memory (via add_memory)
-3. Recipient memory (via add_memory - after fix)
-
-**Question**: Do we need messages in actions table at all?
-
-**Stanford Pattern**: Messages are just memories. No separate action storage.
-
-**Proposed Investigation**:
-- Check if anything uses actions table for message retrieval
-- If not, consider dropping communication from action persistence
-- Or document the two-track system clearly
-
-**Effort**: Investigation 1 hour, fix TBD
+- Unit/integration tests: 29 passing
+- New tests assert truthful logging tags: `[LLM]` only on real LLM branches, `[•]` on deterministic branches
 
 ---
 
-## 🟡 OLD: Depr ecated Issue Descriptions (For Reference)
-
-### Status
-**ARCHIVED** - Replaced by fix documentation above
-
-### Description (OLD)
-Valentine's Day party scenario shows 0/5 agents becoming aware of the party, despite Isabella successfully sending invitation messages.
-
-## 📋 NEW: Next Steps (Prioritized)
-
-### Immediate (This Session - COMPLETED)
-
-1. ✅ **Fix Information Diffusion Bug**
-   - Added recipient memory creation
-   - Created tests (`test_information_diffusion.py`)
-   - All 27 tests passing
-
-### Short-term (Next 1-2 Days)
-
-2. **Test Valentine's Scenario** 🎯
-   - Run `examples/valentines_party.ipynb` with fix
-   - Verify agents become aware of party
-   - Document expected vs actual awareness rates
-
-3. **Eliminate Dual Memory Retrieval** (Issue A1)
-   - Single fetch in orchestrator
-   - Convert to strings once
-   - Update all call sites
-
-4. **Add Perception Logging** (DEBUG_PERCEPTION mode)
-   - Show what memories retrieved
-   - Show what messages in perception
-   - Parallel to DEBUG_LLM for troubleshooting
-
-5. **Enhanced Logging & Observability** ✅ (DX Enhancement - COMPLETED 2025-10-16)
-   - ✅ **Color-coded output**: Distinguish deterministic vs LLM calls
-     - 🔵 Blue: Deterministic (physics, perception)
-     - 🤖 Yellow: LLM calls (executor, planner, reflection)
-     - ✅ Green: Success/completion
-     - ℹ️ Cyan: Metadata/reasoning (verbose mode)
-   - ✅ **Verbose mode**: `MINIVERSE_VERBOSE=true` shows action reasoning & messages
-   - ✅ **Color-blind accessible**: Emoji markers alongside colors
-   - ✅ **Disable option**: `MINIVERSE_NO_COLOR=true` for CI/CD
-   - **Benefit**: Much easier to debug and verify experiments visually
-
-### Medium-term (Next Week)
-
-6. **Remove Action-based Message Filtering** (Issue A2)
-   - Simplify perception.py
-   - Messages from memory only
-   - Update orchestrator
-
-7. **Improve Memory Retrieval** (Issue A3)
-   - Document ImportanceWeightedMemory as recommended default
-   - Add embedding example to docs
-   - Consider fuzzy matching for future
-
-8. **Document Communication Architecture** (Issue A4)
-   - Clarify why messages in both actions and memories
-   - Update USAGE.md with communication patterns
-   - Add "Building Social Scenarios" guide
-
-### Long-term (Post-Fix)
-
-9. **Stanford Comparison Study**
-   - Run Valentine's with different memory strategies
-   - Compare awareness rates with Stanford paper
-   - Document gaps and parity
-
-10. **Performance Optimization**
-   - Benchmark memory retrieval strategies
-   - Profile LLM call patterns
-   - Consider caching/batching
+Document Owner: Kenneth
+Next Review: After A3–A6 changes land
 
 ---
 
-## 🗃️ ARCHIVED: Old Investigation Notes
+## Appendix: Files to Review / Touch per Item
 
-These sections kept for historical reference but replaced by fix documentation above.
+### ✅ COMPLETED
+- A1 (Dual memory retrieval): ✅ COMPLETED
+  - `miniverse/orchestrator.py` - `_get_single_agent_action` (single fetch implemented)
+  - `miniverse/memory.py` (no code change required; reference only)
 
----
+- A2 (Perception should not parse actions): ✅ COMPLETED
+  - `miniverse/perception.py` - Removed `recent_actions` parameter, messages from memory
+  - `miniverse/orchestrator.py` - Updated call sites, derives messages from memories
+  - `tests/test_perception.py` - Updated to new API
 
-## 🟡 Medium Priority: LLM Non-Determinism
+### OUTSTANDING
+- A3 (Memory retrieval quality):
+  - `miniverse/memory.py` (add or document `ImportanceWeightedMemory` as recommended default)
+  - New example adapter in docs (embedding-based strategy)
 
-### Status
-**DOCUMENTED** - Expected behavior, may need mitigation
+- A4 (Communication unification):
+  - `miniverse/orchestrator.py`
+    - `_update_memories` (sender/recipient memories already implemented)
+    - `_persist_tick` / call to `save_actions` (adjust to not persist message bodies)
+  - `miniverse/persistence.py` (action persistence layout)
+  - `miniverse/schemas.py` (reference only; keep `AgentAction.communication` type)
+  - Docs: USAGE.md (communication patterns), architecture docs
 
-### Description
-Same prompts produce different agent behaviors across runs due to LLM sampling.
+- A5 (Deterministic world updates adoption):
+  - `miniverse/simulation_rules.py` (process_actions hook)
+  - `miniverse/orchestrator.py` (world_update_mode selection; preflight summary)
+  - Scenario rules where strict mechanics apply (implement `process_actions`)
 
-### Impact
-- Test results vary between runs
-- Isabella sometimes chooses `communicate`, sometimes `work`
-- Makes debugging and validation difficult
-
-### Evidence
-- Run 1 (no DEBUG_LLM): Isabella chose `work` actions → 0/5 awareness
-- Run 2 (with DEBUG_LLM): Isabella chose `communicate` actions → still 0/5 (but different path)
-
-### Proposed Solutions
-
-**Option A: Add temperature=0 for deterministic mode**
-- Modify LLM calls to support temperature parameter
-- Allow users to set deterministic behavior for testing
-- Document trade-off (less creative but reproducible)
-
-**Option B: Multiple test runs with success threshold**
-- Run scenario 10 times, check if ≥30% show information diffusion
-- Statistical validation instead of single-run expectation
-- Better captures emergent behavior
-
-**Option C: Seed-based reproducibility**
-- If LLM provider supports seeds, use them
-- Document that tests are provider-specific
-- Accept some variability as feature, not bug
-
-### Recommendation
-Option A for testing, Option C for production. Document non-determinism as expected.
+- A6 (Docs sweep):
+  - Replace `SimpleExecutor` with `LLMExecutor`/`RuleBasedExecutor`
+  - Ensure `WORLD_UPDATE_MODE` usage is shown in examples
 
 ---
 
-## 🟡 Medium Priority: Stanford Comparison Gaps
+## Acceptance Criteria per Item
 
-### Status
-**NEEDS INVESTIGATION** - Behavior doesn't match expectations from paper
+### ✅ COMPLETED
+- A1: ✅ Orchestrator uses one memory fetch; perception receives strings derived from the same objects.
+- A2: ✅ Perception shows messages from memory only; removing `recent_actions` does not regress examples.
 
-### Observations
-
-1. **Plan Execution Too Rigid**
-   - Agents follow multi-step plans sequentially
-   - Don't react dynamically to new information (e.g., receiving invitation)
-   - Stanford agents seem more reactive/opportunistic
-
-2. **Memory Retrieval May Be Too Weak**
-   - Even with 3-factor scoring (recency + importance + relevance), messages not surfacing
-   - Stanford's system clearly got this working
-   - May need to tune scoring weights or thresholds
-
-3. **Reflection Not Triggering Information Update**
-   - Agents reflect on their actions but don't reflect on received messages
-   - Should reflection engine explicitly process communication memories?
-
-### Questions for Further Investigation
-
-1. **How does Stanford handle message delivery?**
-   - Do messages create immediate perception updates?
-   - Or are they queued for next tick's perception?
-   - What memory_type do they use?
-
-2. **How important is the retrieval scoring?**
-   - What weights do Stanford use for recency/importance/relevance?
-   - Do they have minimum thresholds?
-   - How many memories do they retrieve per query?
-
-3. **Should executors see messages directly?**
-   - Currently messages go to memory, then retrieved via perception
-   - Should there be a "pending messages" queue that's always shown?
-   - Stanford paper unclear on this
-
-### Action Items
-
-1. Re-read Stanford paper section on "Information Diffusion"
-2. Check if Reverie code is open source for reference
-3. Test with different memory retrieval strategies
-4. Consider adding "message queue" separate from episodic memory
-
----
-
-## 🟢 Low Priority: Code Cleanup
-
-### Status
-**DEFERRED** - Can wait until core issues resolved
-
-### Items
-
-1. **Temporary Test Files**
-   - `test_valentines_notebook.py` - Move to examples/ or delete
-   - `test_simple_communicate.py` - Delete (was for debugging)
-   - `test_welcome_notebook.py` - Move to examples/ or delete
-
-2. **Debug Logs**
-   - `/tmp/debug_llm_full.log` - Archive or delete
-   - `/tmp/debug_valentines_v2.log` - Archive or delete
-   - `/tmp/valentines_fixed.log` - Delete
-   - `/tmp/workshop_debug.log` - Delete
-
-3. **Duplicate Documentation**
-   - Multiple session summaries - consolidate
-   - Analysis docs - keep ROOT_CAUSE_ANALYSIS.md, archive rest
-
-4. **Example Consolidation**
-   - `examples/valentines_party.ipynb` - Needs to incorporate findings
-   - `examples/welcome.ipynb` - Verify still works
-   - `examples/tutorial.ipynb` - Verify still works
-
----
-
-## 📋 Next Steps (Prioritized)
-
-### Immediate (This Week)
-
-1. **Investigate Memory/Perception Issue** 🔴
-   - Add logging to perception builder
-   - Verify message storage format
-   - Test with SimpleMemoryStream
-   - Fix information diffusion
-
-2. **Update Examples** 📝
-   - Fix `valentines_party.ipynb` based on findings
-   - Add notes about current limitations
-   - Ensure deterministic examples work
-
-3. **Document Current State** 📚
-   - Update README with known issues
-   - Add troubleshooting section
-   - Set expectations for information diffusion
-
-### Short-term (Next 2 Weeks)
-
-4. **Stanford Comparison Study** 🔬
-   - Deep dive into Reverie architecture
-   - Identify exact gaps in our implementation
-   - Prioritize features for parity
-
-5. **Add Deterministic Testing Mode** 🧪
-   - Temperature=0 option
-   - Reproducible test scenarios
-   - Better validation framework
-
-6. **Memory Retrieval Improvements** 🧠
-   - Tune scoring weights
-   - Add debug logging
-   - Consider alternative strategies
-
-### Long-term (Month+)
-
-7. **Advanced Features** 🚀
-   - Branching/Loom for scenario exploration
-   - Better reflection triggers
-   - Hierarchical planning
-
-8. **Performance Optimization** ⚡
-   - Batch LLM calls
-   - Cache embeddings
-   - Parallel agent processing
-
-9. **Production Readiness** 📦
-   - Comprehensive test suite
-   - Error handling
-   - API documentation
-
----
-
-## 🔍 Open Questions
-
-1. **Why aren't messages appearing in perception?**
-   - Storage format issue?
-   - Retrieval query issue?
-   - Memory type mismatch?
-
-2. **Should we change the message delivery model?**
-   - Direct queue vs episodic memory?
-   - Immediate vs next-tick delivery?
-   - Push vs pull notification?
-
-3. **How much Stanford parity do we need?**
-   - Is information diffusion essential for v0.1?
-   - Can we ship with known limitations?
-   - What's the minimum viable feature set?
-
-4. **Should agents be more reactive?**
-   - Current: Plan-driven, sequential execution
-   - Stanford: Opportunistic, reactive to environment
-   - Is this a planner issue or executor issue?
-
----
-
-## 📞 Getting Help
-
-If investigating these issues:
-
-1. **Use DEBUG_LLM**: `DEBUG_LLM=true` shows full LLM context
-2. **Check logs**: All findings documented in ROOT_CAUSE_ANALYSIS.md
-3. **Test with simple scenarios**: Isolate variables
-4. **Compare with workshop example**: Known working communication
-
----
-
-**Document Owner**: Kenneth + Claude
-**Next Review**: After memory/perception investigation
-**Priority**: Fix information diffusion before shipping
+### OUTSTANDING
+- A3: Docs recommend `ImportanceWeightedMemory`; example adapter for embeddings exists.
+- A4: No communication content is persisted in actions; analytics and perception work from memories only.
+- A5: At least one rules-heavy example implements `process_actions`; preflight reports deterministic via rules.
+- A6: No public docs/notebooks reference `SimpleExecutor`; examples indicate WORLD_UPDATE_MODE and executor choices clearly.
 
