@@ -7,7 +7,7 @@ None to skip planning or reflection phases.
 
 from .scratchpad import Scratchpad
 from .planner import Planner, Plan, PlanStep
-from .executor import Executor, SimpleExecutor
+from .executor import Executor, RuleBasedExecutor, DefaultRuleBasedExecutor
 from .reflection import ReflectionEngine, ReflectionResult
 from .runtime import AgentCognition, AgentCognitionMap, build_default_cognition
 from .context import PromptContext, build_prompt_context
@@ -28,7 +28,8 @@ __all__ = [
     "Plan",
     "PlanStep",
     "Executor",
-    "SimpleExecutor",
+    "RuleBasedExecutor",
+    "DefaultRuleBasedExecutor",
     "ReflectionEngine",
     "ReflectionResult",
     "AgentCognition",

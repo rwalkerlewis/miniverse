@@ -19,6 +19,8 @@ from miniverse.schemas import (
 )
 from miniverse.simulation_rules import SimulationRules
 from miniverse.memory import MemoryStrategy
+from miniverse.cognition import AgentCognition
+from miniverse.cognition.llm import LLMExecutor
 
 
 class DummyRules(SimulationRules):
@@ -137,6 +139,7 @@ async def test_orchestrator_runs_single_tick(monkeypatch):
         llm_model="gpt-5-nano",
         simulation_rules=rules,
         memory=memory,
+        agent_cognition={"alpha": AgentCognition(executor=LLMExecutor())},
     )
 
     mocked_action = AgentAction(
@@ -150,10 +153,12 @@ async def test_orchestrator_runs_single_tick(monkeypatch):
     )
     mocked_state = world_state.model_copy(update={"tick": 1})
 
+    # Patch LLMExecutor path to avoid real LLM calls
     get_action_mock = AsyncMock(return_value=mocked_action)
     world_update_mock = AsyncMock(return_value=mocked_state)
 
-    monkeypatch.setattr("miniverse.cognition.executor.get_agent_action", get_action_mock)
+    # LLMExecutor uses call_llm_with_retries under miniverse.cognition.llm
+    monkeypatch.setattr("miniverse.cognition.llm.call_llm_with_retries", get_action_mock)
     monkeypatch.setattr("miniverse.orchestrator.process_world_update", world_update_mock)
 
     result = await orchestrator.run(num_ticks=1)

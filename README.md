@@ -100,7 +100,9 @@ orchestrator = Orchestrator(
     simulation_rules=WorkshopRules(),
     agent_cognition=cognition_map,
     llm_provider="openai",
-    llm_model="gpt-5-nano"
+    llm_model="gpt-5-nano",
+    # Select world update behavior: 'auto' | 'deterministic' | 'llm'
+    world_update_mode="auto"
 )
 
 result = await orchestrator.run(num_ticks=20)

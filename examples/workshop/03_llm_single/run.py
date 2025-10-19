@@ -100,6 +100,15 @@ async def main():
     print("EXAMPLE 3: SIMPLE REACTIVE LLM AGENT")
     print("=" * 60)
     print(f"Using: {provider}/{model}")
+    # Optional: allow overriding world update mode for debugging speed
+    world_update_mode = os.getenv("WORLD_UPDATE_MODE", "auto")
+    debug_llm = os.getenv("DEBUG_LLM")
+    debug_perc = os.getenv("DEBUG_PERCEPTION")
+    verbose = os.getenv("MINIVERSE_VERBOSE")
+    print(f"WORLD_UPDATE_MODE={world_update_mode} (auto|deterministic|llm)")
+    print(f"DEBUG_LLM={'on' if debug_llm else 'off'} | DEBUG_PERCEPTION={'on' if debug_perc else 'off'} | MINIVERSE_VERBOSE={'on' if verbose else 'off'}")
+    # Explain phases so users understand where time is spent
+    print("Phases per tick: Physics -> Agent LLM (choose_action) -> World Engine (LLM or deterministic) -> Persist -> Summary")
     print()
 
     # ========================================
@@ -182,7 +191,8 @@ Available actions: work, rest"""
         simulation_rules=WorkshopRules(),
         agent_cognition=cognition_map,
         llm_provider=provider,
-        llm_model=model
+        llm_model=model,
+        world_update_mode=world_update_mode,
     )
 
     print("Running 10 ticks with LLM agent...\n")
@@ -205,11 +215,6 @@ Available actions: work, rest"""
     print(f"Final power: {final_power:.1f} kWh")
     print(f"AI Worker energy: {final_energy:.0f}%")
     print(f"AI Worker stress: {final_stress:.0f}%")
-    print(f"\nNotice how the LLM agent:")
-    print(f"  - Makes context-aware decisions (not just thresholds)")
-    print(f"  - Balances multiple goals (wellbeing + productivity)")
-    print(f"  - Adapts behavior based on changing conditions")
-    print(f"  - No hardcoded if/then logic needed!")
 
 
 if __name__ == "__main__":

@@ -242,10 +242,6 @@ async def main():
     print(f"\n✅ Simulation complete!")
     print(f"Final backlog: {int(final_backlog)} tasks")
     print(f"Final power: {final_power:.1f} kWh")
-    print(f"\nNotice how agents balance work and rest based on:")
-    print(f"  - Personal energy levels")
-    print(f"  - Backlog pressure")
-    print(f"  - No LLM needed - pure deterministic logic!")
 
 
 if __name__ == "__main__":

@@ -255,8 +255,7 @@ class LLMReflectionEngine(ReflectionEngine):
 class LLMExecutor(Executor):
     """Executor that calls LLM for action selection on every tick.
 
-    Pure LLM-driven executor with NO deterministic fallback. Unlike SimpleExecutor
-    (which returns "rest" action when LLM is unavailable), LLMExecutor REQUIRES
+    Pure LLM-driven executor with NO deterministic fallback. LLMExecutor REQUIRES
     LLM configuration and raises ValueError if missing.
 
     Use cases:
@@ -264,7 +263,7 @@ class LLMExecutor(Executor):
     - Social simulations where emergent decisions are critical
     - Scenarios where agents must adapt to unpredictable conditions
 
-    For deterministic fallback behavior, use SimpleExecutor instead.
+        For deterministic behavior, use RuleBasedExecutor instead.
     For pure deterministic logic, create custom executor (e.g., RuleBasedExecutor).
 
     Example:
@@ -314,8 +313,8 @@ class LLMExecutor(Executor):
         if not provider or not model:
             raise ValueError(
                 f"LLMExecutor requires LLM configuration (agent: {agent_id}). "
-                f"Set LLM_PROVIDER and LLM_MODEL environment variables, or use SimpleExecutor "
-                f"for automatic fallback to deterministic actions when LLM unavailable."
+                f"Set LLM_PROVIDER and LLM_MODEL environment variables, or use RuleBasedExecutor "
+                f"for deterministic actions when LLM is unavailable or undesired."
             )
 
         # Resolve prompt library with three-level fallback (same as planner/reflection)
@@ -376,3 +375,6 @@ class LLMExecutor(Executor):
             print(f"{'='*80}\n")
 
         return action
+
+    def uses_llm(self) -> bool:
+        return True

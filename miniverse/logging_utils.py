@@ -69,8 +69,8 @@ def log_info(message: str) -> None:
 
 
 # Markers for operation types (color-blind accessible)
-EMOJI_DETERMINISTIC = "[•]"  # Deterministic operation
-EMOJI_LLM = "[AI]"           # LLM call
-EMOJI_ERROR = "[!]"          # Error/retry
-EMOJI_SUCCESS = "[✓]"        # Success
-EMOJI_INFO = "[i]"           # Information
+LOG_TAG_DETERMINISTIC = "[•]"  # Deterministic / rule-based step (no LLM)
+LOG_TAG_LLM = "[LLM]"          # Actual LLM call will occur
+LOG_TAG_ERROR = "[!]"            # Error/retry
+LOG_TAG_SUCCESS = "[✓]"          # Success
+LOG_TAG_INFO = "[i]"             # Information

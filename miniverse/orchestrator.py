@@ -27,9 +27,9 @@ from .memory import MemoryStrategy, SimpleMemoryStream
 from .logging_utils import (
     colored,
     Color,
-    EMOJI_DETERMINISTIC,
-    EMOJI_LLM,
-    EMOJI_SUCCESS,
+    LOG_TAG_DETERMINISTIC,
+    LOG_TAG_LLM,
+    LOG_TAG_SUCCESS,
 )
 from .cognition import (
     AgentCognition,
@@ -128,6 +128,7 @@ class Orchestrator:
         llm_provider: Optional[str] = None,
         llm_model: Optional[str] = None,
         simulation_rules: Optional[SimulationRules] = None,
+        world_update_mode: str = "auto",
         persistence: Optional[PersistenceStrategy] = None,
         memory: Optional[MemoryStrategy] = None,
         agent_cognition: Optional[AgentCognitionMap] = None,
@@ -160,6 +161,7 @@ class Orchestrator:
         self.llm_provider = llm_provider
         self.llm_model = llm_model
         self.simulation_rules = simulation_rules
+        self.world_update_mode = world_update_mode  # 'auto' | 'deterministic' | 'llm'
         self._world_llm_warning_emitted = False
 
         # Use defaults if strategies not provided. InMemoryPersistence is fastest for
@@ -271,6 +273,23 @@ class Orchestrator:
                     )
                     self._prompt_warnings_emitted[f"reflection:{name}"] = True
 
+    def _describe_world_update_mode(self) -> str:
+        """Return a one-line summary of the selected world update mode and reason."""
+        mode = self.world_update_mode
+        rules = self.simulation_rules
+        if mode == "deterministic":
+            if rules and getattr(rules, "process_actions").__func__ is not SimulationRules.process_actions:
+                return "[Preflight] World updates: deterministic (rules.process_actions)"
+            return "[Preflight] World updates: deterministic (basic)"
+        if mode == "llm":
+            return "[Preflight] World updates: LLM (fail-fast if misconfigured)"
+        # auto mode
+        if rules and getattr(rules, "process_actions").__func__ is not SimulationRules.process_actions:
+            return "[Preflight] World updates (auto): deterministic via rules.process_actions"
+        if self.llm_provider and self.llm_model:
+            return "[Preflight] World updates (auto): LLM"
+        return "[Preflight] World updates (auto): deterministic (basic)"
+
     def _set_scratchpad_value(self, cognition: AgentCognition, key: str, value: Any) -> None:
         """Safely set scratchpad value (no-op if scratchpad is None)."""
         if cognition.scratchpad is not None:
@@ -311,6 +330,9 @@ class Orchestrator:
 
             # Preflight: warn early if requested prompt templates are missing
             self._preflight_prompt_templates()
+
+            # Preflight: report world update mode
+            print(self._describe_world_update_mode())
 
             # Main simulation loop. Each tick is independent - if one tick fails, we propagate
             # the exception immediately rather than continuing with corrupted state.
@@ -355,11 +377,11 @@ class Orchestrator:
         # previous tick's physics. Example: resource consumption, environmental decay,
         # scheduled events. Physics is pure Python (fast, testable, deterministic).
         if self.simulation_rules:
-            print(colored(f"  {EMOJI_DETERMINISTIC} [Physics] Applying deterministic rules for tick {tick}...", Color.BLUE))
+            print(colored(f"  {LOG_TAG_DETERMINISTIC} [Physics] Applying deterministic rules for tick {tick}...", Color.BLUE))
             self.current_state = self.simulation_rules.apply_tick(
                 self.current_state, tick
             )
-            print(colored(f"  {EMOJI_SUCCESS} [Physics] Physics applied", Color.GREEN))
+            print(colored(f"  {LOG_TAG_SUCCESS} [Physics] Physics applied", Color.GREEN))
 
         # 1. Gather agent actions in parallel. Each agent gets partial observability based on
         # their location and access rights. Running in parallel minimizes total LLM latency
@@ -453,7 +475,7 @@ class Orchestrator:
         """
         agent_name = self.agents[agent_id].name
         cognition = self.agent_cognition[agent_id]
-        print(colored(f"  {EMOJI_DETERMINISTIC} [{agent_name}] Building perception...", Color.BLUE))
+        print(colored(f"  {LOG_TAG_DETERMINISTIC} [{agent_name}] Building perception...", Color.BLUE))
 
         # Retrieve previous tick's actions to extract communications. Agents need to see
         # messages directed at them to maintain conversation continuity. Only fetch
@@ -590,7 +612,24 @@ class Orchestrator:
         # Delegate action selection to executor. Executor considers current plan step,
         # perception, memories, and world state to choose concrete action (move, interact,
         # communicate, rest). Executor may deviate from plan if circumstances changed.
-        print(colored(f"  {EMOJI_LLM} [{agent_name}] Choosing action via executor...", Color.YELLOW))
+        # Choose appropriate tag based on executor capability
+        executor_obj = cognition.executor
+        uses_llm = False
+        if hasattr(executor_obj, "uses_llm"):
+            try:
+                uses_llm = bool(executor_obj.uses_llm())  # type: ignore[attr-defined]
+            except Exception:
+                uses_llm = False
+        else:
+            # Fallback: detect known LLM executor type
+            try:
+                from .cognition.llm import LLMExecutor as _LLMExec
+                uses_llm = isinstance(executor_obj, _LLMExec)
+            except Exception:
+                uses_llm = False
+
+        exec_tag = LOG_TAG_LLM if uses_llm else LOG_TAG_DETERMINISTIC
+        print(colored(f"  {exec_tag} [{agent_name}] Choosing action via executor...", Color.YELLOW))
         action = await cognition.executor.choose_action(
             agent_id,
             perception,
@@ -610,7 +649,7 @@ class Orchestrator:
             if msg_preview:
                 print(colored(msg_preview, Color.CYAN))
 
-        print(colored(f"  {EMOJI_SUCCESS} [{agent_name}] Got action: {action.action_type}", Color.GREEN))
+        print(colored(f"  {LOG_TAG_SUCCESS} [{agent_name}] Got action: {action.action_type}", Color.GREEN))
 
         # Ensure agent_id matches the requesting agent. LLM may hallucinate wrong agent_id
         # or executor may use templates that don't populate it correctly. Overwriting here
@@ -639,33 +678,82 @@ class Orchestrator:
         Raises:
             Exception: If LLM call fails
         """
-        print(f"  [World Engine] Processing {len(actions)} actions...")
-        # Tell world engine whether physics was already applied
-        physics_applied = self.simulation_rules is not None
-        if not self.llm_provider or not self.llm_model:
-            raise WorldEngineUnavailableError(
-                tick=tick,
-                reason=(
-                    "World Engine LLM is not configured (missing LLM_PROVIDER and/or LLM_MODEL). "
-                    "Set provider/model and API key, or disable world engine usage."
-                ),
+        # Tag world engine step based on mode/branch
+        # Compute branch to tag the world update step
+        has_rules_processor = bool(
+            self.simulation_rules and getattr(self.simulation_rules, "process_actions").__func__ is not SimulationRules.process_actions
+        )
+        will_use_llm = (
+            self.world_update_mode == "llm"
+            or (
+                self.world_update_mode == "auto"
+                and not has_rules_processor
+                and self.llm_provider
+                and self.llm_model
             )
+        )
+        print(f"  [{'LLM' if will_use_llm else '•'}] [World Engine] Processing {len(actions)} actions...")
+        mode = self.world_update_mode
+        rules = self.simulation_rules
 
-        try:
-            new_state = await process_world_update(
-                self.current_state,
-                actions,
-                tick,
-                self.world_prompt,
-                self.llm_provider,
-                self.llm_model,
-                physics_applied=physics_applied,
-            )
-        except Exception as exc:  # pragma: no cover - exercised during failed LLM responses
-            raise WorldEngineValidationError(tick=tick, underlying=exc)
+        # Helper to detect overridden process_actions
+        has_rules_processor = bool(
+            rules and getattr(rules, "process_actions").__func__ is not SimulationRules.process_actions
+        )
 
-        print(f"  [World Engine] ✓ World state updated")
-        return new_state
+        # Mode selection
+        if mode == "deterministic":
+            if has_rules_processor:
+                return rules.process_actions(self.current_state, actions, tick)  # type: ignore[arg-type]
+            return self._apply_deterministic_world_update(tick, actions)
+
+        if mode == "llm":
+            # Require LLM and call
+            physics_applied = rules is not None
+            if not self.llm_provider or not self.llm_model:
+                raise WorldEngineUnavailableError(
+                    tick=tick,
+                    reason=(
+                        "World Engine LLM is not configured (missing LLM_PROVIDER and/or LLM_MODEL). "
+                        "Set provider/model and API key, or disable world engine usage."
+                    ),
+                )
+            try:
+                new_state = await process_world_update(
+                    self.current_state,
+                    actions,
+                    tick,
+                    self.world_prompt,
+                    self.llm_provider,
+                    self.llm_model,
+                    physics_applied=physics_applied,
+                )
+            except Exception as exc:
+                raise WorldEngineValidationError(tick=tick, underlying=exc)
+            print(f"  [World Engine] ✓ World state updated")
+            return new_state
+
+        # auto mode
+        if has_rules_processor:
+            return rules.process_actions(self.current_state, actions, tick)  # type: ignore[arg-type]
+        if self.llm_provider and self.llm_model:
+            physics_applied = rules is not None
+            try:
+                new_state = await process_world_update(
+                    self.current_state,
+                    actions,
+                    tick,
+                    self.world_prompt,
+                    self.llm_provider,
+                    self.llm_model,
+                    physics_applied=physics_applied,
+                )
+            except Exception as exc:
+                raise WorldEngineValidationError(tick=tick, underlying=exc)
+            print(f"  [World Engine] ✓ World state updated")
+            return new_state
+        # No LLM configured and no rules processor: basic deterministic
+        return self._apply_deterministic_world_update(tick, actions)
 
     async def _persist_tick(
         self, tick: int, state: WorldState, actions: List[AgentAction]

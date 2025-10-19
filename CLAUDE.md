@@ -178,7 +178,7 @@ miniverse/
     __init__.py                   # Cognition module exports
     scratchpad.py                 # Working memory data structure
     planner.py                    # Planner protocol + SimplePlanner
-    executor.py                   # Executor protocol + SimpleExecutor
+    executor.py                   # Executor protocol + RuleBasedExecutor/LLMExecutor
     reflection.py                 # ReflectionEngine protocol + SimpleReflectionEngine
     runtime.py                    # AgentCognition bundle + defaults
     context.py                    # PromptContext builder

@@ -253,12 +253,6 @@ Your advantage: Intelligence to adapt, not control over randomness."""
     print(f"Final power: {final_power:.1f} kWh")
     print(f"Final equipment health: {final_equipment:.0f}%")
     print(f"Worker energy: {final_energy:.0f}%")
-    print(f"\nKey concept demonstrated:")
-    print(f"  ✓ Stochastic PHYSICS = random world events (in SimulationRules)")
-    print(f"  ✓ LLM ADAPTATION = intelligent response to those events")
-    print(f"  ✓ Different from deterministic threshold logic!")
-    print(f"\nThe agent couldn't predict task arrivals or breakdowns,")
-    print(f"but it ADAPTED intelligently to whatever happened.")
 
 
 if __name__ == "__main__":

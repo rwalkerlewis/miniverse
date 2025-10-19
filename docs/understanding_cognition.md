@@ -369,13 +369,13 @@ Example: 10 agents, 20 ticks, planning every 10 ticks:
 - Reflection: 10 agents × ~4 triggers = 40 calls
 - **Total: ~260 LLM calls**
 
-**Q: What's the difference between SimpleExecutor and LLMExecutor?**
+**Q: What's the difference between RuleBasedExecutor and LLMExecutor?**
 
 A:
-- `SimpleExecutor`: Calls LLM if configured, returns "rest" if not (dual behavior - confusing)
+- `RuleBasedExecutor`: Purely deterministic (no LLM calls) — fast and reproducible
 - `LLMExecutor`: Always calls LLM, raises error if not configured (clear, predictable)
 
-**Recommendation:** Use `LLMExecutor` for pure LLM mode, custom deterministic executors for pure deterministic mode.
+**Recommendation:** Use `LLMExecutor` for pure LLM mode; use a `RuleBasedExecutor` (or custom deterministic executor) for pure deterministic mode.
 
 **Q: How do I add custom logic without LLM?**
 

@@ -259,3 +259,28 @@ class SimulationRules(ABC):
         """
 
         return format_resources_generic(state)
+
+    # ------------------------------------------------------------
+    # Optional deterministic action processing (advanced)
+    # ------------------------------------------------------------
+    def process_actions(
+        self, state: WorldState, actions: list[AgentAction], tick: int
+    ) -> WorldState | None:
+        """
+        Optionally process agent actions deterministically and return a new state.
+
+        Default implementation returns None, signaling the orchestrator to use the
+        configured world engine (LLM) or basic deterministic updates. Override this
+        in rules-heavy simulations (e.g., vote tallying, game mechanics) where LLM
+        should not be used for world updates.
+
+        Args:
+            state: Current world state (after apply_tick)
+            actions: Validated agent actions for this tick
+            tick: Tick number being processed
+
+        Returns:
+            WorldState if handled deterministically, otherwise None to delegate.
+        """
+
+        return None

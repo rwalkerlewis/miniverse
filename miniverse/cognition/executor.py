@@ -43,25 +43,37 @@ class Executor(Protocol):
 
         ...
 
+    def uses_llm(self) -> bool:
+        """Return True if this executor performs an LLM call for action selection."""
+        ...
 
-class SimpleExecutor:
-    """Executor with LLM capability and deterministic fallback.
 
-    Behavior:
-    - If LLM configured (llm_provider and llm_model present): Calls LLM via get_agent_action()
-      for intelligent, context-aware action decisions
-    - If no LLM configured: Returns AgentAction(action_type="rest") as safe deterministic fallback
+class RuleBasedExecutor:
+    """Deterministic executor with no LLM calls.
 
-    Use cases:
-    - Code that should work both with and without LLM configuration (testing, CI/CD)
-    - Gradual migration from deterministic to LLM-driven simulations
-    - Examples that support both modes via --llm flag
+    Implement 'choose_action' using pure Python logic.
+    """
 
-    For pure LLM (no fallback): Use LLMExecutor instead (raises error if LLM missing).
-    For pure deterministic: Create custom executor with hardcoded logic (see workshop example).
+    def uses_llm(self) -> bool:
+        return False
 
-    This maintains backward compatibility with existing examples while bridging legacy
-    get_agent_action() with new prompt template system.
+    async def choose_action(
+        self,
+        agent_id: str,
+        perception: AgentPerception,
+        scratchpad: Scratchpad,
+        *,
+        plan: Plan,
+        plan_step: PlanStep | None,
+        context: PromptContext,
+    ) -> AgentAction:
+        raise NotImplementedError("RuleBasedExecutor requires a concrete implementation")
+
+
+class DefaultRuleBasedExecutor(RuleBasedExecutor):
+    """Minimal deterministic executor that rests by default.
+
+    Used for quick-start defaults and tests.
     """
 
     async def choose_action(
@@ -74,47 +86,12 @@ class SimpleExecutor:
         plan_step: PlanStep | None,
         context: PromptContext,
     ) -> AgentAction:
-        # Extract base agent prompt (personality, role definition) from context
-        base_prompt = context.extra.get("base_agent_prompt", "")
-        # Extract LLM credentials. If not configured, return default rest action.
-        llm_provider = context.extra.get("llm_provider")
-        llm_model = context.extra.get("llm_model")
-        # Resolve prompt library with fallback to system defaults
-        prompt_library = context.extra.get("prompt_library") or DEFAULT_PROMPTS
-        # Allow dynamic template selection via scratchpad (e.g., switch to crisis mode)
-        template_name = context.extra.get("execute_prompt_template", "execute_tick")
-
-        # Look up execution template by name. Template contains instructions for converting
-        # plan step + perception into concrete action (move, interact, communicate, rest).
-        try:
-            template = prompt_library.get(template_name)
-        except KeyError:
-            # Template not found - fall back to default tick execution template
-            template = DEFAULT_PROMPTS.get("execute_tick")
-
-        # Render template with context. Replaces placeholders with agent profile, perception,
-        # memories, plan state, etc. Returns system and user prompt components.
-        rendered = render_prompt(template, context)
-        # Combine base agent prompt (personality) with rendered system prompt (instructions).
-        # Filter empty blocks to avoid extra whitespace.
-        system_blocks = [block for block in (base_prompt, rendered.system) if block]
-        system_prompt = "\n\n".join(system_blocks)
-        user_prompt = rendered.user
-
-        # If no LLM configured, fail fast with informative error (no silent fallback).
-        if not llm_provider or not llm_model:
-            raise ValueError(
-                "SimpleExecutor requires LLM configuration (llm_provider/llm_model) to operate. "
-                "To allow deterministic fallback, use a custom executor or future configurable policy."
-            )
-
-        # Delegate to legacy get_agent_action. This function makes LLM call with retry
-        # logic and validates response matches AgentAction schema. user_prompt_override
-        # allows us to inject rendered prompt instead of building prompt internally.
-        return await get_agent_action(
-            system_prompt,
-            perception,
-            llm_provider,
-            llm_model,
-            user_prompt_override=user_prompt,
+        return AgentAction(
+            agent_id=agent_id,
+            tick=perception.tick,
+            action_type="rest",
+            target=None,
+            parameters={},
+            reasoning="Default deterministic executor chose to rest",
+            communication=None,
         )

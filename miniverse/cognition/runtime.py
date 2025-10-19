@@ -11,7 +11,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, Optional
 
-from .executor import Executor, SimpleExecutor
+from .executor import Executor, DefaultRuleBasedExecutor
 from .planner import Planner
 from .reflection import ReflectionEngine
 from .scratchpad import Scratchpad
@@ -71,17 +71,16 @@ def build_default_cognition() -> AgentCognition:
 
     Notes
     -----
-    Returns the simplest possible agent configuration:
-    - ``SimpleExecutor`` emits a rest action (fallback for testing)
+    Returns a minimal agent configuration:
     - No planner (purely reactive)
     - No reflection (no memory synthesis)
     - No scratchpad (no working memory)
 
-    For production use, provide explicit executor implementation.
+    For production use, provide an explicit executor implementation.
     """
 
     return AgentCognition(
-        executor=SimpleExecutor(),
+        executor=DefaultRuleBasedExecutor(),
         planner=None,
         reflection=None,
         scratchpad=None,

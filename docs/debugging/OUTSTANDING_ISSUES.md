@@ -45,7 +45,7 @@
 
 ### Workshop Example (examples/workshop/run.py)
 **Status**: 🔄 Running with DEBUG_LLM for regression testing
-**Expected Outcome**: Should still work (uses SimpleExecutor which calls same code path)
+**Expected Outcome**: Should still work (uses LLMExecutor for LLM mode; deterministic mode uses a rule-based executor)
 **Log**: `/tmp/workshop_debug.log`
 
 ---
@@ -101,12 +101,12 @@
 **Files Modified**: `miniverse/cognition/prompts.py`
 **Documentation**: `ROOT_CAUSE_ANALYSIS.md`
 
-### 🟡 Workshop Uses Legacy get_agent_action()
+### 🟡 Workshop Executor Path
 **Status**: Design question, not a bug
 **Severity**: Low
-**Description**: Workshop example uses `SimpleExecutor` which calls legacy `get_agent_action()` function instead of `LLMExecutor`. Both work, but code paths differ.
-**Impact**: Maintenance complexity - two ways to do LLM executor calls
-**Recommendation**: Eventually migrate workshop to use `LLMExecutor` directly for consistency
+**Description**: Workshop example now uses `LLMExecutor` for LLM mode and a deterministic rule-based executor for non-LLM mode.
+**Impact**: Reduced ambiguity about which codepath is used
+**Recommendation**: Keep using `LLMExecutor` directly; avoid legacy indirection
 **Priority**: Low - works fine as-is
 
 ### 🟡 DEBUG_LLM Not in Legacy get_agent_action()
@@ -183,9 +183,8 @@
 ### 1. Consolidate Executor Implementations
 **Priority**: Medium
 **Effort**: Medium
-**Description**: `SimpleExecutor`, `LLMExecutor`, and `get_agent_action()` provide overlapping functionality. Consider:
-- Deprecating `get_agent_action()` in favor of `LLMExecutor`
-- Making `SimpleExecutor` a thin wrapper around `LLMExecutor` with deterministic fallback
+**Description**: `LLMExecutor` and `get_agent_action()` provide overlapping functionality. Consider:
+- Using `LLMExecutor` directly
 - Clearer documentation on which to use when
 
 ### 2. Prompt Template Validation

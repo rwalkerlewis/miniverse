@@ -48,8 +48,8 @@ from miniverse.cognition import (
     PromptLibrary,
     PromptTemplate,
     Scratchpad,
-    SimpleExecutor,
 )
+from miniverse.cognition.llm import LLMExecutor
 from miniverse.cognition.executor import Executor
 from miniverse.cognition.planner import Planner
 from miniverse.cognition.reflection import ReflectionEngine
@@ -533,7 +533,7 @@ async def run_simulation(
                     template_name="plan_workshop",
                     prompt_library=prompt_library,
                 ),
-                executor=SimpleExecutor(),
+                executor=LLMExecutor(),
                 reflection=LLMReflectionEngine(
                     template_name="reflect_workshop",
                     prompt_library=prompt_library,

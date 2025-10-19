@@ -251,7 +251,7 @@ orchestrator = Orchestrator(
     agents=profiles_map,
     world_prompt="You oversee operations.",
     agent_prompts={aid: prompt for aid, prompt in base_prompts.items()},
-    llm_provider=Config.LLM_PROVIDER,  # or None for deterministic world updates
+    llm_provider=Config.LLM_PROVIDER,
     llm_model=Config.LLM_MODEL,
     simulation_rules=WorkshopRules(
         occupancy,
@@ -265,10 +265,16 @@ orchestrator = Orchestrator(
 
 ### Deterministic vs LLM World Updates
 
-- If `llm_provider`/`llm_model` are provided, the orchestrator will call the world-engine LLM via `process_world_update` after each tick.
-- If either is missing, the orchestrator logs a warning and applies deterministic updates only (`_apply_deterministic_world_update`)—cloning the state, stamping new `tick`, and updating agent activities/locations.
+Control world updates via `world_update_mode`:
 
-Deterministic rules always run before cognition; world updates simply decide how the shared state changes afterwards.
+- `auto` (default):
+  - If your rules override `process_actions(state, actions, tick)`, that deterministic handler is used.
+  - Else if `llm_provider`/`llm_model` are set, the world-engine LLM runs (fail-fast on misconfig/validation).
+  - Else, basic deterministic updates apply (clone state, update tick, apply activities/locations).
+- `deterministic`: force deterministic world updates (prefer rules.process_actions; otherwise basic deterministic).
+- `llm`: force LLM world engine; raises if not configured or validation fails.
+
+Preflight prints the selected mode and why at the start of the run.
 
 ---
 
@@ -281,7 +287,7 @@ result = await orchestrator.run(num_ticks=8)
 final_state = result["final_state"]
 ```
 
-The workshop example shows CI-friendly usage (deterministic by default) and an LLM mode toggled via CLI (`--llm`). Pass `--debug` to log planner/executor/reflection payloads (including provider/model info) and `--analysis` to emit per-tick summaries (backlog deltas, average energy/stress).
+The workshop examples are CI-friendly: use `WORLD_UPDATE_MODE=deterministic` for faster runs during development; switch to `llm` to test world-engine behavior. Pass DEBUG flags to inspect prompts and perceptions: `DEBUG_LLM`, `DEBUG_PERCEPTION`, `MINIVERSE_VERBOSE`.
 
 Structured schema errors are also surfaced automatically. If an LLM response fails validation, the retry loop prints each offending field (with the received value preview) and appends the same checklist to the next prompt so the model corrects itself without guesswork.
 

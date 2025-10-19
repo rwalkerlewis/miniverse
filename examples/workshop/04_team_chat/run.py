@@ -259,11 +259,6 @@ Participate in team discussions - share concerns, respond to others, help coordi
 
     print(f"\n✅ Simulation complete!")
     print(f"Final backlog: {int(final_backlog)} tasks")
-    print(f"\nKey insights:")
-    print(f"  - Agents coordinated via natural language communication")
-    print(f"  - Leader emerged as coordinator without hardcoded roles")
-    print(f"  - Team adapted strategy based on shared information")
-    print(f"  - No centralized control - just individual LLM decisions + chat!")
 
 
 if __name__ == "__main__":

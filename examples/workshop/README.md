@@ -59,6 +59,8 @@ export OPENAI_API_KEY=your_key
 uv run python -m examples.workshop.03_llm_single.run
 ```
 
+Tip: set `WORLD_UPDATE_MODE=deterministic` during development to skip the world engine LLM and keep runs fast. Preflight will print the selected mode at start.
+
 **Key takeaway:** Single LLM agent making intelligent work/rest decisions based on goals (wellbeing + productivity). No hardcoded thresholds - agent reasons about trade-offs.
 
 ---
@@ -82,6 +84,8 @@ export OPENAI_API_KEY=your_key
 uv run python -m examples.workshop.04_team_chat.run
 ```
 
+Tip: `WORLD_UPDATE_MODE=deterministic` avoids the world engine LLM; `WORLD_UPDATE_MODE=llm` forces it (fail-fast if misconfigured).
+
 **Key takeaway:** Team leader + 2 workers coordinate via chat. Leader emerges as coordinator without hardcoded control - just through communication and individual decisions.
 
 ---
@@ -104,6 +108,8 @@ export LLM_MODEL=gpt-4
 export OPENAI_API_KEY=your_key
 uv run python -m examples.workshop.05_stochastic.run
 ```
+
+Tip: `WORLD_UPDATE_MODE=llm` showcases non-deterministic world updates; `auto` and `deterministic` remain available.
 
 **Key takeaway:** Agent can't predict random task arrivals or equipment breakdowns, but adapts intelligently. Shows that "non-determinism" has two forms: random physics (world) and intelligent decisions (agents).
 
