@@ -29,8 +29,13 @@ logs/
 docs/technical/
 docs/archive/
 # reference research
-reference-work/
+.reference-work/
 examples/_legacy/
 # Mac OS
 .DS_Store
 **/.DS_Store
+
+# no text files in exmaples except for requirements.txt which we will track
+examples/smallville/*.txt
+
+
