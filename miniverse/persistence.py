@@ -342,12 +342,11 @@ class InMemoryPersistence(PersistenceStrategy):
         """
         Close in-memory storage.
 
-        Clears all data. No-op otherwise.
+        No-op for in-memory: we do NOT clear data on close so callers can
+        perform post-run reads (e.g., debugging, analysis). Use delete_run()
+        or clear_agent_memories() for explicit cleanup.
         """
-        self.runs.clear()
-        self.states.clear()
-        self.actions.clear()
-        self.memories.clear()
+        pass
 
     async def save_run_metadata(self, run: SimulationRun) -> None:
         """
