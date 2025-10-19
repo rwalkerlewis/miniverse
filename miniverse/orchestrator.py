@@ -769,7 +769,20 @@ class Orchestrator:
         """
         print(f"  [Persistence] Persisting tick {tick}...")
         await self.persistence.save_state(self.run_id, tick, state)
-        await self.persistence.save_actions(self.run_id, tick, actions)
+
+        # A4: Actions should not persist full communication content. Keep only minimal reference.
+        sanitized_actions: List[AgentAction] = []
+        for action in actions:
+            comm = action.communication
+            if comm:
+                # Preserve only the recipient reference; drop message body from action history
+                recipient = comm.get("to") if isinstance(comm, dict) else None
+                if recipient is None:
+                    recipient = "unknown"
+                action = action.model_copy(update={"communication": {"to": recipient}})
+            sanitized_actions.append(action)
+
+        await self.persistence.save_actions(self.run_id, tick, sanitized_actions)
         await self._update_memories(tick, actions, state)
         print(f"  [Persistence] ✓ Tick {tick} persisted")
 

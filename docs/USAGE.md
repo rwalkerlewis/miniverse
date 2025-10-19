@@ -203,6 +203,14 @@ cognition_map = {
 
 `PromptLibrary` and `render_prompt` handle the template substitution using data from `PromptContext` (profile, perception, plan, memories, scratchpad state). Default templates live in `miniverse/cognition/prompts.py` and already include JSON examples.
 
+### Communication Persistence Model (Canonical Source)
+
+- Actions can include a `communication` payload during execution, but when persisted, actions are sanitized to include only a minimal reference (e.g., `{ "to": "bob" }`). The message text is not persisted with actions.
+- The full communication content is stored as memories for both sender and recipient:
+  - Sender memory: `I told bob: <message>` (metadata includes `role=sender`, `recipient`)
+  - Recipient memory: `<SenderName> told me: <message>` (metadata includes `role=recipient`, `sender`)
+- Implication: Read transcripts/chat history from memories, not from actions.
+
 ### Controlling Planner/Reflection Cadence
 
 Use `CognitionCadence` to throttle how often planners and reflection engines execute. The orchestrator stores the last run tick in each agent's scratchpad, so you don't have to manage bookkeeping yourself:

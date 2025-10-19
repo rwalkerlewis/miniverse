@@ -205,6 +205,16 @@ async def test_information_diffusion():
         print("   Information diffusion broken")
         print("\n⚠️ The bug is still present")
 
+    # Verify actions were persisted without message body (A4: no duplication)
+    actions_tick1 = await persistence.get_actions(run_id, 1)
+    for act in actions_tick1:
+        if act.action_type == "communicate":
+            assert act.communication is not None
+            assert isinstance(act.communication, dict)
+            # Only 'to' should be present; message must not be persisted in actions
+            assert "to" in act.communication
+            assert "message" not in act.communication
+
     # NOW we can close
     await persistence.close()
     await memory.close()

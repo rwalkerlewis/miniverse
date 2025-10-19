@@ -169,3 +169,13 @@ async def test_orchestrator_runs_single_tick(monkeypatch):
     world_update_mock.assert_awaited()
     assert any("Need to inspect" in record.content for record in memory.records)
     assert any(record.tags and "communication" in record.tags for record in memory.records)
+
+    # A4: Verify action communication is sanitized on persistence (no message body)
+    actions = await orchestrator.persistence.get_actions(orchestrator.run_id, 1)
+    for act in actions:
+        if act.action_type == "work":
+            continue
+        if act.communication is not None:
+            assert isinstance(act.communication, dict)
+            assert "to" in act.communication
+            assert "message" not in act.communication
