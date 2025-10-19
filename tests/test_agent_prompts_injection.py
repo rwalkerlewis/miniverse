@@ -1,4 +1,4 @@
-"""Test that agent_prompts are properly injected into system prompts."""
+"""Test that agent_prompts are properly injected into user prompts."""
 
 import pytest
 from datetime import datetime, timezone
@@ -9,7 +9,7 @@ from miniverse.schemas import AgentProfile, AgentPerception, WorldState, Environ
 
 
 def test_agent_prompts_injection():
-    """Verify that base_agent_prompt from context.extra is prepended to system prompt."""
+    """Verify that base_agent_prompt from context.extra is prepended to user prompt."""
 
     # Create minimal context with a test marker
     test_marker = "[TEST_MARKER_ABC123]"
@@ -54,13 +54,13 @@ def test_agent_prompts_injection():
     # Render the prompt
     rendered = render_prompt(template, context)
 
-    # Verify marker appears in system prompt
-    assert test_marker in rendered.system, \
-        f"Test marker not found in system prompt. Got: {rendered.system[:200]}"
+    # Verify marker appears in user prompt
+    assert test_marker in rendered.user, \
+        f"Test marker not found in user prompt. Got: {rendered.user[:200]}"
 
     # Verify it's at the beginning (prepended)
-    assert rendered.system.startswith(test_marker), \
-        f"Test marker should be at start of system prompt. Got: {rendered.system[:100]}"
+    assert rendered.user.startswith(test_marker), \
+        f"Test marker should be at start of user prompt. Got: {rendered.user[:100]}"
 
     # Verify template content still appears after agent_prompt
     assert "execution module" in rendered.system, \
@@ -122,10 +122,10 @@ DO NOT use any other action type. ONLY move actions.'''
     template = DEFAULT_PROMPTS.get("execute_tick")
     rendered = render_prompt(template, context)
 
-    # Verify snake marker and instructions are present
-    assert snake_marker in rendered.system
-    assert "ONLY move actions" in rendered.system
-    assert rendered.system.startswith(snake_marker)
+    # Verify snake marker and instructions are present (in USER)
+    assert snake_marker in rendered.user
+    assert "ONLY move actions" in rendered.user
+    assert rendered.user.startswith(snake_marker)
 
     # Verify template is still there (this is the architectural issue we documented)
     assert "execution module" in rendered.system

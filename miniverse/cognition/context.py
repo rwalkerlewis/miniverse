@@ -13,6 +13,7 @@ from typing import Any, Dict, Iterable, List
 
 import json
 from datetime import datetime
+import os
 
 from miniverse.schemas import AgentProfile, AgentPerception, AgentMemory, WorldState
 
@@ -104,7 +105,7 @@ async def build_prompt_context(
       KPI summaries, etc.).
     """
 
-    return PromptContext(
+    ctx = PromptContext(
         agent_profile=agent_profile,
         perception=perception,
         world_snapshot=world_state,
@@ -113,6 +114,28 @@ async def build_prompt_context(
         memories=list(memories),
         extra=extra or {},
     )
+
+    # Minimal debug logging for prompt context assembly
+    # Enable with DEBUG_PROMPT_CONTEXT=1
+    try:
+        if os.getenv("DEBUG_PROMPT_CONTEXT", "").lower() in ("1", "true", "yes"):  # pragma: no cover
+            agent_id = getattr(agent_profile, "agent_id", "?")
+            tick = getattr(perception, "tick", "?")
+            location = getattr(perception, "location", None)
+            messages = getattr(perception, "messages", []) or []
+            memories_count = len(ctx.memories)
+            extras = ctx.extra or {}
+            has_initial_state = bool(extras.get("initial_state_agent_prompt") or extras.get("base_agent_prompt"))
+            has_sim_instructions = bool(extras.get("simulation_instructions"))
+            available_actions = extras.get("available_actions") or []
+            print(f"[PROMPT_CONTEXT] agent={agent_id} tick={tick} location={location}")
+            print(f"  memories={memories_count} messages={len(messages)} actions={len(available_actions)}")
+            print(f"  initial_state_agent_prompt={'yes' if has_initial_state else 'no'} sim_instructions={'yes' if has_sim_instructions else 'no'}")
+    except Exception:
+        # Never let debug logging break execution
+        pass
+
+    return ctx
 
 
 def _sanitize(value: Any) -> Any:

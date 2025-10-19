@@ -61,17 +61,15 @@ DEFAULT_PROMPTS.register(
     PromptTemplate(
         name="default",
         system=(
-            "You are the agent's execution module. Decide the next action that best follows the current plan and "
-            "the situational context. Respond with valid AgentAction JSON."
+            "{{character_prompt}}\n\n"
+            "{{simulation_instructions}}\n\n"
+            "Available actions:\n{{action_catalog}}\n"
         ),
         user=(
-            "Perception:\n{{perception_json}}\n\n"
-            "Plan state:\n{{plan_json}}\n\n"
-            "Recent memories:\n{{memories_text}}\n\n"
-            "{{action_catalog}}\n\n"
-            "Return JSON only."
+            "{{initial_state_agent_prompt}}\n\n"
+            "Perception:\n{{perception_json}}\n"
         ),
-        description="Minimal default executor template (alias).",
+        description="Minimal default executor template using character/base/action_catalog placeholders.",
     )
 )
 

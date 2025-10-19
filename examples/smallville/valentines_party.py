@@ -13,11 +13,11 @@ from datetime import datetime, timezone
 from typing import List, Optional, Dict, Any
 from uuid import UUID
 
-# Enable debugging
-os.environ['DEBUG_MEMORY'] = 'true'
-os.environ['DEBUG_PERCEPTION'] = 'true'
-os.environ['DEBUG_LLM'] = 'true'  # Show full LLM prompts/responses
-os.environ['MINIVERSE_VERBOSE'] = 'true'
+# Clean run - disable debugging
+# os.environ['DEBUG_MEMORY'] = 'true'
+# os.environ['DEBUG_PERCEPTION'] = 'true'
+# os.environ['DEBUG_LLM'] = 'true'
+# os.environ['MINIVERSE_VERBOSE'] = 'true'
 
 # Miniverse core
 from miniverse import (
@@ -26,15 +26,22 @@ from miniverse import (
     Stat, AgentAction
 )
 from miniverse.cognition import AgentCognition, LLMExecutor, LLMPlanner, Scratchpad
+from miniverse.cognition.context import PromptContext
+from miniverse.cognition.renderers import render_prompt
+from miniverse.cognition.prompts import DEFAULT_PROMPTS
 from miniverse.memory import SimpleMemoryStream
-from miniverse.schemas import AgentMemory
+from miniverse.schemas import AgentMemory, AgentPerception
 from miniverse.persistence import InMemoryPersistence
 
 
 class TownSimulationRules(SimulationRules):
-    """Simple town: agents move between locations, time passes."""
+    """Simple town: agents move between locations, time passes.
+
+    Deterministic physics for Smallville - handles movement, time, activity tracking.
+    """
 
     def apply_tick(self, state, tick):
+        """Update time each tick."""
         updated = state.model_copy(deep=True)
 
         # Update time resource
@@ -45,7 +52,34 @@ class TownSimulationRules(SimulationRules):
         return updated
 
     def validate_action(self, action, state):
+        """All actions are valid in this simple town."""
         return True
+
+    def process_actions(self, actions, state):
+        """Process agent actions deterministically - movement, activity updates.
+
+        This is Stanford's approach: LLM decides what to do, physics processes it.
+        """
+        updated = state.model_copy(deep=True)
+
+        for action in actions:
+            # Find the agent in the world state
+            agent_status = next((a for a in updated.agents if a.agent_id == action.agent_id), None)
+            if not agent_status:
+                continue
+
+            # Update agent's activity description
+            agent_status.activity = f"{action.action_type}: {action.reasoning[:50]}..."
+
+            # Handle movement
+            if action.action_type == "move_to" and action.target:
+                agent_status.location = action.target
+
+            # Communicate actions don't change location, but we could track conversation state
+            # Work actions don't change location either
+            # Rest, investigate, monitor - all stay in place
+
+        return updated
 
 
 async def main():
@@ -171,10 +205,80 @@ async def main():
 
     memory = SimpleMemoryStream(persistence)
 
+    # Define available actions for agents
+    available_actions = [
+        {
+            "action_type": "communicate",
+            "description": "Send a message to another agent",
+            "example": {
+                "action_type": "communicate",
+                "target": "maria",
+                "parameters": None,
+                "reasoning": "I want to invite Maria to the party",
+                "communication": {"to": "maria", "message": "Hi Maria! I'm hosting a Valentine's Day party at the cafe tomorrow (Feb 14) from 5-7pm. Would love for you to come!"}
+            }
+        },
+        {
+            "action_type": "move_to",
+            "description": "Move to a different location",
+            "example": {
+                "action_type": "move_to",
+                "target": "hobbs_cafe",
+                "parameters": {},
+                "reasoning": "I want to go to the cafe",
+                "communication": None
+            }
+        },
+        {
+            "action_type": "work",
+            "description": "Work on a task or project",
+            "example": {
+                "action_type": "work",
+                "target": "party_planning",
+                "parameters": {"task": "prepare invitations"},
+                "reasoning": "I need to get ready for the party",
+                "communication": None
+            }
+        },
+        {
+            "action_type": "rest",
+            "description": "Take a break or relax",
+            "example": {
+                "action_type": "rest",
+                "target": None,
+                "parameters": {},
+                "reasoning": "I need to recharge",
+                "communication": None
+            }
+        },
+        {
+            "action_type": "investigate",
+            "description": "Look into something or explore",
+            "example": {
+                "action_type": "investigate",
+                "target": "community_events",
+                "parameters": {"focus": "upcoming gatherings"},
+                "reasoning": "I want to learn about local events",
+                "communication": None
+            }
+        },
+        {
+            "action_type": "monitor",
+            "description": "Observe or keep track of something",
+            "example": {
+                "action_type": "monitor",
+                "target": "cafe_activity",
+                "parameters": {},
+                "reasoning": "I want to see who's around",
+                "communication": None
+            }
+        }
+    ]
+
     # Configure cognition for each agent
     cognition_map = {
         agent_id: AgentCognition(
-            executor=LLMExecutor(template_name="default"),
+            executor=LLMExecutor(template_name="default", available_actions=available_actions),
             planner=LLMPlanner(),
             scratchpad=Scratchpad()
         )
@@ -201,55 +305,65 @@ async def main():
         llm_provider=provider,
         llm_model=model,
         persistence=persistence,
-        memory=memory
+        memory=memory,
+        world_update_mode='deterministic'  # Stanford approach: physics processes actions, not LLM
     )
+
+    # Print initial prompt setup for each agent - show ACTUAL rendered prompts
+    print('\n' + '=' * 80)
+    print('INITIAL AGENT PROMPT SETUP (RENDERED)')
+    print('=' * 80)
+
+    # Get the default template that will be used
+    template = DEFAULT_PROMPTS.get("default")
+
+    for agent_id, agent_prompt in agent_prompts.items():
+        agent_profile = agents[agent_id]
+
+        # Create minimal context to render initial prompt (tick 0, no memories)
+        context = PromptContext(
+            agent_profile=agent_profile,
+            perception=AgentPerception(
+                agent_id=agent_id,
+                tick=0,
+                location=world_state.agents[list(agents.keys()).index(agent_id)].location,
+                nearby_agents=[],
+                recent_memories=[],
+                messages=[],
+                alerts=[]
+            ),
+            world_snapshot=world_state,
+            scratchpad_state={},
+            plan_state={},
+            memories=[],
+            extra={
+                "initial_state_agent_prompt": agent_prompt,
+                "available_actions": available_actions
+            }
+        )
+
+        # Render the prompt exactly as LLMExecutor will
+        rendered = render_prompt(template, context, include_default=False)
+
+        print(f'\n{"━" * 80}')
+        print(f'AGENT: {agent_profile.name}')
+        print(f'{"━" * 80}')
+        print(f'\n[SYSTEM PROMPT]')
+        print('-' * 80)
+        print(rendered.system)
+        print('-' * 80)
+        print(f'\n[USER PROMPT]')
+        print('-' * 80)
+        print(rendered.user)
+        print('-' * 80)
+
+    print('\n' + '=' * 80 + '\n')
 
     # Run simulation
     result = await orchestrator.run(num_ticks=8)
 
-    print('=' * 60)
     print('\n✅ Simulation complete!')
     print(f'   Run ID: {result["run_id"]}')
-
-    # Analyze memories
-    print('\n=== MEMORY ANALYSIS ===')
-    run_id = result['run_id']
-
-    for agent_id, profile in agents.items():
-        memories = await persistence.get_recent_memories(run_id, agent_id, limit=20)
-        print(f'\n{profile.name} ({len(memories)} memories):')
-
-        party_aware = False
-        for mem in memories:
-            print(f'  [Tick {mem.tick}] {mem.content}')
-            if 'party' in mem.content.lower() or 'valentine' in mem.content.lower():
-                party_aware = True
-
-        if party_aware:
-            print(f'  ✅ Knows about party!')
-        else:
-            print(f'  ❌ No party awareness')
-
-    # Check attendance
-    print('\n=== PARTY ATTENDANCE ===')
-    final_state = result['final_state']
-
-    attendees = []
-    for agent in final_state.agents:
-        profile = agents[agent.agent_id]
-        at_party = agent.location == 'hobbs_cafe'
-        status = '🎉' if at_party else '  '
-
-        print(f'{status} {profile.name}: {agent.location}')
-        if at_party:
-            attendees.append(profile.name)
-
-    print(f'\n📊 Attendance: {len(attendees)}/{len(agents)} agents at Hobbs Cafe')
-    print(f'   Stanford paper: 5/12 invited showed up (42%)')
-    print(f'   Our result: {len(attendees)}/{len(agents)} showed up ({len(attendees)/len(agents)*100:.0f}%)')
-
-    if attendees:
-        print(f'\n   Party guests: {", ".join(attendees)}')
 
 
 if __name__ == '__main__':
