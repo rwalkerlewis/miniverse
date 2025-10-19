@@ -248,10 +248,10 @@ class Orchestrator:
 
             # Planner
             if isinstance(cognition.planner, LLMPlanner):
-                name = getattr(cognition.planner, "template_name", "plan_daily")
+                name = getattr(cognition.planner, "template_name", "plan")
                 if name not in library.templates and not self._prompt_warnings_emitted.get(f"planner:{name}"):
                     print(
-                        f"  [Prompts] Agent '{agent_id}' planner template '{name}' not found; using default 'plan_daily'."
+                        f"  [Prompts] Agent '{agent_id}' planner template '{name}' not found; using default 'plan'."
                     )
                     self._prompt_warnings_emitted[f"planner:{name}"] = True
 
@@ -477,15 +477,7 @@ class Orchestrator:
         cognition = self.agent_cognition[agent_id]
         print(colored(f"  {LOG_TAG_DETERMINISTIC} [{agent_name}] Building perception...", Color.BLUE))
 
-        # Retrieve previous tick's actions to extract communications. Agents need to see
-        # messages directed at them to maintain conversation continuity. Only fetch
-        # tick-1 (not entire history) to keep perception focused on immediate context.
-        if tick > 1:
-            recent_actions_data = await self.persistence.get_actions(self.run_id, tick - 1)
-            recent_actions = recent_actions_data if recent_actions_data else []
-        else:
-            # Tick 1 has no previous actions - agents start with clean slate
-            recent_actions = []
+        # A2: Do not read messages from actions. Messages are sourced from memories.
 
         # Retrieve structured memory objects (AgentMemory instances) once.
         # We'll use these for both perception (as strings) and prompt context (as objects).
@@ -510,14 +502,24 @@ class Orchestrator:
             if len(recent_agent_memories) > 5:
                 print(colored(f"    ... and {len(recent_agent_memories) - 5} more", Color.CYAN))
 
+        # Build direct messages for this agent from recent memories (recipient entries only)
+        recent_messages: List[Dict[str, str]] = []
+        for mem in recent_agent_memories:
+            if mem.memory_type != "communication":
+                continue
+            role = (mem.metadata or {}).get("role")
+            if role != "recipient":
+                continue
+            sender = (mem.metadata or {}).get("sender") or (mem.metadata or {}).get("sender_name") or "unknown"
+            message_text = (mem.metadata or {}).get("message") or mem.content
+            recent_messages.append({"from": sender, "message": message_text})
+
         # Build partial observability view (Stanford Generative Agents pattern).
-        # Perception includes: agent's own status, nearby entities, visible locations,
-        # messages directed at them, and recent memory context. Agent cannot see
-        # entities/locations outside their access range.
+        # Perception includes: agent's own status, messages to them, and memory context.
         perception = build_agent_perception(
             agent_id,
             self.current_state,
-            recent_actions,
+            recent_messages,
             recent_memory_strings,
         )
 
@@ -1087,7 +1089,7 @@ class Orchestrator:
             perception = build_agent_perception(
                 agent_id,
                 self.current_state,
-                [],  # No actions needed for reflection context
+                [],  # No direct messages needed for reflection context
                 recent_memory_strings,
             )
 

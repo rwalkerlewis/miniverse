@@ -80,22 +80,14 @@ def make_world_state() -> WorldState:
 
 def test_build_agent_perception_structure():
     world_state = make_world_state()
-    recent_actions = [
-        AgentAction(
-            agent_id="beta",
-            tick=2,
-            action_type="communicate",
-            target="alpha",
-            parameters=None,
-            reasoning="Inform operations about wind readings",
-            communication={"to": "alpha", "message": "Expect gusts over 25 km/h."},
-        )
+    recent_messages = [
+        {"from": "beta", "message": "Expect gusts over 25 km/h."}
     ]
 
     perception = build_agent_perception(
         agent_id="alpha",
         world_state=world_state,
-        recent_actions=recent_actions,
+        recent_messages=recent_messages,
         recent_memories=["Calibrated sensors at tick 2"],
     )
 

@@ -30,21 +30,21 @@ Usage:
     perception = build_agent_perception(
         agent_id="alice",
         world_state=current_state,
-        recent_actions=last_tick_actions,
+        recent_messages=[{"from": "bob", "message": "Hi Alice"}],
         recent_memories=memory_stream[-10:]
     )
     # perception now contains ONLY what alice can perceive
 """
 
-from typing import List
+from typing import List, Dict
 
-from miniverse.schemas import WorldState, AgentPerception, AgentAction
+from miniverse.schemas import WorldState, AgentPerception
 
 
 def build_agent_perception(
     agent_id: str,
     world_state: WorldState,
-    recent_actions: List[AgentAction],
+    recent_messages: List[Dict[str, str]],
     recent_memories: List[str],
 ) -> AgentPerception:
     """Build partial observability perception for a specific agent.
@@ -59,7 +59,7 @@ def build_agent_perception(
     3. Deep copy shared resources (public dashboards)
     4. Deep copy environment metrics (ambient conditions)
     5. Filter events to high-severity broadcasts (severity >= 5)
-    6. Extract messages addressed to this agent from recent actions
+    6. Include direct messages (derived from memory stream, not actions)
     7. Include recent memories for context
     8. Return filtered AgentPerception object
 
@@ -68,8 +68,8 @@ def build_agent_perception(
     - Agent cognition cannot modify world state through perception reference
     - Enables safe parallel processing (multiple agents, same world state)
 
-    Message filtering:
-    - Only messages with communication.to == agent_id are included
+    Message handling:
+    - Messages are sourced from the agent's memory stream (recipient entries)
     - Prevents eavesdropping on private communications
     - Enables private coordination vs public announcements
 
@@ -81,7 +81,7 @@ def build_agent_perception(
     Args:
         agent_id: ID of agent to build perception for
         world_state: Current complete world state (omniscient view)
-        recent_actions: Recent actions from ALL agents (for message extraction)
+        recent_messages: Direct messages for THIS agent (from memory)
         recent_memories: Recent memory strings for THIS agent (last 10)
 
     Returns:
@@ -94,7 +94,7 @@ def build_agent_perception(
         >>> perception = build_agent_perception(
         ...     agent_id="alice",
         ...     world_state=current_state,
-        ...     recent_actions=last_tick_actions,
+        ...     recent_messages=[{"from": "bob", "message": "Expect gusts over 25 km/h."}],
         ...     recent_memories=["Repaired oxygen tank", "Spoke with Bob"]
         ... )
         >>> # perception.personal_attributes contains only Alice's health/stress
@@ -141,17 +141,8 @@ def build_agent_perception(
         if event.severity is not None and event.severity >= 5
     ]
 
-    # Extract messages sent TO this agent from recent actions
-    # Filters out messages to other agents (no eavesdropping)
-    messages = []
-    for action in recent_actions:
-        if action.communication and action.communication.get("to") == agent_id:
-            messages.append(
-                {
-                    "from": action.agent_id,
-                    "message": action.communication["message"],
-                }
-            )
+    # Use provided messages (already filtered from memory for this agent)
+    messages = recent_messages
 
     # Use provided recent memories (already filtered to last 10 by memory strategy)
     # Provides context for decision-making without overwhelming LLM prompt
