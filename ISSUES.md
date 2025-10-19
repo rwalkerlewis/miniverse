@@ -19,6 +19,14 @@ This file lists only unresolved items aligned with the current architecture.
 - Updated orchestrator call sites and tests accordingly
 - Better separation of concerns: perception no longer depends on action parsing
 
+### A7: AgentProfile.age Should Be Optional ✅
+**Status:** COMPLETED (2025-10-19)
+- Changed `age: int` to `age: Optional[int] = Field(None, ...)`
+- Non-human agents (snake AI, robots) can now omit age field
+- Existing human agents with age continue to work
+- All 29 tests pass
+- Updated snake.py to remove placeholder age
+
 ---
 
 ## OUTSTANDING ISSUES
@@ -92,6 +100,7 @@ Plan:
 Status: In progress; remaining notebooks to verify.
 
 ---
+
 
 ## Test/Build Status
 

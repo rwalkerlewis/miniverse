@@ -386,3 +386,4 @@ docs/
 Stay within these guardrails and Miniverse stays maintainable, extensible, and true to its hybrid (deterministic + emergent) design philosophy.
 
 -- Claude | 2025-10-14
+- always use gpt-5-nano with openai which just released. you can simply do this by bringing in the env llm model
