@@ -58,6 +58,9 @@ def render_prompt(
     # Build replacement map for placeholder substitution. Placeholders use {{double_brace}}
     # syntax to avoid conflicts with JSON braces. String replacement is simple and fast;
     # no need for complex templating engines (Jinja, Mustache) for this use case.
+    # Optionally allow templates to reference base_agent_prompt directly
+    base_agent_prompt = context.extra.get("base_agent_prompt", "")
+
     replacements: Dict[str, str] = {
         "{{context_json}}": context_json,
         "{{context_summary}}": summary,
@@ -65,6 +68,7 @@ def render_prompt(
         "{{plan_json}}": plan_json,
         "{{memories_text}}": memories_text,
         "{{scratchpad_json}}": scratchpad_json,
+        "{{base_agent_prompt}}": base_agent_prompt,
     }
 
     # Extract system and user prompt components from template. Templates separate system
@@ -78,5 +82,11 @@ def render_prompt(
     for placeholder, value in replacements.items():
         system = system.replace(placeholder, value)
         user = user.replace(placeholder, value)
+
+    # Auto-inject base_agent_prompt at the start of the system prompt if present.
+    # This ensures high-priority, per-agent instructions are seen by the LLM even
+    # if templates don't explicitly include a placeholder.
+    if base_agent_prompt:
+        system = base_agent_prompt + "\n\n" + system
 
     return RenderedPrompt(system=system, user=user)
