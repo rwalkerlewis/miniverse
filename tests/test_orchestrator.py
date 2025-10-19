@@ -139,7 +139,7 @@ async def test_orchestrator_runs_single_tick(monkeypatch):
         llm_model="gpt-5-nano",
         simulation_rules=rules,
         memory=memory,
-        agent_cognition={"alpha": AgentCognition(executor=LLMExecutor())},
+        agent_cognition={"alpha": AgentCognition(executor=LLMExecutor(template_name="default"))},
     )
 
     mocked_action = AgentAction(

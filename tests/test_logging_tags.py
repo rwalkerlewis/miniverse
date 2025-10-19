@@ -133,9 +133,13 @@ async def test_executor_tag_llm(monkeypatch):
             communication=None,
         )
 
-    monkeypatch.setattr("miniverse.cognition.executor.get_agent_action", fake_action)
+    # Patch LLM call to avoid network and return a deterministic action
+    async def fake_call_llm_with_retries(**kwargs):
+        return await fake_action()
 
-    cognition = AgentCognition(executor=LLMExecutor())
+    monkeypatch.setattr("miniverse.cognition.llm.call_llm_with_retries", fake_call_llm_with_retries)
+
+    cognition = AgentCognition(executor=LLMExecutor(template_name="default"))
     orchestrator = Orchestrator(
         world_state=world_state,
         agents={"alpha": profile},
