@@ -372,7 +372,7 @@ class AgentProfile(BaseModel):
     agent_id: str = Field(..., description="Unique agent identifier")
     # Name provides human-friendly reference for prompts and logs
     name: str = Field(..., description="Agent's full name")
-    age: int = Field(..., ge=18, le=70, description="Age in years")
+    age: Optional[int] = Field(None, ge=18, le=70, description="Age in years (optional, for human agents)")
     # Background written as first-person interview gives LLM context for character consistency.
     # Example: "I joined the mission because my family... I've always been..."
     background: str = Field(
