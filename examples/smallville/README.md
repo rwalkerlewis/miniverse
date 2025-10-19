@@ -18,16 +18,19 @@ This directory contains a working demonstration of Stanford Generative Agents-st
 ## 🚀 How to Run
 
 ```bash
-# Basic run
-uv run python examples/valentines_party.py
+# Basic run (uses executor template_name="default")
+uv run python examples/smallville/valentines_party.py
 
 # With memory debugging (recommended)
-DEBUG_MEMORY=true uv run python examples/valentines_party.py
+DEBUG_MEMORY=true uv run python examples/smallville/valentines_party.py
 
-# Full debugging (shows all LLM prompts)
-
-MINIVERSE_VERBOSE=true DEBUG_LLM=true DEBUG_MEMORY=true uv run python examples/valentines_party.py
+# Full debugging (shows LLM prompts)
+MINIVERSE_VERBOSE=true DEBUG_LLM=true DEBUG_MEMORY=true uv run python examples/smallville/valentines_party.py
 ```
+
+Notes:
+- Communication content is persisted in memories (sender+recipient), not in actions. Read transcripts from memories.
+- World updates use deterministic rules for time/resource changes; LLM handles agent actions.
 
 ## 🔧 Key Features
 

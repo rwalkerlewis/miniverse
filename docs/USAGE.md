@@ -84,6 +84,33 @@ Miniverse ships two sets of implementations:
 1. **Deterministic (example)** – see `examples/workshop/run.py` (`DeterministicPlanner`, `DeterministicExecutor`, `DeterministicReflection`).
 2. **LLM-backed** – `LLMPlanner` and `LLMReflectionEngine` in `miniverse/cognition/llm.py`. They render templates, call the LLM via `call_llm_with_retries`, and parse structured JSON responses.
 
+### Prompt templates: explicit usage
+
+- `LLMExecutor`, `LLMPlanner`, and `LLMReflectionEngine` now require an explicit template selection.
+- Provide either `template_name` (registered in a `PromptLibrary`) or an inline `PromptTemplate` object.
+- A friendly alias `template_name="default"` is available for the minimal built-in executor template.
+- If neither `template` nor `template_name` is provided, a `ValueError` is raised.
+
+Inline template example (executor only):
+
+```python
+from miniverse.cognition.prompts import PromptTemplate
+from miniverse.cognition import AgentCognition
+from miniverse.cognition.llm import LLMExecutor
+
+my_inline = PromptTemplate(
+    name="inline",
+    system="You choose the next AgentAction. Respond with valid JSON only.",
+    user="Perception:\n{{perception_json}}\n\nPlan:\n{{plan_json}}"
+)
+
+cognition = {
+    "agent": AgentCognition(
+        executor=LLMExecutor(template=my_inline)  # inline template takes precedence
+    )
+}
+```
+
 ## Choosing Cognition Modules: Deterministic vs LLM
 
 **Key concept:** Only `executor` is required. Planner, reflection, and scratchpad are **optional enhancements** that can be added independently based on your needs.
@@ -137,7 +164,7 @@ from miniverse.cognition import AgentCognition, LLMExecutor
 
 cognition_map = {
     "worker1": AgentCognition(
-        executor=LLMExecutor()  # LLM makes decisions, no planning/reflection
+        executor=LLMExecutor(template_name="default")  # explicit minimal template
     )
 }
 ```
@@ -202,6 +229,35 @@ cognition_map = {
 **Note:** All LLM modules (LLMPlanner, LLMExecutor, LLMReflectionEngine) raise clear errors if LLM not configured. Use `planner=None` / `reflection=None` to explicitly skip those phases.
 
 `PromptLibrary` and `render_prompt` handle the template substitution using data from `PromptContext` (profile, perception, plan, memories, scratchpad state). Default templates live in `miniverse/cognition/prompts.py` and already include JSON examples.
+
+#### Agent prompts injection
+
+- Pass per-agent instructions via `agent_prompts={agent_id: "..."}` to the `Orchestrator`.
+- These are injected as `base_agent_prompt` and automatically prepended to the system prompt before template text.
+- Use this for situational guidance; identity and personality should primarily come from `AgentProfile`.
+
+#### Action Catalog injection
+
+- Provide `available_actions` to `LLMExecutor(...)` to inject a formatted list via `{{action_catalog}}` in templates.
+
+```python
+actions = [
+    {
+        "action_type": "communicate",
+        "schema": {"to": "agent_id", "message": "string"},
+        "examples": [{
+            "action_type": "communicate",
+            "target": "maria",
+            "communication": {"to": "maria", "message": "Hi!"}
+        }],
+    },
+    {"action_type": "move", "schema": {"target": "location_id"}},
+]
+
+cognition = AgentCognition(
+    executor=LLMExecutor(template_name="default", available_actions=actions)
+)
+```
 
 ### Communication Persistence Model (Canonical Source)
 
@@ -317,3 +373,15 @@ Key tuning points are documented inline (`StandupPlanner.ROLE_STEPS`, `StandupEx
   - `docs/examples/PLAN.md` – upcoming scenarios (Stanford replication, Mars habitat, etc.).
 
 With this workflow you can craft simulations ranging from KPI-only organizational planning (Tier 0) to spatial sandboxes with LLM-driven agents (Tier 2). Start with the workshop example and adapt the templates or rules to your own domain.
+
+---
+
+## 7. Testing
+
+- Run all tests with: `uv run pytest`
+- Core unit tests mock LLM calls for reliability and speed.
+- One integration test performs a real LLM call and is marked `@pytest.mark.llm`.
+  - Enable by setting env vars: `LLM_PROVIDER`, `LLM_MODEL` (and provider API key)
+  - Run: `uv run pytest -m llm`
+
+Tip: Use `-k` to target subsets (e.g., `-k world_update_modes`).

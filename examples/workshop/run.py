@@ -533,7 +533,7 @@ async def run_simulation(
                     template_name="plan_workshop",
                     prompt_library=prompt_library,
                 ),
-                executor=LLMExecutor(),
+                executor=LLMExecutor(template_name="default"),
                 reflection=LLMReflectionEngine(
                     template_name="reflect_workshop",
                     prompt_library=prompt_library,

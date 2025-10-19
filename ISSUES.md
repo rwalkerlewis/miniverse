@@ -19,6 +19,13 @@ This file lists only unresolved items aligned with the current architecture.
 - Updated orchestrator call sites and tests accordingly
 - Better separation of concerns: perception no longer depends on action parsing
 
+### A4: Communication Data Duplication ✅
+**Status:** COMPLETED (2025-10-19)
+- Persisted actions are sanitized to keep only minimal communication reference (recipient `to`); message body is not persisted in actions
+- Full communication content is stored canonically in memories (sender and recipient entries)
+- Prevents duplication and clarifies source of truth for transcripts (read from memories)
+- Tests updated to assert persisted actions exclude `communication.message`
+
 ### A7: AgentProfile.age Should Be Optional ✅
 **Status:** COMPLETED (2025-10-19)
 - Changed `age: int` to `age: Optional[int] = Field(None, ...)`
@@ -26,6 +33,20 @@ This file lists only unresolved items aligned with the current architecture.
 - Existing human agents with age continue to work
 - All 29 tests pass
 - Updated snake.py to remove placeholder age
+
+### A5: World-Update Deterministic Processing Adoption ✅
+**Status:** COMPLETED (2025-10-19)
+- Deterministic world update hook `SimulationRules.process_actions(...)` is implemented and respected by the orchestrator
+- `examples/behavior_is_all_you_need/rules.py` provides a rules-heavy implementation
+- Added `tests/test_world_update_modes.py` asserting the orchestrator takes the deterministic branch
+
+### A6: Documentation Sweep (Follow-ups) ✅
+**Status:** COMPLETED (2025-10-19)
+- Updated `docs/USAGE.md` with explicit template usage (`template_name="default"`, inline `PromptTemplate`), `base_agent_prompt` and `{{action_catalog}}`, communication persistence model, deterministic world updates, and testing guidance (LLM-marked test)
+- Updated root `README.md` to reflect new defaults, env vars, and key recent changes
+- Updated `docs/README.md` index to highlight `USAGE.md` scope
+- Updated example READMEs (smallville, examples index); examples now explicitly use `LLMExecutor(template_name="default")`
+- Removed/avoided legacy notebook guidance in examples index
 
 ---
 
@@ -48,56 +69,9 @@ Effort: 2–4 hours for docs/examples; more for algorithmic upgrade.
 
 ---
 
-### A4: Communication Data Duplication
-
-Problem: Messages are stored in actions and as sender/recipient memories.
-
-Open Question:
-- Do we still need messages in the actions table now that memories are canonical?
-
- Goal: Single source of truth for communication is the memory stream. Actions remain for action metadata, not message content.
-
- Unification Plan:
- 1) Audit current usage of action-stored communication fields (search analytics and examples).
- 2) If safe, stop persisting message content in `save_actions` for the `communication` field (keep the field in the in-memory `AgentAction` for prompts, but do not persist the message body in actions storage).
- 3) Ensure orchestrator continues writing sender/recipient memories (already implemented) and update any consumers to read communication from memories only.
- 4) Optionally persist a minimal reference in actions (e.g., communication=true, to=..., message_id) to correlate with memories, without duplicating content.
- 5) Update docs: "Memories are canonical for communication; actions contain at most references."
-
- Migration/Compatibility:
- - No schema change required to `AgentAction`; change is in persistence behavior.
- - Any reporting that reads messages from actions must switch to memory queries.
-
- Validation Checklist:
- - Perception shows multi-tick messages sourced from memory only
- - No double-counting in analytics (actions vs memories)
- - Workshop/Valentines still run; transcripts/awareness validated from memories
-
-Effort: Investigation ~1 hour; fix TBD.
-
 ---
 
-### A5: World-Update Deterministic Processing Adoption
-
-Context: Orchestrator supports `world_update_mode` (auto|deterministic|llm) and `SimulationRules.process_actions()` for deterministic world updates.
-
-Plan:
-- Migrate scenarios that have strict mechanics (e.g., vote tallying) to implement `process_actions()`
-- Keep LLM world-engine mode for narrative/event synthesis scenarios
-
-Effort: Scenario-dependent.
-
 ---
-
-### A6: Documentation Sweep (Follow-ups)
-
-Problem: Older docs referenced `SimpleExecutor` and legacy fallback behavior.
-
-Plan:
-- Ensure all public docs and notebooks reference `LLMExecutor` for LLM mode and `RuleBasedExecutor` (or custom deterministic executors) for non-LLM mode
-- Keep WORLD_UPDATE_MODE guidance and preflight messages up-to-date
-
-Status: In progress; remaining notebooks to verify.
 
 ---
 
@@ -247,9 +221,6 @@ Next Review: After A3–A6 changes land
 
 ### OUTSTANDING
 - A3: Docs recommend `ImportanceWeightedMemory`; example adapter for embeddings exists.
-- A4: No communication content is persisted in actions; analytics and perception work from memories only.
-- A5: At least one rules-heavy example implements `process_actions`; preflight reports deterministic via rules.
-- A6: No public docs/notebooks reference `SimpleExecutor`; examples indicate WORLD_UPDATE_MODE and executor choices clearly.
 - A8: Log output is readable at multiple verbosity levels; agent information is grouped together; message content is visible in summaries.
 - A9: AgentProfile identity appears in system prompt; users don't need to repeat identity info in agent_prompts; clear separation between identity and situational context.
 - A10: Default template is minimal; domain-specific templates available; template choice is explicit in code; no conflicting action examples.

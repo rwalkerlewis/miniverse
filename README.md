@@ -85,7 +85,7 @@ world_state, agents = loader.load("workshop")
 # (Only executor is required - planner/reflection are optional enhancements)
 cognition_map = {
     agent.agent_id: AgentCognition(
-        executor=LLMExecutor(),  # Required - LLM makes decisions each tick
+        executor=LLMExecutor(template_name="default"),  # explicit minimal template
         planner=LLMPlanner(),  # Optional - generates multi-step plans
         reflection=LLMReflectionEngine(),  # Optional - synthesizes insights
         scratchpad=Scratchpad()  # Optional - needed if using planner
@@ -100,7 +100,7 @@ orchestrator = Orchestrator(
     simulation_rules=WorkshopRules(),
     agent_cognition=cognition_map,
     llm_provider="openai",
-    llm_model="gpt-5-nano",
+    llm_model="gpt-4o-mini",
     # Select world update behavior: 'auto' | 'deterministic' | 'llm'
     world_update_mode="auto"
 )
@@ -120,8 +120,8 @@ UV_CACHE_DIR=.uv-cache uv run python -m examples.workshop.run --ticks 5
 UV_CACHE_DIR=.uv-cache uv run python -m examples.workshop.monte_carlo --runs 100 --ticks 20 --base-seed 42
 
 # LLM cognition demo (requires provider/model + API key)
-export MINIVERSE_LLM_PROVIDER=openai
-export MINIVERSE_LLM_MODEL=gpt-5-nano
+export LLM_PROVIDER=openai
+export LLM_MODEL=gpt-4o-mini
 UV_CACHE_DIR=.uv-cache uv run python -m examples.workshop.llm_demo --ticks 8
 
 # Verbose cognition logging + per-tick analysis
@@ -342,7 +342,14 @@ orchestrator = Orchestrator(
 - Additional deterministic helper modules (queuing theory, energy budgeting, resource optimization)
 - Large-scale performance testing (100+ agents)
 
-See `plan.md` for detailed roadmap and `docs/README.md` for research foundations.
+See `docs/README.md` for the documentation index.
+
+### Key recent changes
+
+- Explicit prompt templates: `LLMExecutor(template_name="default")` or inline `PromptTemplate`
+- Agent prompts injection: `agent_prompts` are prepended to the system prompt
+- Action Catalog: pass `available_actions` to inject `{{action_catalog}}`
+- Communication persistence: actions store only `{ "to": agent_id }`; full messages live in memories
 
 ## Example
 
@@ -352,13 +359,13 @@ Legacy examples are preserved under `examples/_legacy/` for reference.
 
 ## Documentation
 
-- **[ISSUES.md](ISSUES.md)** - Current status, known issues, and next steps ⭐
-- **[Engineering Plan](plan.md)** - Repo orientation and workflow
+- **[USAGE.md](docs/USAGE.md)** - How to build simulations (templates, prompts, comms model) ⭐
+- **[ISSUES.md](ISSUES.md)** - Current status, known issues, and next steps
 - **[CLAUDE.md](CLAUDE.md)** - Development guide and codebase orientation
 - **[Cognition Stack](docs/architecture/cognition.md)** - Planner/executor/reflection flow
 - **[Environment Tiers](docs/architecture/environment.md)** - Logical graphs and spatial grids
 - **[RESEARCH.md](docs/RESEARCH.md)** - Academic foundations
-- **[Debugging Archive](docs/debugging/)** - 2025-10-16 session investigation notes
+- **[Debugging Archive](docs/debugging/)** - Investigation notes
 
 ## Research Foundation
 

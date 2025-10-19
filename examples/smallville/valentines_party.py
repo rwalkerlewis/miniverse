@@ -174,7 +174,7 @@ async def main():
     # Configure cognition for each agent
     cognition_map = {
         agent_id: AgentCognition(
-            executor=LLMExecutor(),
+            executor=LLMExecutor(template_name="default"),
             planner=LLMPlanner(),
             scratchpad=Scratchpad()
         )
@@ -189,10 +189,6 @@ async def main():
         'ayesha': '''You're always on the lookout for community stories - the kinds of things that bring neighborhoods together. Local events, new businesses, people connecting - that's what makes good local journalism. You've found that being genuinely curious and sharing what you learn helps you build trust.''',
         'tom': '''Business has been steady. You keep regular hours and take pride in being reliable. You don't go out of your way to socialize, but you appreciate the other local business owners and try to support them when you can.'''
     }
-
-    print('\n   Memory strategy: SimpleMemoryStream')
-    print('   Running 8 ticks (Feb 13 9am → Feb 14 5pm)')
-    print('=' * 60)
 
     # Create orchestrator
     orchestrator = Orchestrator(

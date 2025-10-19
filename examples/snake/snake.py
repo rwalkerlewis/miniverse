@@ -248,7 +248,7 @@ DO NOT use any other action type. ONLY move actions.'''
     # Cognition - use standard LLMExecutor (agent_prompts now properly injected!)
     cognition_map = {
         'snake': AgentCognition(
-            executor=LLMExecutor(),
+            executor=LLMExecutor(template_name='default'),
             planner=NoOpPlanner(),
             scratchpad=Scratchpad()
         )

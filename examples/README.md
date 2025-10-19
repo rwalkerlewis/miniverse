@@ -2,13 +2,9 @@
 
 This directory contains examples and tutorials for learning Miniverse.
 
-## 🚀 Start Here: Welcome Notebook
+## 🚀 Start Here
 
-**`welcome.ipynb`** - 5-minute Mars habitat simulation showing what Miniverse does.
-
-See 3 LLM-powered agents coordinate on Mars base operations. Watch them plan, communicate, and adapt. Then peek under the hood to see how it works.
-
-**Perfect for:** First-time users who want to see the library in action before diving into details.
+Prefer the script examples under `examples/workshop/` for up-to-date flows. Legacy notebooks may lag behind the latest API.
 
 ## Tutorial Notebooks
 
@@ -88,9 +84,9 @@ See `workshop/README.md` for detailed explanations of each example.
 
 ## Which to use?
 
-- **New to Miniverse?** → Start with `tutorial.ipynb` (interactive, step-by-step)
-- **Want to see complete simulations?** → Run workshop examples 01-05
-- **Building your own simulation?** → Reference tutorial notebook for primitives, then adapt workshop examples
+- **New to Miniverse?** → Start with workshop examples 01-05
+- **Want to see complete simulations?** → Run workshop examples
+- **Building your own simulation?** → Read `docs/USAGE.md`, then adapt workshop examples
 
 ## LLM Configuration (Optional)
 
