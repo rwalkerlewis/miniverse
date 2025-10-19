@@ -60,6 +60,28 @@ def render_prompt(
     # no need for complex templating engines (Jinja, Mustache) for this use case.
     # Optionally allow templates to reference base_agent_prompt directly
     base_agent_prompt = context.extra.get("base_agent_prompt", "")
+    # Build action catalog if provided
+    action_catalog_items = context.extra.get("available_actions") or []
+    if action_catalog_items:
+        lines = ["Action Catalog (choose one):"]
+        for item in action_catalog_items:
+            name = item.get("name", "(unnamed)")
+            lines.append(f"- {name}")
+            schema = item.get("schema")
+            if schema is not None:
+                import json as _json
+                lines.append("  Schema:")
+                lines.append("    " + _json.dumps(schema, indent=2).replace("\n", "\n    "))
+            examples = item.get("examples") or []
+            if examples:
+                lines.append("  Examples:")
+                for ex in examples:
+                    import json as _json
+                    pretty = _json.dumps(ex)
+                    lines.append(f"    {pretty}")
+        action_catalog_str = "\n".join(lines)
+    else:
+        action_catalog_str = ""
 
     replacements: Dict[str, str] = {
         "{{context_json}}": context_json,
@@ -68,6 +90,7 @@ def render_prompt(
         "{{plan_json}}": plan_json,
         "{{memories_text}}": memories_text,
         "{{scratchpad_json}}": scratchpad_json,
+        "{{action_catalog}}": action_catalog_str,
         "{{base_agent_prompt}}": base_agent_prompt,
     }
 

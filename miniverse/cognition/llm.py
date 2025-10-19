@@ -283,16 +283,20 @@ class LLMExecutor(Executor):
     def __init__(
         self,
         *,
-        template_name: str = "execute_tick",
+        template: Optional[PromptTemplate] = None,
+        template_name: Optional[str] = None,
         prompt_library: Optional[PromptLibrary] = None,
+        available_actions: Optional[List[Dict[str, Any]]] = None,
     ) -> None:
         # Template name identifies which execution prompt to use. Common patterns:
         # - "execute_tick": General-purpose action selection
         # - "execute_warehouse": Domain-specific (inventory vs fulfillment decisions)
         # - "execute_social": Communication-focused actions
+        self.template = template
         self.template_name = template_name
         # Custom prompt library for scenario-specific execution styles
         self.prompt_library = prompt_library
+        self.available_actions = available_actions or []
 
     async def choose_action(
         self,
@@ -317,18 +321,25 @@ class LLMExecutor(Executor):
                 f"for deterministic actions when LLM is unavailable or undesired."
             )
 
-        # Resolve prompt library with three-level fallback (same as planner/reflection)
-        library = self.prompt_library or context.extra.get("prompt_library") or DEFAULT_PROMPTS
-        try:
-            # Look up execution template. Execution prompts guide LLM to choose actions
-            # based on current perception, plan step, and recent memories.
-            template = library.get(self.template_name)
-        except KeyError:
-            # Template not found - fall back to default tick execution template
-            template = DEFAULT_PROMPTS.get("execute_tick")
+        # Determine template source: inline overrides library/name; else require name
+        if self.template is not None:
+            template = self.template
+        else:
+            name = self.template_name or "default"
+            # Resolve prompt library with three-level fallback (same as planner/reflection)
+            library = self.prompt_library or context.extra.get("prompt_library") or DEFAULT_PROMPTS
+            try:
+                template = library.get(name)
+            except KeyError:
+                # Final fallback to minimal default
+                template = DEFAULT_PROMPTS.get("default")
 
         # Render template with context. Replaces placeholders like {{perception_json}},
         # {{plan_step_description}}, {{memories_text}} with actual agent data.
+        # Inject available_actions into context.extra for renderer consumption
+        # (non-destructive copy)
+        context.extra.setdefault("available_actions", self.available_actions)
+
         rendered = render_prompt(template, context, include_default=False)
 
         # Debug logging: Show LLM prompts if enabled
