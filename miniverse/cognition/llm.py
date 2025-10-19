@@ -49,7 +49,7 @@ class LLMPlanner(Planner):
     def __init__(
         self,
         *,
-        template_name: str = "plan_daily",
+        template_name: str = "plan",
         prompt_library: Optional[PromptLibrary] = None,
     ) -> None:
         # Template name identifies which prompt to use from library (e.g., "plan_daily",
@@ -86,8 +86,8 @@ class LLMPlanner(Planner):
             # with placeholders for context injection.
             template = library.get(self.template_name)
         except KeyError:
-            # Template not found - fall back to default daily planning template
-            template = DEFAULT_PROMPTS.get("plan_daily")
+            # Template not found - fall back to default planning template
+            template = DEFAULT_PROMPTS.get("plan")
 
         # Render template with context. Replaces placeholders like {{perception_json}},
         # {{memories_text}} with actual context data. Returns system and user prompts.
