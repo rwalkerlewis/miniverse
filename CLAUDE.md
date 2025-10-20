@@ -13,7 +13,6 @@ Authoritative instructions for working on the **Miniverse** codebase.
 - **docs/architecture/** – Deep dives on cognition stack and environment tiers.
 - **docs/USAGE.md** – Step-by-step guide for building new simulations.
 - **docs/RESEARCH.md** – Academic foundations (Stanford Generative Agents, AgentTorch, etc.).
-- **docs/debugging/** – Session investigation notes (2025-10-16 debugging archive).
 - **docs/archive/** – Historical context only; do not resurrect old patterns.
 
 If something isn't covered in these sources, ask before implementing new patterns.

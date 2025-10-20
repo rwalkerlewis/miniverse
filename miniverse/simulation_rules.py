@@ -14,8 +14,12 @@ Design principle: If it can be calculated, calculate it (don't ask LLM).
 """
 
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 from miniverse.schemas import WorldState, AgentAction
+
+if TYPE_CHECKING:  # pragma: no cover - type hint only
+    from miniverse.schemas import AgentPerception
 
 
 def format_resources_generic(state: WorldState) -> str:
@@ -189,6 +193,39 @@ class SimulationRules(ABC):
             return True
         """
         pass
+
+    def customize_perception(
+        self,
+        agent_id: str,
+        perception: "AgentPerception",
+        world_state: WorldState,
+    ) -> "AgentPerception":
+        """Allow deterministic rules to adjust the agent's perception payload.
+
+        Scenarios can override this hook to add or modify perception fields
+        (e.g., prepend summary lines, redact information, or inject
+        deterministic telemetry). Default implementation returns the
+        perception unchanged.
+        """
+
+        return perception
+
+    def should_stop(self, state: WorldState, tick: int) -> bool:
+        """Return True to halt the simulation loop after the current tick.
+
+        Override in subclasses when deterministic physics can detect terminal
+        conditions (e.g., game over, mission success). Default behavior keeps
+        the simulation running for the requested number of ticks.
+
+        Args:
+            state: World state after the current tick has completed
+            tick: Tick number that just finished processing
+
+        Returns:
+            True if orchestrator.run() should stop before the next tick
+        """
+
+        return False
 
     def get_tick_duration_seconds(self) -> int:
         """

@@ -1,5 +1,5 @@
 """
-Varela Configuration
+Miniverse Configuration
 
 Loads configuration from environment variables with sensible defaults.
 """
@@ -54,7 +54,7 @@ class Config:
     def display(cls) -> str:
         """Return a formatted string showing current configuration."""
         lines = [
-            "Varela Configuration:",
+            "Miniverse Configuration:",
             f"  LLM Provider: {cls.LLM_PROVIDER}",
             f"  LLM Model: {cls.LLM_MODEL}",
             f"  Database: {cls.DATABASE_URL}",

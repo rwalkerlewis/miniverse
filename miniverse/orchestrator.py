@@ -354,6 +354,8 @@ class Orchestrator:
 
             # Main simulation loop. Each tick is independent - if one tick fails, we propagate
             # the exception immediately rather than continuing with corrupted state.
+            ticks_completed = 0
+            stopped_early = False
             for tick in range(1, num_ticks + 1):
                 print(f"=== Tick {tick}/{num_ticks} ===")
 
@@ -363,14 +365,28 @@ class Orchestrator:
                     print(f"ERROR at tick {tick}: {e}")
                     raise
 
+                ticks_completed = tick
+
+                if self.simulation_rules and self.simulation_rules.should_stop(
+                    self.current_state, tick
+                ):
+                    stopped_early = True
+                    print(
+                        f"\nSimulation stopped early at tick {tick} (signaled by simulation rules)."
+                    )
+                    break
+
             # Give simulation rules a chance to compute final statistics, aggregate metrics,
             # or clean up tracking structures. Not all rules need this hook.
             if self.simulation_rules:
                 self.current_state = self.simulation_rules.on_simulation_end(
-                    self.current_state, num_ticks
+                    self.current_state, ticks_completed
                 )
 
-            print("\n✅ Simulation complete!")
+            if stopped_early:
+                print("\nSimulation finished early (simulation rules signaled stop).")
+            else:
+                print("\n✅ Simulation complete!")
 
             return {"run_id": self.run_id, "final_state": self.current_state}
 
@@ -540,6 +556,16 @@ class Orchestrator:
             recent_messages,
             recent_memory_strings,
         )
+
+        if self.simulation_rules:
+            try:
+                perception = self.simulation_rules.customize_perception(
+                    agent_id, perception, self.current_state
+                )
+            except Exception as exc:  # pragma: no cover - defensive
+                raise RuntimeError(
+                    f"SimulationRules.customize_perception raised an error for agent {agent_id}"
+                ) from exc
 
         # DEBUG_PERCEPTION: Log what agent perceives (parallel to DEBUG_LLM)
         if os.getenv("DEBUG_PERCEPTION"):

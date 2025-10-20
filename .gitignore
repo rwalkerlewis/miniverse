@@ -29,6 +29,7 @@ logs/
 
 docs/technical/
 docs/archive/
+docs/debugging/
 # reference research
 .reference-work/
 examples/_legacy/

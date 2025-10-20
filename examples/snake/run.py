@@ -53,6 +53,7 @@ class SnakeRules(SimulationRules):
         self.food_pos: Tuple[int, int] = self._spawn_food()
         self.score = 0
         self.game_over = False
+        self.last_notice: str | None = None
 
     def _spawn_food(self) -> Tuple[int, int]:
         """Spawn food at random empty location."""
@@ -85,6 +86,67 @@ class SnakeRules(SimulationRules):
 
         return grid
 
+    def _evaluate_move(self, direction: str) -> Tuple[str, dict]:
+        """Evaluate a prospective move and return status + metadata."""
+
+        dx, dy = DIRECTIONS[direction]
+        head_x, head_y = self.snake_body[0]
+        new_pos = (head_x + dx, head_y + dy)
+
+        status = 'clear'
+        reason = None
+
+        # Off-grid = wall collision
+        if (
+            new_pos[0] <= 0
+            or new_pos[0] >= GRID_WIDTH - 1
+            or new_pos[1] <= 0
+            or new_pos[1] >= GRID_HEIGHT - 1
+        ):
+            status = 'blocked'
+            reason = 'wall'
+        else:
+            body_without_tail = (
+                self.snake_body[:-1] if len(self.snake_body) > 1 else []
+            )
+            if new_pos in body_without_tail:
+                status = 'blocked'
+                reason = 'self'
+            elif new_pos == self.food_pos:
+                status = 'food'
+
+        payload = {
+            'direction': direction,
+            'status': status,
+            'reason': reason,
+            'position': list(new_pos),
+        }
+
+        return status, payload
+
+    def _snapshot_state(
+        self,
+        state,
+        *,
+        head_position: Tuple[int, int] | None = None,
+        status_message: str | None = None,
+    ):
+        """Clone world state and attach grid metadata for default perception."""
+
+        self.last_notice = status_message
+
+        updated = state.model_copy(deep=True)
+        updated.environment_grid = self._build_grid()
+        updated.metadata['grid_visibility_radius'] = VISIBILITY_RADIUS
+
+        if updated.agents:
+            head = list(head_position or self.snake_body[0])
+            agent = updated.agents[0]
+            agent.grid_position = head
+            agent.metadata['grid_visibility_radius'] = VISIBILITY_RADIUS
+
+        return updated
+
     def apply_tick(self, state, tick):
         """Update world state (snake movement happens in process_action)."""
         if self.game_over:
@@ -96,45 +158,44 @@ class SnakeRules(SimulationRules):
 
     def validate_action(self, action, state):
         """Validate movement action."""
-        if action.action_type == 'move':
-            params = action.parameters or {}
-            direction = params.get('direction')
-            return direction in DIRECTIONS
-        return True
+        if action.action_type != 'move':
+            return True
+
+        params = action.parameters or {}
+        direction = params.get('direction')
+        if direction not in DIRECTIONS:
+            return False
+
+        status, _ = self._evaluate_move(direction)
+        return status != 'blocked'
 
     def process_actions(self, state, actions, tick):
         """Process agent actions deterministically - move snake based on LLM decision."""
         visibility_radius = VISIBILITY_RADIUS
 
         if self.game_over or not actions:
-            updated = state.model_copy(deep=True)
-            updated.environment_grid = self._build_grid()
-            updated.metadata['grid_visibility_radius'] = visibility_radius
-            if updated.agents:
-                updated.agents[0].grid_position = list(self.snake_body[0])
-                updated.agents[0].metadata['grid_visibility_radius'] = visibility_radius
+            updated = self._snapshot_state(state)
             return updated
 
         # Process first action (only one snake)
         action = actions[0]
         if action.action_type != 'move':
-            updated = state.model_copy(deep=True)
-            updated.environment_grid = self._build_grid()
-            updated.metadata['grid_visibility_radius'] = visibility_radius
-            if updated.agents:
-                updated.agents[0].grid_position = list(self.snake_body[0])
-                updated.agents[0].metadata['grid_visibility_radius'] = visibility_radius
+            updated = self._snapshot_state(state)
             return updated
 
         params = action.parameters or {}
         new_dir = params.get('direction')
         if new_dir not in DIRECTIONS:
-            updated = state.model_copy(deep=True)
-            updated.environment_grid = self._build_grid()
-            updated.metadata['grid_visibility_radius'] = visibility_radius
-            if updated.agents:
-                updated.agents[0].grid_position = list(self.snake_body[0])
-                updated.agents[0].metadata['grid_visibility_radius'] = visibility_radius
+            updated = self._snapshot_state(state, status_message="Invalid move command (missing direction)")
+            return updated
+
+        status, move_payload = self._evaluate_move(new_dir)
+        if status == 'blocked':
+            reason = move_payload.get('reason', 'blocked')
+            message = f"Cannot move {new_dir}: {reason}"
+            self.game_over = True
+            updated = self._snapshot_state(state, status_message=message)
+            updated.resources.get_metric('game_status').value = 'game_over'
             return updated
 
         self.direction = new_dir
@@ -144,31 +205,6 @@ class SnakeRules(SimulationRules):
         dx, dy = DIRECTIONS[self.direction]
         new_head = (head_x + dx, head_y + dy)
 
-        # Check wall collision
-        if (new_head[0] <= 0 or new_head[0] >= GRID_WIDTH - 1 or
-            new_head[1] <= 0 or new_head[1] >= GRID_HEIGHT - 1):
-            self.game_over = True
-            updated = state.model_copy(deep=True)
-            updated.resources.get_metric('game_status').value = 'game_over'
-            updated.environment_grid = self._build_grid()
-            updated.metadata['grid_visibility_radius'] = visibility_radius
-            if updated.agents:
-                updated.agents[0].grid_position = list(self.snake_body[0])
-                updated.agents[0].metadata['grid_visibility_radius'] = visibility_radius
-            return updated
-
-        # Check self collision
-        if new_head in self.snake_body:
-            self.game_over = True
-            updated = state.model_copy(deep=True)
-            updated.resources.get_metric('game_status').value = 'game_over'
-            updated.environment_grid = self._build_grid()
-            updated.metadata['grid_visibility_radius'] = visibility_radius
-            if updated.agents:
-                updated.agents[0].grid_position = list(self.snake_body[0])
-                updated.agents[0].metadata['grid_visibility_radius'] = visibility_radius
-            return updated
-
         # Move snake
         self.snake_body.insert(0, new_head)
 
@@ -176,21 +212,45 @@ class SnakeRules(SimulationRules):
         if new_head == self.food_pos:
             self.score += 1
             self.food_pos = self._spawn_food()
+            status_message = f"Ate food moving {new_dir}!"
         else:
             # Remove tail (snake doesn't grow unless eating)
             self.snake_body.pop()
+            status_message = f"Moved {new_dir}"
 
         # Update world state with new snake position and grid snapshot
-        updated = state.model_copy(deep=True)
+        updated = self._snapshot_state(
+            state,
+            head_position=new_head,
+            status_message=status_message,
+        )
         updated.resources.get_metric('score').value = self.score
-        updated.environment_grid = self._build_grid()
-        updated.metadata['grid_visibility_radius'] = visibility_radius
-
-        if updated.agents:
-            updated.agents[0].grid_position = list(new_head)
-            updated.agents[0].metadata['grid_visibility_radius'] = visibility_radius
-
         return updated
+
+    def customize_perception(self, agent_id, perception, world_state):
+        ascii_grid = render_grid(self)
+
+        perception.recent_observations = [ascii_grid]
+        # Ensure structured artifacts are removed so default template stays lean
+        perception.grid_visibility = None
+        if hasattr(perception, 'grid_ascii'):
+            try:
+                delattr(perception, 'grid_ascii')
+            except AttributeError:
+                perception.grid_ascii = None
+        return perception
+
+    def should_stop(self, state, tick):
+        """Stop simulation once the deterministic rules mark the game as over."""
+
+        if self.game_over:
+            return True
+
+        status = state.resources.metrics.get('game_status') if state.resources else None
+        if status and getattr(status, 'value', None) == 'game_over':
+            return True
+
+        return False
 
 
 def render_grid(rules: SnakeRules) -> str:
@@ -249,12 +309,18 @@ async def main():
                 display_name='Snake AI',
                 location=None,
                 grid_position=list(rules.snake_body[0]),
-                metadata={'grid_visibility_radius': VISIBILITY_RADIUS}
+                metadata={
+                    'grid_visibility_radius': VISIBILITY_RADIUS,
+                }
             )
         ],
         environment_grid=rules._build_grid(),
-        metadata={'grid_visibility_radius': VISIBILITY_RADIUS}
+        metadata={
+            'grid_visibility_radius': VISIBILITY_RADIUS,
+        }
     )
+
+    world_state = rules._snapshot_state(world_state)
 
     # Agent profile
     agents = {
@@ -273,11 +339,11 @@ async def main():
     # Simple prompt - just show the grid and let LLM decide
     agent_prompts = {
         'snake': (
-            "You are a snake in a grid world. Each perception includes your `grid_position`, a structured "
-            "`grid_visibility.tiles` window, and a quick `grid_ascii` rendering of nearby tiles. Use those to "
-            "choose a safe direction (`up`, `down`, `left`, or `right`) that moves toward the food while avoiding "
-            "walls (`game_object='wall'`) and your own body (`snake_body`). Always return an action with "
-            "`action_type='move'` and `parameters={\"direction\": <direction>}` and explain your reasoning."
+            "You are a snake in a grid world. Each perception provides the ASCII board of the arena as a single "
+            "string (top row first, walls shown as █, snake head as ●, body as o, food as ★). Choose a safe "
+            "direction (`up`, `down`, `left`, or `right`) that moves toward the food while avoiding walls and "
+            "your own body. Always return an action with `action_type='move'` and `parameters={\"direction\": "
+            "<direction>}` and explain your reasoning."
         )
     }
 
@@ -302,7 +368,7 @@ async def main():
 
     # LLM config
     provider = os.getenv('LLM_PROVIDER', 'openai')
-    model = os.getenv('LLM_MODEL', 'gpt-5-nano')
+    model = os.getenv('LLM_MODEL', 'gpt-5')
 
     # Memory and persistence
     persistence = InMemoryPersistence()

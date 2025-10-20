@@ -135,13 +135,12 @@ def test_build_agent_perception_includes_grid_visibility():
     assert perception.grid_position == [2, 2]
     assert perception.grid_visibility is not None
     assert perception.grid_visibility.radius == 2  # agent metadata overrides world metadata
-    # radius=2 → (2*2+1)^2 tiles within bounds
-    assert len(perception.grid_visibility.tiles) == 25
-
+    assert len(perception.grid_visibility.tiles) == 25  # (2*radius+1)^2
     tiles = {tuple(tile.position): tile.tile for tile in perception.grid_visibility.tiles}
     assert tiles[(3, 2)].game_object == "food"
     assert tiles[(1, 1)].collision is True
-    # Empty tiles are provided with default metadata
-    assert tiles[(0, 0)].game_object is None
-    assert perception.grid_ascii is not None
-    assert "●" in perception.grid_ascii
+    assert tiles[(2, 2)].game_object == "snake_head"
+    assert perception.recent_observations
+    grid_line = perception.recent_observations[0]
+    assert grid_line.startswith("GRID ASCII:")
+    assert "●" in grid_line

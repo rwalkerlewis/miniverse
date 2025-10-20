@@ -35,9 +35,9 @@ def _minimal_context(extra=None):
 
 
 def test_base_agent_prompt_goes_to_user_with_fallback():
-    # Template without placeholder should get base prompt auto-prepended to USER
-    tmpl = PromptTemplate(name="t", system="SYSTEM", user="USER")
-    ctx = _minimal_context(extra={"base_agent_prompt": "AGENT_RULES"})
+    # Template WITH placeholder should inject initial_state_agent_prompt
+    tmpl = PromptTemplate(name="t", system="SYSTEM", user="{{initial_state_agent_prompt}}\n\nUSER")
+    ctx = _minimal_context(extra={"initial_state_agent_prompt": "AGENT_RULES"})
     rendered = render_prompt(tmpl, ctx, include_default=False)
     assert rendered.user.startswith("AGENT_RULES")
 
@@ -54,8 +54,8 @@ def test_action_catalog_is_rendered():
 
 
 def test_character_prompt_in_system_with_fallback():
-    # Template lacks character placeholder → should be auto-prepended to SYSTEM
-    tmpl = PromptTemplate(name="t", system="SYSTEM", user="USER")
+    # Template WITH character placeholder should inject character prompt
+    tmpl = PromptTemplate(name="t", system="{{character_prompt}}\n\nSYSTEM", user="USER")
     ctx = _minimal_context()
     rendered = render_prompt(tmpl, ctx, include_default=False)
     assert rendered.system.startswith("I am Alice Smith.")
@@ -63,10 +63,10 @@ def test_character_prompt_in_system_with_fallback():
 
 def test_default_template_places_identity_and_base_correctly():
     tmpl = DEFAULT_PROMPTS.get("default")
-    ctx = _minimal_context(extra={"base_agent_prompt": "Focus on safety."})
+    ctx = _minimal_context(extra={"initial_state_agent_prompt": "Focus on safety."})
     rendered = render_prompt(tmpl, ctx, include_default=False)
     # Identity at the start of SYSTEM
     assert rendered.system.startswith("I am Alice Smith.")
-    # Base prompt at the start of USER
+    # Base prompt at the start of USER (via placeholder)
     assert rendered.user.startswith("Focus on safety.")
 

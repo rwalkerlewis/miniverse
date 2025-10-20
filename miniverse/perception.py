@@ -160,7 +160,6 @@ def build_agent_perception(
     # Determine grid visibility for Tier 2 environments (if configured)
     grid_position: List[int] | None = None
     grid_visibility: GridVisibility | None = None
-    grid_ascii: str | None = None
     if world_state.environment_grid and agent_status.grid_position:
         grid_position = list(agent_status.grid_position)
         center: Tuple[int, int] = (grid_position[0], grid_position[1])
@@ -187,6 +186,9 @@ def build_agent_perception(
             center,
             radius=radius,
         )
+
+        # Default builder adds an ASCII snapshot for human/LLM readability.
+        # Scenario-specific hooks can override recent_observations entirely if desired.
         recent_observations.insert(0, f"GRID ASCII:\n{grid_ascii}")
 
     return AgentPerception(
@@ -200,5 +202,5 @@ def build_agent_perception(
         messages=messages,
         recent_observations=recent_observations,
         grid_visibility=grid_visibility,
-        grid_ascii=grid_ascii,
+        grid_ascii=None,
     )

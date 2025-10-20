@@ -545,11 +545,8 @@ class AgentPerception(BaseModel):
         None,
         description="Visible grid window with tile metadata for spatial environments",
     )
-    # Optional ASCII rendering of the visible window for human/LLM readability
-    grid_ascii: Optional[str] = Field(
-        None,
-        description="ASCII rendering of the visible grid window (for quick reference)",
-    )
+    # ASCII rendering removed from core schema; scenarios should add custom context via
+    # SimulationRules.customize_perception() when they need human-readable grids.
 
 
 # ============================================================================

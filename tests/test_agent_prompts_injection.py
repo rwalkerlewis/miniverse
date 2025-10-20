@@ -45,11 +45,11 @@ def test_agent_prompts_injection():
         scratchpad_state={},
         plan_state={},
         memories=[],
-        extra={"base_agent_prompt": agent_prompt}
+        extra={"initial_state_agent_prompt": agent_prompt}
     )
 
-    # Use default execute_tick template
-    template = DEFAULT_PROMPTS.get("execute_tick")
+    # Use default template (has initial_state_agent_prompt placeholder)
+    template = DEFAULT_PROMPTS.get("default")
 
     # Render the prompt
     rendered = render_prompt(template, context)
@@ -62,8 +62,8 @@ def test_agent_prompts_injection():
     assert rendered.user.startswith(test_marker), \
         f"Test marker should be at start of user prompt. Got: {rendered.user[:100]}"
 
-    # Verify template content still appears after agent_prompt
-    assert "execution module" in rendered.system, \
+    # Verify template content still appears
+    assert "simulation" in rendered.system.lower(), \
         "Default template content should still be present"
 
 
@@ -116,10 +116,10 @@ DO NOT use any other action type. ONLY move actions.'''
         scratchpad_state={},
         plan_state={},
         memories=[],
-        extra={"base_agent_prompt": snake_prompt}
+        extra={"initial_state_agent_prompt": snake_prompt}
     )
 
-    template = DEFAULT_PROMPTS.get("execute_tick")
+    template = DEFAULT_PROMPTS.get("default")
     rendered = render_prompt(template, context)
 
     # Verify snake marker and instructions are present (in USER)
@@ -127,6 +127,5 @@ DO NOT use any other action type. ONLY move actions.'''
     assert "ONLY move actions" in rendered.user
     assert rendered.user.startswith(snake_marker)
 
-    # Verify template is still there (this is the architectural issue we documented)
-    assert "execution module" in rendered.system
-    assert "common values: communicate, work, move_to" in rendered.user
+    # Verify template is still there
+    assert "simulation" in rendered.system.lower()

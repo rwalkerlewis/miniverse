@@ -365,7 +365,6 @@ Legacy examples are preserved under `examples/_legacy/` for reference.
 - **[Cognition Stack](docs/architecture/cognition.md)** - Planner/executor/reflection flow
 - **[Environment Tiers](docs/architecture/environment.md)** - Logical graphs and spatial grids
 - **[RESEARCH.md](docs/RESEARCH.md)** - Academic foundations
-- **[Debugging Archive](docs/debugging/)** - Investigation notes
 
 ## Research Foundation
 
@@ -388,7 +387,3 @@ Current priorities:
 ## License
 
 MIT
-
-## Project Name
-
-The Python package is `miniverse`. The project folder is `varela` (codename inspired by Francisco Varela's work in cybernetics and autopoiesis).

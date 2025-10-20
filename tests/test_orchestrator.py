@@ -39,6 +39,17 @@ class DummyRules(SimulationRules):
         return True
 
 
+class StopAfterRules(DummyRules):
+    """Rules that request early termination after a specific tick."""
+
+    def __init__(self, stop_after: int):
+        super().__init__()
+        self.stop_after = stop_after
+
+    def should_stop(self, state: WorldState, tick: int) -> bool:
+        return tick >= self.stop_after
+
+
 class RecordingMemory(MemoryStrategy):
     """Simple memory implementation that records writes for assertions."""
 
@@ -179,3 +190,76 @@ async def test_orchestrator_runs_single_tick(monkeypatch):
             assert isinstance(act.communication, dict)
             assert "to" in act.communication
             assert "message" not in act.communication
+
+
+@pytest.mark.asyncio
+async def test_orchestrator_stops_when_rules_signal(monkeypatch):
+    world_state = WorldState(
+        tick=0,
+        timestamp=datetime(2160, 3, 21, 10, 0, 0),
+        environment=EnvironmentState(metrics={}),
+        resources=ResourceState(metrics={"power": Stat(value=100, unit="kWh")}),
+        agents=[
+            AgentStatus(
+                agent_id="alpha",
+                display_name="Morgan Reyes",
+                role="floor_lead",
+                location="operations",
+                activity=None,
+                attributes={},
+            )
+        ],
+        metadata={},
+    )
+
+    profile = AgentProfile(
+        agent_id="alpha",
+        name="Morgan Reyes",
+        age=32,
+        background="Workshop supervisor.",
+        role="floor_lead",
+        personality="driven",
+        skills={},
+        goals=[],
+        relationships={},
+    )
+
+    rules = StopAfterRules(stop_after=2)
+    memory = RecordingMemory()
+
+    orchestrator = Orchestrator(
+        world_state=world_state,
+        agents={"alpha": profile},
+        world_prompt="",
+        agent_prompts={"alpha": ""},
+        llm_provider="openai",
+        llm_model="gpt-5-nano",
+        simulation_rules=rules,
+        memory=memory,
+        agent_cognition={"alpha": AgentCognition(executor=LLMExecutor(template_name="default"))},
+    )
+
+    mocked_action = AgentAction(
+        agent_id="alpha",
+        tick=1,
+        action_type="work",
+        target=None,
+        parameters=None,
+        reasoning="",
+        communication=None,
+    )
+
+    action_mock = AsyncMock(return_value=mocked_action)
+    state_tick_1 = world_state.model_copy(update={"tick": 1})
+    state_tick_2 = world_state.model_copy(update={"tick": 2})
+    world_update_mock = AsyncMock(side_effect=[state_tick_1, state_tick_2])
+
+    monkeypatch.setattr("miniverse.cognition.llm.call_llm_with_retries", action_mock)
+    monkeypatch.setattr("miniverse.orchestrator.process_world_update", world_update_mock)
+
+    result = await orchestrator.run(num_ticks=5)
+
+    assert result["final_state"].tick == 2
+    assert rules.ticks_applied == [1, 2]
+    assert action_mock.await_count == 2
+    assert world_update_mock.await_count == 2
