@@ -14,6 +14,8 @@ from .helpers import (
     grid_shortest_path,
     validate_grid_move,
     validate_graph_move,
+    get_visible_tiles,
+    render_ascii_window,
 )
 
 __all__ = [
@@ -30,4 +32,6 @@ __all__ = [
     "grid_shortest_path",
     "validate_grid_move",
     "validate_graph_move",
+    "get_visible_tiles",
+    "render_ascii_window",
 ]

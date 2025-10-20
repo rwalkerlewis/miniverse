@@ -36,9 +36,18 @@ Usage:
     # perception now contains ONLY what alice can perceive
 """
 
-from typing import List, Dict
+from typing import Dict, List, Tuple
 
-from miniverse.schemas import WorldState, AgentPerception
+from miniverse.environment import get_visible_tiles, render_ascii_window
+from miniverse.schemas import (
+    AgentPerception,
+    GridVisibility,
+    VisibleGridTile,
+    WorldState,
+)
+
+
+DEFAULT_GRID_VISIBILITY_RADIUS = 2
 
 
 def build_agent_perception(
@@ -146,15 +155,50 @@ def build_agent_perception(
 
     # Use provided recent memories (already filtered to last 10 by memory strategy)
     # Provides context for decision-making without overwhelming LLM prompt
-    recent_observations = recent_memories
+    recent_observations = list(recent_memories)
+
+    # Determine grid visibility for Tier 2 environments (if configured)
+    grid_position: List[int] | None = None
+    grid_visibility: GridVisibility | None = None
+    grid_ascii: str | None = None
+    if world_state.environment_grid and agent_status.grid_position:
+        grid_position = list(agent_status.grid_position)
+        center: Tuple[int, int] = (grid_position[0], grid_position[1])
+
+        # Allow scenarios to override visibility radius via metadata
+        radius = DEFAULT_GRID_VISIBILITY_RADIUS
+        if isinstance(world_state.metadata, dict):
+            radius = int(world_state.metadata.get("grid_visibility_radius", radius))
+        if isinstance(agent_status.metadata, dict):
+            radius = int(agent_status.metadata.get("grid_visibility_radius", radius))
+
+        tiles = get_visible_tiles(
+            world_state.environment_grid,
+            center,
+            radius=radius,
+        )
+        visible_tiles = [
+            VisibleGridTile(position=pos, tile=tile)
+            for pos, tile in sorted(tiles.items())
+        ]
+        grid_visibility = GridVisibility(center=center, radius=radius, tiles=visible_tiles)
+        grid_ascii = render_ascii_window(
+            world_state.environment_grid,
+            center,
+            radius=radius,
+        )
+        recent_observations.insert(0, f"GRID ASCII:\n{grid_ascii}")
 
     return AgentPerception(
         tick=world_state.tick,
         personal_attributes=personal_attributes,
         location=agent_status.location,
+        grid_position=grid_position,
         visible_resources=visible_resources,
         environment_snapshot=environment_snapshot,
         system_alerts=system_alerts,
         messages=messages,
         recent_observations=recent_observations,
+        grid_visibility=grid_visibility,
+        grid_ascii=grid_ascii,
     )

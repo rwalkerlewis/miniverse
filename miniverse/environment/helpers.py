@@ -7,6 +7,7 @@ from typing import Dict, Iterable, List, Optional, Set, Tuple
 
 from .graph import EnvironmentGraph
 from .grid import EnvironmentGrid
+from .schemas import EnvironmentGridState, GridTileState
 
 
 class GraphOccupancy:
@@ -197,6 +198,85 @@ def validate_grid_move(
         return False  # path exists but too far for single action
 
     return True
+
+
+def get_visible_tiles(
+    grid: EnvironmentGridState,
+    center: Tuple[int, int],
+    *,
+    radius: int,
+) -> Dict[Tuple[int, int], GridTileState]:
+    """Return tiles visible within ``radius`` of ``center`` from an ``EnvironmentGridState``."""
+
+    radius = max(int(radius), 0)
+    visible: Dict[Tuple[int, int], GridTileState] = {}
+
+    cx, cy = center
+    width = grid.width
+    height = grid.height
+
+    min_x = max(0, cx - radius)
+    max_x = min(width - 1, cx + radius)
+    min_y = max(0, cy - radius)
+    max_y = min(height - 1, cy + radius)
+
+    for x in range(min_x, max_x + 1):
+        for y in range(min_y, max_y + 1):
+            tile = grid.tiles.get((x, y))
+            if tile is None:
+                tile = GridTileState()
+            visible[(x, y)] = tile
+
+    return visible
+
+
+_DEFAULT_TILE_SYMBOLS: Dict[str, str] = {
+    "wall": "██",
+    "snake_head": "● ",
+    "snake_body": "o ",
+    "food": "★ ",
+}
+
+
+def render_ascii_window(
+    grid: EnvironmentGridState,
+    center: Tuple[int, int],
+    *,
+    radius: int,
+    symbols: Optional[Dict[str, str]] = None,
+) -> str:
+    """Render a small ASCII window around ``center`` using ``get_visible_tiles``.
+
+    Suitable for prompts/debug views where a quick human-readable snapshot helps the
+    LLM reason about nearby tiles. Unknown game_object values fall back to ``??``.
+    """
+
+    if radius <= 0:
+        radius = 0
+
+    mapping = {**_DEFAULT_TILE_SYMBOLS}
+    if symbols:
+        mapping.update(symbols)
+
+    visible = get_visible_tiles(grid, center, radius=radius)
+    cx, cy = center
+    min_x = max(0, cx - radius)
+    max_x = min(grid.width - 1, cx + radius)
+    min_y = max(0, cy - radius)
+    max_y = min(grid.height - 1, cy + radius)
+
+    lines: List[str] = []
+    for y in range(max_y, min_y - 1, -1):
+        row_chars: List[str] = []
+        for x in range(min_x, max_x + 1):
+            tile = visible.get((x, y))
+            if tile and tile.game_object:
+                row_chars.append(mapping.get(tile.game_object, "??"))
+            else:
+                row_chars.append("  ")
+        lines.append("".join(row_chars))
+
+    return "\n".join(lines)
 
 
 def validate_graph_move(

@@ -29,6 +29,7 @@ Miniverse supports multiple levels of environment fidelity so simulations can sc
   - A* pathfinding over walkable tiles.
   - Reverse indices for quick lookup of all tiles matching an object name.
   - Automatic population of events based on tile metadata (e.g., place equipment events at object coordinates).
+- Agent perception now exposes `grid_visibility` (local window of tiles around the agent) when `environment_grid` and `grid_position` are present, enabling LLM agents to reason about nearby walls, objects, and goals.
 
 ## Scenario Loader & World State
 
@@ -57,6 +58,8 @@ Helper modules in `miniverse/environment/` will eventually provide reusable util
 - `shortest_path(graph, start, goal)` returns a list of node IDs using BFS.
 - `grid_shortest_path(grid, start, goal)` finds a walkable path on the tile grid while avoiding collision tiles.
 - `EnvironmentGrid.is_walkable(row, col)` and `EnvironmentGraph.neighbors(node_id)` offer convenience checks for deterministic rules.
+- `get_visible_tiles(grid_state, center, radius)` produces the local window of tiles used by agent perception to populate `grid_visibility`.
+- `render_ascii_window(grid_state, center, radius)` creates a compact ASCII summary of the same window—useful for perception summaries or debugging output.
 
 ## Next Steps
 

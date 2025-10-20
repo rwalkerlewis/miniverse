@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 from miniverse.environment import (
     EnvironmentGraphState,
     EnvironmentGridState,
+    GridTileState,
 )
 from typing import Any, Dict, List, Optional, Tuple, Union
 from datetime import datetime
@@ -453,6 +454,24 @@ class AgentAction(BaseModel):
     )
 
 
+class VisibleGridTile(BaseModel):
+    """A tile visible to the agent within their local grid view."""
+
+    position: Tuple[int, int] = Field(..., description="(x, y) coordinate of the tile")
+    tile: GridTileState = Field(..., description="Metadata describing the tile contents")
+
+
+class GridVisibility(BaseModel):
+    """Container describing the agent's local grid view."""
+
+    center: Tuple[int, int] = Field(..., description="Agent grid position used as visibility center")
+    radius: int = Field(..., ge=0, description="Visibility radius in tiles (Chebyshev distance)")
+    tiles: List[VisibleGridTile] = Field(
+        default_factory=list,
+        description="Tiles within the visible window around the agent",
+    )
+
+
 class AgentPerception(BaseModel):
     """What a specific agent can perceive in a single tick (partial observability pattern).
 
@@ -484,6 +503,13 @@ class AgentPerception(BaseModel):
     tick: int = Field(..., ge=0, description="Current tick")
     # location enables spatial reasoning ("I'm in the lab, can't access reactor")
     location: Optional[str] = Field(None, description="Agent's current location")
+    # grid_position provides the agent's coordinates in Tier 2 environments (if applicable)
+    grid_position: Optional[List[int]] = Field(
+        None,
+        min_length=2,
+        max_length=2,
+        description="Agent's grid coordinates [x, y] when environment_grid is present",
+    )
     # personal_attributes = what agent feels/knows about themselves (introspection)
     personal_attributes: Dict[str, Stat] = Field(
         default_factory=dict, description="Self-reported attributes (health, morale, etc.)"
@@ -513,6 +539,16 @@ class AgentPerception(BaseModel):
     recent_observations: List[str] = Field(
         default_factory=list,
         description="Recent memories (last 10 observations from memory stream)",
+    )
+    # grid_visibility describes the local window of tiles around the agent in Tier 2 grids
+    grid_visibility: Optional[GridVisibility] = Field(
+        None,
+        description="Visible grid window with tile metadata for spatial environments",
+    )
+    # Optional ASCII rendering of the visible window for human/LLM readability
+    grid_ascii: Optional[str] = Field(
+        None,
+        description="ASCII rendering of the visible grid window (for quick reference)",
     )
 
 

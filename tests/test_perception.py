@@ -2,6 +2,7 @@
 
 from datetime import datetime
 
+from miniverse.environment import EnvironmentGridState, GridTileState
 from miniverse.perception import build_agent_perception
 from miniverse.schemas import (
     AgentAction,
@@ -101,3 +102,46 @@ def test_build_agent_perception_structure():
     assert perception.messages == [
         {"from": "beta", "message": "Expect gusts over 25 km/h."}
     ]
+
+
+def test_build_agent_perception_includes_grid_visibility():
+    world_state = make_world_state()
+
+    # Attach Tier 2 grid to world state
+    grid = EnvironmentGridState(
+        width=5,
+        height=5,
+        tiles={
+            (2, 2): GridTileState(game_object="snake_head", collision=True),
+            (3, 2): GridTileState(game_object="food", collision=False),
+            (1, 1): GridTileState(game_object="wall", collision=True),
+        },
+    )
+    world_state.environment_grid = grid
+    world_state.metadata["grid_visibility_radius"] = 1
+
+    # Configure agent grid position + override radius via metadata
+    agent_status = next(a for a in world_state.agents if a.agent_id == "alpha")
+    agent_status.grid_position = [2, 2]
+    agent_status.metadata["grid_visibility_radius"] = 2
+
+    perception = build_agent_perception(
+        agent_id="alpha",
+        world_state=world_state,
+        recent_messages=[],
+        recent_memories=[],
+    )
+
+    assert perception.grid_position == [2, 2]
+    assert perception.grid_visibility is not None
+    assert perception.grid_visibility.radius == 2  # agent metadata overrides world metadata
+    # radius=2 → (2*2+1)^2 tiles within bounds
+    assert len(perception.grid_visibility.tiles) == 25
+
+    tiles = {tuple(tile.position): tile.tile for tile in perception.grid_visibility.tiles}
+    assert tiles[(3, 2)].game_object == "food"
+    assert tiles[(1, 1)].collision is True
+    # Empty tiles are provided with default metadata
+    assert tiles[(0, 0)].game_object is None
+    assert perception.grid_ascii is not None
+    assert "●" in perception.grid_ascii
