@@ -32,6 +32,8 @@ docs/archive/
 # reference research
 .reference-work/
 examples/_legacy/
+# ignore legacy experimental example (kept locally, not tracked)
+examples/behavior_is_all_you_need/
 # Mac OS
 .DS_Store
 **/.DS_Store
@@ -40,3 +42,5 @@ examples/_legacy/
 examples/smallville/*.txt
 
 
+# runs
+runs/
