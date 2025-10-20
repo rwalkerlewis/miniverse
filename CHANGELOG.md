@@ -12,6 +12,13 @@
 - Docs: Align examples with renderer expectations
   - `docs/USAGE.md` shows `available_actions` entries with `name/schema/examples`
   - `README.md` clarifies that action catalog entries should include `name`
+- Notebook: Smallville Valentine's walkthrough is Jupyter-safe
+  - Update `examples/smallville/valentines_party.ipynb` to instantiate `InMemoryPersistence()`
+  - Add notebook-safe async runner with `nest_asyncio` and `asyncio.run` fallback
+  - Fix orchestrator wiring to avoid class vs instance initialization issues
+- Logging: Include action parameters in tick summary
+  - Default tick summary now shows `target`, `parameters`, and `comm.to` alongside action type
+  - Remove reasoning truncation; full reasoning is now printed
 
 ## 2025-10-20
 
