@@ -1256,15 +1256,19 @@ class Orchestrator:
         if resource_summary:
             print(f"  Resources: {resource_summary}")
 
-        # Print agent actions
+        # Print agent actions (full details)
         for action in actions:
             agent = self.agents[action.agent_id]
-            reasoning_preview = (
-                action.reasoning[:60] + "..."
-                if len(action.reasoning) > 60
-                else action.reasoning
+            reasoning_text = action.reasoning if action.reasoning is not None else ""
+            target_str = f" target={action.target}" if action.target is not None else ""
+            params_str = f" params={action.parameters}" if action.parameters else ""
+            comm_to = None
+            if action.communication and isinstance(action.communication, dict):
+                comm_to = action.communication.get("to")
+            comm_str = f" comm.to={comm_to}" if comm_to else ""
+            print(
+                f"  {agent.name}: {action.action_type}{target_str}{params_str}{comm_str} - {reasoning_text}"
             )
-            print(f"  {agent.name}: {action.action_type} - {reasoning_preview}")
 
         # Print events
         for event in state.recent_events:

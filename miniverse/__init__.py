@@ -61,6 +61,8 @@ from .schemas import (
     AgentProfile,
     AgentAction,
     AgentPerception,
+    GridVisibility,
+    VisibleGridTile,
     SimulationRun,
     AgentMemory,
     Stat,
@@ -105,6 +107,8 @@ __all__ = [
     "AgentProfile",
     "AgentAction",
     "AgentPerception",
+    "GridVisibility",
+    "VisibleGridTile",
     # Database schemas
     "SimulationRun",
     "AgentMemory",
