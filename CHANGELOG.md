@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-10-20 (grid perception)
+
+- Perception: Tier-2 grids now surface `grid_visibility` windows and a `grid_ascii` snapshot on `AgentPerception`, honoring visibility radius overrides from world/agent metadata and injecting the ASCII view into recent observations.
+- Environment helpers: Added `render_ascii_window()` for converting sparse `EnvironmentGridState` tiles into readable windows with default symbols (snake head/body, food, walls) for prompts and debugging.
+- Example (Snake): Scenario now runs as a single orchestrator session with a tick listener that prints the ASCII board, validates LLM moves deterministically, and announces game over/timeouts without emoji noise.
+- Tests: Expanded grid perception coverage and ASCII rendering assertions in `tests/test_perception.py` and `tests/test_environment_helpers.py`.
+
 ## 2025-10-20 (later)
 
 - Fix: Deterministic fallback respects occupancy capacity
@@ -37,4 +44,3 @@
 - Examples: Smallville Valentine’s action catalog made generic to preserve emergence; only Isabella has initial state about the party.
 - Docs: `docs/PROMPTS.md` updated to reflect simplified renderer, roles, and defaults.
 - Tests: adjusted for simplified renderer and defaults (ensure first-turn-only injection via orchestrator).
-
