@@ -51,6 +51,7 @@ def render_prompt(
     context_json = context.to_json()  # Full context as JSON (agent profile, perception, world, memories, plan)
     summary = context.summary()  # Human-readable text summary (location, plan steps, recent conversation)
     perception_json = context.perception_json()  # Just perception as JSON (what agent observes)
+    perception_text = "\n".join(context.perception.recent_observations)
     plan_json = context.plan_json()  # Just plan as JSON (current step, remaining steps)
     memories_text = context.memories_text()  # Recent memories as bulleted text list
     scratchpad_json = context.scratchpad_json()  # Scratchpad state as JSON (working memory)
@@ -95,6 +96,7 @@ def render_prompt(
         "{{context_json}}": context_json,
         "{{context_summary}}": summary,
         "{{perception_json}}": perception_json,
+        "{{perception_text}}": perception_text,
         "{{plan_json}}": plan_json,
         "{{memories_text}}": memories_text,
         "{{scratchpad_json}}": scratchpad_json,
@@ -102,6 +104,8 @@ def render_prompt(
         "{{initial_state_agent_prompt}}": initial_state_agent_prompt,
         "{{simulation_instructions}}": simulation_instructions,
         "{{character_prompt}}": character_prompt,
+        "{{agent_id}}": getattr(context.agent_profile, "agent_id", ""),
+        "{{current_tick}}": str(getattr(context.perception, "tick", "")),
     }
 
     # Extract system and user prompt components from template. Templates separate system

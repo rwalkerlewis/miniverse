@@ -445,7 +445,7 @@ class AgentAction(BaseModel):
     )
     # reasoning preserves LLM's decision process for debugging and agent self-reflection.
     # Example: "Health critical, need rest before continuing repairs"
-    reasoning: str = Field(..., description="Why this action was chosen")
+    reasoning: str = Field("", description="Why this action was chosen")
     # communication stores message content when action_type involves messaging.
     # Format: {"to": "other_agent_id", "message": "text content"}
     # Enables social coordination without separate message queue
