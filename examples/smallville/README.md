@@ -2,7 +2,7 @@
 
 This directory contains a working demonstration of Stanford Generative Agents-style information diffusion. Specifically, we construct a micro replication of the experiment focused on the Valentine's Day party scenario where agents spread information (party invites) through their social network.
 
-## 📁 Files
+## Files
 
 ### Main Script
 **`valentines_party.py`** - Python script that runs the scenario
@@ -15,7 +15,7 @@ This directory contains a working demonstration of Stanford Generative Agents-st
 - More complex setup with EmbeddingMemoryStream
 - Same scenario, more advanced implementation
 
-## 🚀 How to Run
+## How to Run
 
 ```bash
 # Basic run (uses executor template_name="default")
@@ -32,7 +32,7 @@ Notes:
 - Communication content is persisted in memories (sender+recipient), not in actions. Read transcripts from memories.
 - World updates use deterministic rules for time/resource changes; LLM handles agent actions.
 
-## 🔧 Key Features
+## Key Features
 
 - LLM-driven social coordination
 - Memory-based information propagation
