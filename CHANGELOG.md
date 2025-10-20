@@ -2,11 +2,11 @@
 
 ## 2025-10-20 (grid perception)
 
-- Perception: Restored the minimal Tier-2 behavior (full `grid_visibility` snapshot plus an ASCII window). Scenarios that need richer context can now override `SimulationRules.customize_perception()` to inject bespoke observations.
-- Environment helpers: Added `render_ascii_window()` for converting sparse `EnvironmentGridState` tiles into readable windows with default symbols (snake head/body, food, walls) for prompts and debugging.
-- Example (Snake): Scenario now runs as a single orchestrator session with a tick listener that prints the ASCII board, validates LLM moves deterministically, and announces game over/timeouts without emoji noise.
-- Orchestrator: `SimulationRules.should_stop()` lets deterministic physics halt runs early; the Snake example now ends as soon as `game_status` flips to `game_over`.
-- Tests: Expanded grid perception coverage and ASCII rendering assertions in `tests/test_perception.py` and `tests/test_environment_helpers.py`.
+- Perception: Restored the minimal Tier-2 behavior; `AgentPerception` no longer exposes `grid_ascii`. The builder now only prepends the ASCII view to `recent_observations`, and scenarios inject richer context via `SimulationRules.customize_perception()`.
+- Cognition: Prompt renderer gained `{{perception_text}}`, `{{current_tick}}`, and `{{agent_id}}` placeholders so executor templates can work with plain text boards instead of JSON dumps.
+- Schemas: `AgentAction.reasoning` defaults to an empty string, letting scenarios skip rationale without breaking validation.
+- Example (Snake): Executor uses a custom ASCII-only prompt template and strips structured perception fields, closely mirroring the legacy `snake.py` experience.
+- Tests: Updated `tests/test_perception.py` and friends to reflect the simplified perception payload.
 
 ## 2025-10-20 (later)
 
