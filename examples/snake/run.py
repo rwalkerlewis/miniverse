@@ -25,7 +25,7 @@ from miniverse import (
     EnvironmentGridState,
     GridTileState,
 )
-from miniverse.cognition import AgentCognition, LLMExecutor
+from miniverse.cognition import AgentCognition, LLMExecutor, PromptTemplate
 from miniverse.persistence import InMemoryPersistence
 from miniverse.memory import SimpleMemoryStream
 from miniverse.schemas import AgentAction
@@ -42,6 +42,21 @@ DIRECTIONS = {
     'left': (-1, 0),
     'right': (1, 0)
 }
+
+
+SNAKE_EXECUTOR_TEMPLATE = PromptTemplate(
+    name="snake_executor_ascii",
+    system=(
+        "You control Snake AI in a classic grid-based snake game. Use the ASCII board to decide a move. "
+        "Return a valid AgentAction JSON with fields: agent_id (\"snake\"), tick ({{current_tick}}), "
+        "action_type=\"move\", target=null, parameters={\"direction\": <up|down|left|right>}, and reasoning as an empty string. "
+        "Respond with JSON only."
+    ),
+    user=(
+        "ASCII board:\n{{perception_text}}\n\n"
+        "Directions available: up, down, left, right. Choose a safe move toward the food (★)."
+    ),
+)
 
 
 class SnakeRules(SimulationRules):
@@ -347,22 +362,9 @@ async def main():
         )
     }
 
-    # Simple action catalog - just move with direction
-    available_actions = [
-        {
-            "name": "move",
-            "action_type": "move",
-            "description": "Move snake in a direction",
-            "schema": {
-                "action_type": "move",
-                "parameters": {"direction": "up|down|left|right"}
-            }
-        }
-    ]
-
     cognition_map = {
         'snake': AgentCognition(
-            executor=LLMExecutor(template_name='default', available_actions=available_actions)
+            executor=LLMExecutor(template=SNAKE_EXECUTOR_TEMPLATE)
         )
     }
 
