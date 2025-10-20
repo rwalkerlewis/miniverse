@@ -243,15 +243,17 @@ cognition_map = {
 ```python
 actions = [
     {
-        "action_type": "communicate",
-        "schema": {"to": "agent_id", "message": "string"},
+        "name": "communicate",
+        "schema": {"action_type": "communicate", "target": "agent_id", "parameters": None, "reasoning": "string", "communication": {"to": "agent_id", "message": "string"}},
         "examples": [{
             "action_type": "communicate",
-            "target": "maria",
-            "communication": {"to": "maria", "message": "Hi!"}
+            "target": "agent_b",
+            "parameters": None,
+            "reasoning": "Coordinate with another agent",
+            "communication": {"to": "agent_b", "message": "Hello! Let's sync."}
         }],
     },
-    {"action_type": "move", "schema": {"target": "location_id"}},
+    {"name": "move_to", "schema": {"action_type": "move_to", "target": "location_id", "parameters": {}}, "examples": [{"action_type": "move_to", "target": "location_alpha", "parameters": {}, "reasoning": "Move to a new location", "communication": None}]},
 ]
 
 cognition = AgentCognition(

@@ -248,30 +248,48 @@ class Orchestrator:
 
             # Planner
             if isinstance(cognition.planner, LLMPlanner):
-                name = getattr(cognition.planner, "template_name", "plan")
-                if name not in library.templates and not self._prompt_warnings_emitted.get(f"planner:{name}"):
-                    print(
-                        f"  [Prompts] Agent '{agent_id}' planner template '{name}' not found; using default 'plan'."
-                    )
-                    self._prompt_warnings_emitted[f"planner:{name}"] = True
+                planner_obj = cognition.planner
+                name = getattr(planner_obj, "template_name", None)
+                # One-time notice: using default template
+                if getattr(planner_obj, "template", None) is None and (name is None or name == "plan") and library is DEFAULT_PROMPTS:
+                    key = f"planner_default:{agent_id}"
+                    if not self._prompt_warnings_emitted.get(key):
+                        print(f"  [Prompts] Agent '{agent_id}' planner using default template 'plan'.")
+                        self._prompt_warnings_emitted[key] = True
+                # Missing named template warning
+                if name and name not in library.templates and not self._prompt_warnings_emitted.get(f"planner_missing:{name}"):
+                    print(f"  [Prompts] Agent '{agent_id}' planner template '{name}' not found; using default 'plan'.")
+                    self._prompt_warnings_emitted[f"planner_missing:{name}"] = True
 
             # Executor
             if isinstance(cognition.executor, LLMExecutor):
-                name = getattr(cognition.executor, "template_name", "execute_tick")
-                if name not in library.templates and not self._prompt_warnings_emitted.get(f"executor:{name}"):
-                    print(
-                        f"  [Prompts] Agent '{agent_id}' executor template '{name}' not found; using default 'execute_tick'."
-                    )
-                    self._prompt_warnings_emitted[f"executor:{name}"] = True
+                exec_obj = cognition.executor
+                name = getattr(exec_obj, "template_name", None)
+                # One-time notice: using default template
+                if getattr(exec_obj, "template", None) is None and (name is None or name in ("default", "execute_tick")) and library is DEFAULT_PROMPTS:
+                    key = f"executor_default:{agent_id}"
+                    if not self._prompt_warnings_emitted.get(key):
+                        print(f"  [Prompts] Agent '{agent_id}' executor using default template '{'default' if name in (None, 'default') else name}'.")
+                        self._prompt_warnings_emitted[key] = True
+                # Missing named template warning
+                if name and name not in library.templates and not self._prompt_warnings_emitted.get(f"executor_missing:{name}"):
+                    print(f"  [Prompts] Agent '{agent_id}' executor template '{name}' not found; using default 'default'.")
+                    self._prompt_warnings_emitted[f"executor_missing:{name}"] = True
 
             # Reflection
             if isinstance(cognition.reflection, LLMReflectionEngine):
-                name = getattr(cognition.reflection, "template_name", "reflect_diary")
-                if name not in library.templates and not self._prompt_warnings_emitted.get(f"reflection:{name}"):
-                    print(
-                        f"  [Prompts] Agent '{agent_id}' reflection template '{name}' not found; using default 'reflect_diary'."
-                    )
-                    self._prompt_warnings_emitted[f"reflection:{name}"] = True
+                refl_obj = cognition.reflection
+                name = getattr(refl_obj, "template_name", None)
+                # One-time notice: using default template
+                if getattr(refl_obj, "template", None) is None and (name is None or name == "reflect_diary") and library is DEFAULT_PROMPTS:
+                    key = f"reflection_default:{agent_id}"
+                    if not self._prompt_warnings_emitted.get(key):
+                        print(f"  [Prompts] Agent '{agent_id}' reflection using default template 'reflect_diary'.")
+                        self._prompt_warnings_emitted[key] = True
+                # Missing named template warning
+                if name and name not in library.templates and not self._prompt_warnings_emitted.get(f"reflection_missing:{name}"):
+                    print(f"  [Prompts] Agent '{agent_id}' reflection template '{name}' not found; using default 'reflect_diary'.")
+                    self._prompt_warnings_emitted[f"reflection_missing:{name}"] = True
 
     def _describe_world_update_mode(self) -> str:
         """Return a one-line summary of the selected world update mode and reason."""
@@ -549,14 +567,13 @@ class Orchestrator:
         # Assemble common metadata for all prompt contexts (planning, execution, reflection).
         # This avoids repeating the same data across multiple context builds.
         extra_common = {
-            "base_agent_prompt": self.agent_prompts.get(agent_id, ""),
+            # First-turn only initial state prompt; otherwise empty
+            "initial_state_agent_prompt": self.agent_prompts.get(agent_id, "") if tick == 1 else "",
+            # Optional simulation instructions (system-level contract). If empty, template default applies
+            "simulation_instructions": self.world_prompt or "",
             "llm_provider": self.llm_provider,
             "llm_model": self.llm_model,
             "prompt_library": prompt_library,
-            # Allow agents to dynamically switch execution prompt templates via scratchpad
-            "execute_prompt_template": self._get_scratchpad_value(
-                cognition, "execute_prompt_template", "execute_tick"
-            ),
         }
 
         # Extract existing plan from scratchpad. Plan may be None (agent hasn't planned yet)
@@ -1199,15 +1216,24 @@ class Orchestrator:
             # Process move actions: update location and occupancy. Other action types
             # (interact, rest, communicate) don't affect location.
             if action.action_type == "move" and action.target:
-                if occupancy is not None and previous_location:
-                    # Remove agent from previous location's occupancy list
-                    occupancy.leave(previous_location, action.agent_id)
-                # Update agent location to target
-                status.location = action.target
+                target = action.target
+                # No-op moves: if target equals current location, skip occupancy ops entirely
+                if target == previous_location:
+                    continue
+                entered = True
                 if occupancy is not None:
-                    # Add agent to new location's occupancy list. May raise exception if
-                    # location at capacity, but in deterministic mode we don't validate.
-                    occupancy.enter(action.target, action.agent_id)
+                    # Attempt to enter new location respecting capacity; if refused, keep agent in place
+                    try:
+                        entered = bool(occupancy.enter(target, action.agent_id))
+                    except Exception:
+                        entered = False
+                    if entered and previous_location:
+                        try:
+                            occupancy.leave(previous_location, action.agent_id)
+                        except Exception:
+                            pass
+                if entered:
+                    status.location = target
 
         return new_state
 

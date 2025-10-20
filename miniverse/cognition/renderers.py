@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List
-import os
+from typing import Dict
 
 from .prompts import PromptTemplate, DEFAULT_PROMPTS
 from .context import PromptContext
@@ -39,10 +38,10 @@ def render_prompt(
         Whether to fall back to ``DEFAULT_PROMPTS`` when template is missing.
     """
 
-    # Resolve template reference. If None and defaults enabled, use default execution
-    # template. This allows callers to pass None without explicitly specifying template.
+    # Resolve template reference. If None and defaults enabled, use executor default
+    # template. This keeps configuration optional for the common path.
     if template is None and include_default:
-        template = DEFAULT_PROMPTS.get("execute_tick")
+        template = DEFAULT_PROMPTS.get("default")
     elif template is None:
         raise ValueError("Prompt template not provided and defaults disabled")
 
@@ -59,66 +58,24 @@ def render_prompt(
     # Build replacement map for placeholder substitution. Placeholders use {{double_brace}}
     # syntax to avoid conflicts with JSON braces. String replacement is simple and fast;
     # no need for complex templating engines (Jinja, Mustache) for this use case.
-    # Optionally allow templates to reference initial_state_agent_prompt (first-turn user prompt)
-    # Backward-compat alias: base_agent_prompt
-    initial_state_agent_prompt = (
-        context.extra.get("initial_state_agent_prompt")
-        or context.extra.get("base_agent_prompt", "")
-    )
-    is_first_turn = False
-    try:
-        is_first_turn = int(getattr(context.perception, "tick", 0)) == 0
-    except Exception:
-        is_first_turn = False
-    # Simulation instructions: allow override via context; provide a concise default
+    # Plain replacements only; templates control structure.
+    # Optional placeholders provided via context.extra
+    initial_state_agent_prompt = context.extra.get("initial_state_agent_prompt", "")
     simulation_instructions = context.extra.get(
         "simulation_instructions",
         "You are an agent in a simulation. Read perception and return an AgentAction JSON.",
     )
-
-    # Build character prompt (identity) from AgentProfile with concise lines.
-    # Only include non-empty fields to avoid noise.
-    profile = context.agent_profile
-    character_lines: List[str] = []
-    # Name is always present
-    if profile.name:
-        character_lines.append(f"I am {profile.name}.")
-    # Optional age
-    if getattr(profile, "age", None) is not None:
-        character_lines.append(f"I am {profile.age} years old.")
-    # Role
-    if getattr(profile, "role", None):
-        character_lines.append(f"I work as a {profile.role}.")
-    # Background
-    if getattr(profile, "background", None):
-        character_lines.append(f"Background: {profile.background}")
-    # Personality
-    if getattr(profile, "personality", None):
-        character_lines.append(f"My personality is {profile.personality}.")
-    # Skills
-    if getattr(profile, "skills", None):
-        if isinstance(profile.skills, dict) and profile.skills:
-            skill_parts = [f"{k} ({v})" for k, v in profile.skills.items()]
-            character_lines.append("My skills include: " + ", ".join(skill_parts) + ".")
-    # Goals
-    if getattr(profile, "goals", None):
-        if isinstance(profile.goals, list) and profile.goals:
-            character_lines.append("My goals are: " + ", ".join(profile.goals) + ".")
-    # Relationships
-    if getattr(profile, "relationships", None):
-        if isinstance(profile.relationships, dict) and profile.relationships:
-            character_lines.append("My relationships with others:")
-            for other_id, relation in profile.relationships.items():
-                character_lines.append(f"- {other_id}: {relation}")
-    character_prompt = "\n".join(character_lines).strip()
+    character_prompt = getattr(context, "character_prompt_text", None)
+    character_prompt = character_prompt() if callable(character_prompt) else ""
     # Build action catalog if provided
     action_catalog_items = context.extra.get("available_actions") or []
     if action_catalog_items:
         lines = ["Action Catalog (choose one):"]
         for item in action_catalog_items:
-            name = item.get("name", "(unnamed)")
-            lines.append(f"- {name}")
             schema = item.get("schema")
+            # Prefer explicit name; fallback to action_type from item or schema; else "(unnamed)"
+            name = item.get("name") or item.get("action_type") or (schema.get("action_type") if isinstance(schema, dict) else None) or "(unnamed)"
+            lines.append(f"- {name}")
             if schema is not None:
                 import json as _json
                 lines.append("  Schema:")
@@ -142,10 +99,7 @@ def render_prompt(
         "{{memories_text}}": memories_text,
         "{{scratchpad_json}}": scratchpad_json,
         "{{action_catalog}}": action_catalog_str,
-        # Backward-compat replacement (deprecated):
-        "{{base_agent_prompt}}": initial_state_agent_prompt if is_first_turn else "",
-        # Preferred placeholder:
-        "{{initial_state_agent_prompt}}": initial_state_agent_prompt if is_first_turn else "",
+        "{{initial_state_agent_prompt}}": initial_state_agent_prompt,
         "{{simulation_instructions}}": simulation_instructions,
         "{{character_prompt}}": character_prompt,
     }
@@ -161,28 +115,5 @@ def render_prompt(
     for placeholder, value in replacements.items():
         system = system.replace(placeholder, value)
         user = user.replace(placeholder, value)
-
-    # Fallback auto-injection:
-    # - If character_prompt exists but template didn't place it, prepend to SYSTEM
-    # - If initial_state_agent_prompt exists on first turn and template didn't place it, prepend to USER
-    if character_prompt and "{{character_prompt}}" not in template.system:
-        if character_prompt not in system:
-            system = character_prompt + "\n\n" + system
-    if is_first_turn and initial_state_agent_prompt:
-        if ("{{initial_state_agent_prompt}}" not in template.user) and ("{{base_agent_prompt}}" not in template.user):
-            if initial_state_agent_prompt not in user:
-                user = initial_state_agent_prompt + "\n\n" + user
-
-    # Minimal debug logging for prompt rendering
-    # Enable with DEBUG_PROMPT_RENDER=1
-    try:
-        if os.getenv("DEBUG_PROMPT_RENDER", "").lower() in ("1", "true", "yes"):  # pragma: no cover
-            print("[PROMPT_RENDER]")
-            print(f"  first_turn={is_first_turn}")
-            print(f"  injected: character={'yes' if character_prompt else 'no'}, initial_state={'yes' if (is_first_turn and initial_state_agent_prompt) else 'no'}")
-            print(f"  placeholders present: character={{'{{character_prompt}}' in template.system}}, initial_state={{'{{initial_state_agent_prompt}}' in template.user}}")
-            print(f"  action_catalog_size={len(action_catalog_items) if action_catalog_items else 0}")
-    except Exception:
-        pass
 
     return RenderedPrompt(system=system, user=user)

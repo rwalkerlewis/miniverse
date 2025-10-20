@@ -8,8 +8,49 @@ Usage:
 """
 
 import os
+import sys
+from pathlib import Path
+from datetime import datetime
 import asyncio
 from datetime import datetime, timezone
+def _setup_run_logging(default_prefix: str = "valentines_run") -> str:
+    """Tee stdout/stderr to a timestamped log file under runs/ (or LOG_DIR).
+
+    Env overrides:
+      - LOG_DIR: base directory for logs (default: runs)
+      - LOG_FILE: explicit path to a log file (takes precedence)
+    """
+    log_dir = Path(os.getenv("LOG_DIR", "runs"))
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_file = os.getenv("LOG_FILE")
+    if not log_file:
+        stamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        log_file = str(log_dir / f"{default_prefix}_{stamp}.txt")
+
+    class _Tee:
+        def __init__(self, *streams):
+            self.streams = streams
+
+        def write(self, data: str) -> None:
+            for s in self.streams:
+                try:
+                    s.write(data)
+                except Exception:
+                    pass
+
+        def flush(self) -> None:
+            for s in self.streams:
+                try:
+                    s.flush()
+                except Exception:
+                    pass
+
+    f = open(log_file, "w", buffering=1, encoding="utf-8")
+    sys.stdout = _Tee(sys.stdout, f)
+    sys.stderr = _Tee(sys.stderr, f)
+    print(f"[Log] Writing run output to {log_file}")
+    return log_file
+
 from typing import List, Optional, Dict, Any
 from uuid import UUID
 
@@ -38,15 +79,50 @@ class TownSimulationRules(SimulationRules):
     """Simple town: agents move between locations, time passes.
 
     Deterministic physics for Smallville - handles movement, time, activity tracking.
+
+    Time model:
+    - Each tick advances a configurable number of hours (tick_hours)
+    - Day rolls over every 24 hours
+    - WorldState.resources includes 'hour' (12-hour clock with am/pm) and 'day'
     """
 
+    def __init__(self, *, tick_hours: int = 1, start_hour: int = 9, start_day: int = 13, month_label: str = 'Feb') -> None:
+        self.tick_hours = max(1, int(tick_hours))
+        self.start_hour = int(start_hour)  # 0-23 expected
+        self.start_day = int(start_day)
+        self.month_label = str(month_label)
+
     def apply_tick(self, state, tick):
-        """Update time each tick."""
+        """Update time each tick with rollover to next day."""
         updated = state.model_copy(deep=True)
 
-        # Update time resource
-        hour = updated.resources.get_metric('hour', default=9, unit='am')
-        hour.value = 9 + tick  # Each tick is 1 hour
+        # Calculate absolute hours elapsed since simulation start
+        total_hours = self.start_hour + (tick * self.tick_hours)
+        day_offset = total_hours // 24
+        hour24 = total_hours % 24  # 0..23
+
+        # 12-hour clock formatting
+        if hour24 == 0:
+            hour12 = 12
+            ampm = 'am'
+        elif 1 <= hour24 < 12:
+            hour12 = hour24
+            ampm = 'am'
+        elif hour24 == 12:
+            hour12 = 12
+            ampm = 'pm'
+        else:
+            hour12 = hour24 - 12
+            ampm = 'pm'
+
+        # Update resources
+        hour = updated.resources.get_metric('hour', default=hour12, unit=ampm, label='Current Time')
+        hour.value = hour12
+        hour.unit = ampm
+
+        day = updated.resources.get_metric('day', default=self.start_day, unit=self.month_label, label='Date')
+        day.value = self.start_day + day_offset
+        day.unit = self.month_label
 
         updated.tick = tick
         return updated
@@ -55,7 +131,7 @@ class TownSimulationRules(SimulationRules):
         """All actions are valid in this simple town."""
         return True
 
-    def process_actions(self, actions, state):
+    def process_actions(self, state, actions, tick):
         """Process agent actions deterministically - movement, activity updates.
 
         This is Stanford's approach: LLM decides what to do, physics processes it.
@@ -83,12 +159,13 @@ class TownSimulationRules(SimulationRules):
 
 
 async def main():
+    _setup_run_logging()
     print('🎭 Valentine\'s Day Party - Information Diffusion Test')
     print('=' * 60)
 
     # LLM config
     provider = os.getenv('LLM_PROVIDER', 'openai')
-    model = os.getenv('LLM_MODEL', 'gpt-4o-mini')
+    model = os.getenv('LLM_MODEL', 'gpt-5-nano')
     print(f'\n🤖 LLM: {provider}/{model}')
 
     # Initialize world state
@@ -205,73 +282,124 @@ async def main():
 
     memory = SimpleMemoryStream(persistence)
 
-    # Define available actions for agents
+    # Define available actions for agents (renderer expects name/schema/examples)
     available_actions = [
         {
-            "action_type": "communicate",
-            "description": "Send a message to another agent",
-            "example": {
+            "name": "communicate",
+            "schema": {
                 "action_type": "communicate",
-                "target": "maria",
+                "target": "<agent_id>",
                 "parameters": None,
-                "reasoning": "I want to invite Maria to the party",
-                "communication": {"to": "maria", "message": "Hi Maria! I'm hosting a Valentine's Day party at the cafe tomorrow (Feb 14) from 5-7pm. Would love for you to come!"}
-            }
+                "reasoning": "<string>",
+                "communication": {"to": "<agent_id>", "message": "<string>"}
+            },
+            "examples": [
+                {
+                    "action_type": "communicate",
+                    "target": "agent_b",
+                    "parameters": None,
+                    "reasoning": "Coordinate with another agent about the next step",
+                    "communication": {
+                        "to": "agent_b",
+                        "message": "Hello! Let's sync later today to coordinate our plans."
+                    }
+                }
+            ]
         },
         {
-            "action_type": "move_to",
-            "description": "Move to a different location",
-            "example": {
+            "name": "move_to",
+            "schema": {
                 "action_type": "move_to",
-                "target": "hobbs_cafe",
-                "parameters": {},
-                "reasoning": "I want to go to the cafe",
+                "target": "<location_id>",
+                "parameters": {"speed": "optional"},
+                "reasoning": "<string>",
                 "communication": None
-            }
+            },
+            "examples": [
+                {
+                    "action_type": "move_to",
+                    "target": "location_alpha",
+                    "parameters": {},
+                    "reasoning": "Move to a new location",
+                    "communication": None
+                }
+            ]
         },
         {
-            "action_type": "work",
-            "description": "Work on a task or project",
-            "example": {
+            "name": "work",
+            "schema": {
                 "action_type": "work",
-                "target": "party_planning",
-                "parameters": {"task": "prepare invitations"},
-                "reasoning": "I need to get ready for the party",
+                "target": "<task_or_domain>",
+                "parameters": {"task": "<string>"},
+                "reasoning": "<string>",
                 "communication": None
-            }
+            },
+            "examples": [
+                {
+                    "action_type": "work",
+                    "target": "task_planning",
+                    "parameters": {"task": "prepare materials"},
+                    "reasoning": "Make progress on the current task",
+                    "communication": None
+                }
+            ]
         },
         {
-            "action_type": "rest",
-            "description": "Take a break or relax",
-            "example": {
+            "name": "rest",
+            "schema": {
                 "action_type": "rest",
                 "target": None,
                 "parameters": {},
-                "reasoning": "I need to recharge",
+                "reasoning": "<string>",
                 "communication": None
-            }
+            },
+            "examples": [
+                {
+                    "action_type": "rest",
+                    "target": None,
+                    "parameters": {},
+                    "reasoning": "I need to recharge",
+                    "communication": None
+                }
+            ]
         },
         {
-            "action_type": "investigate",
-            "description": "Look into something or explore",
-            "example": {
+            "name": "investigate",
+            "schema": {
                 "action_type": "investigate",
-                "target": "community_events",
-                "parameters": {"focus": "upcoming gatherings"},
-                "reasoning": "I want to learn about local events",
+                "target": "<topic>",
+                "parameters": {"focus": "<string>"},
+                "reasoning": "<string>",
                 "communication": None
-            }
+            },
+            "examples": [
+                {
+                    "action_type": "investigate",
+                    "target": "community_events",
+                    "parameters": {"focus": "upcoming gatherings"},
+                    "reasoning": "I want to learn about local events",
+                    "communication": None
+                }
+            ]
         },
         {
-            "action_type": "monitor",
-            "description": "Observe or keep track of something",
-            "example": {
+            "name": "monitor",
+            "schema": {
                 "action_type": "monitor",
-                "target": "cafe_activity",
+                "target": "<subject>",
                 "parameters": {},
-                "reasoning": "I want to see who's around",
+                "reasoning": "<string>",
                 "communication": None
-            }
+            },
+            "examples": [
+                {
+                    "action_type": "monitor",
+                    "target": "area_activity",
+                    "parameters": {},
+                    "reasoning": "Observe current activity",
+                    "communication": None
+                }
+            ]
         }
     ]
 
@@ -300,7 +428,7 @@ async def main():
         agents=agents,
         world_prompt='This is smallville, a quiet town with a few local businesses and a community cafe called Hobbs Cafe.',
         agent_prompts=agent_prompts,
-        simulation_rules=TownSimulationRules(),
+        simulation_rules=TownSimulationRules(tick_hours=3, start_hour=15, start_day=13, month_label='Feb'),
         agent_cognition=cognition_map,
         llm_provider=provider,
         llm_model=model,
@@ -338,6 +466,7 @@ async def main():
             memories=[],
             extra={
                 "initial_state_agent_prompt": agent_prompt,
+                "simulation_instructions": "You are an agent in a simulation. Read perception and return an AgentAction JSON. Use only the available actions.",
                 "available_actions": available_actions
             }
         )
@@ -360,7 +489,7 @@ async def main():
     print('\n' + '=' * 80 + '\n')
 
     # Run simulation
-    result = await orchestrator.run(num_ticks=8)
+    result = await orchestrator.run(num_ticks=10)
 
     print('\n✅ Simulation complete!')
     print(f'   Run ID: {result["run_id"]}')

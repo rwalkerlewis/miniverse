@@ -83,6 +83,37 @@ class PromptContext:
             return "No notable context."
         return "\n".join(lines)
 
+    # Identity text used by templates via {{character_prompt}}
+    def character_prompt_text(self) -> str:
+        profile = self.agent_profile
+        lines: List[str] = []
+        if getattr(profile, "name", None):
+            lines.append(f"I am {profile.name}.")
+        if getattr(profile, "age", None) is not None:
+            lines.append(f"I am {profile.age} years old.")
+        if getattr(profile, "role", None):
+            role_label = str(profile.role).replace("_", " ")
+            lines.append(f"I work as a {role_label}.")
+        if getattr(profile, "background", None):
+            lines.append(f"Background: {profile.background}")
+        if getattr(profile, "personality", None):
+            personality_text = str(profile.personality).rstrip(". ")
+            if personality_text:
+                lines.append(f"My personality is {personality_text}.")
+        if getattr(profile, "skills", None):
+            if isinstance(profile.skills, dict) and profile.skills:
+                skill_parts = [f"{k} ({v})" for k, v in profile.skills.items()]
+                lines.append("My skills include: " + ", ".join(skill_parts) + ".")
+        if getattr(profile, "goals", None):
+            if isinstance(profile.goals, list) and profile.goals:
+                lines.append("My goals are: " + ", ".join(profile.goals) + ".")
+        if getattr(profile, "relationships", None):
+            if isinstance(profile.relationships, dict) and profile.relationships:
+                lines.append("My relationships with others:")
+                for other_id, relation in profile.relationships.items():
+                    lines.append(f"- {other_id}: {relation}")
+        return "\n".join(lines).strip()
+
 
 async def build_prompt_context(
     *,

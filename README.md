@@ -348,7 +348,7 @@ See `docs/README.md` for the documentation index.
 
 - Explicit prompt templates: `LLMExecutor(template_name="default")` or inline `PromptTemplate`
 - Agent prompts injection: `agent_prompts` are prepended to the system prompt
-- Action Catalog: pass `available_actions` to inject `{{action_catalog}}`
+- Action Catalog: pass `available_actions` to inject `{{action_catalog}}` (each entry should include `name`, `schema`, and optional `examples`)
 - Communication persistence: actions store only `{ "to": agent_id }`; full messages live in memories
 
 ## Example

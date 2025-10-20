@@ -32,11 +32,11 @@ Role Separation (why it matters)
 - Identity (character) belongs in the system message: it sets stable persona and long-term constraints.
 - Simulation instructions belong in system: global, scenario-level rules and output contract.
 - Action catalog belongs in system: invariant action space and schemas/examples.
-- Base agent prompt belongs in user (first turn): initial state/task framing for this agent.
+- Initial state prompt belongs in user (first turn): `{{initial_state_agent_prompt}}` for per-agent setup.
 - Perception belongs in user (every turn): dynamic, tick-by-tick observations.
 - The default template places each in the right role; if a template omits a placeholder, the renderer auto-injects:
   - `character_prompt` at the start of system
-  - `base_agent_prompt` at the start of user
+  - `initial_state_agent_prompt` at the start of user (first turn only)
 
 Placeholders
 - `{{character_prompt}}`: Generated from `AgentProfile` (name, optional age, role, background, personality, skills, goals, relationships). Keep backgrounds first-person, concise, and relevant.
@@ -54,7 +54,7 @@ Context Protocol
   - `memories`: recent memories
   - `plan_state`/`scratchpad_state`: optional planning/working memory
   - `extra`: free-form bag; commonly includes:
-    - `base_agent_prompt`: per-agent instructions
+    - `initial_state_agent_prompt` (legacy alias: `base_agent_prompt`)
     - `simulation_instructions`: global rules/output contract
     - `available_actions`: action catalog entries (name, schema, examples)
     - `llm_provider`/`llm_model`: for LLM calls
@@ -63,13 +63,12 @@ Context Protocol
 What to Put in Each Section
 - System (stable constraints and identity)
   - Use `{{character_prompt}}` (auto-generated).
-  - Keep any system-level rules minimal and general (e.g., "Respond with AgentAction JSON only").
-  - Avoid task-specific instructions here; those live in user.
+  - Provide `{{simulation_instructions}}` to define output contract and global rules.
+  - Include `{{action_catalog}}` for stable action schemas/examples.
 
 - User (task directive and current context)
-  - Start with `{{base_agent_prompt}}` for per-agent instructions.
+  - On first turn only: `{{initial_state_agent_prompt}}`.
   - Provide `Perception` as JSON (no prose around it).
-  - Provide `Available actions` via `{{action_catalog}}` to steer outputs to valid schemas.
   - Optionally include memories or plan state if your scenario relies on it.
 
 Perception and Context Lifecycle
@@ -91,7 +90,7 @@ Action Catalog: Best Practices
 
 Custom Templates
 - You can pass a custom `PromptTemplate` inline to `LLMExecutor(template=...)`, or select by name via `template_name` against a `PromptLibrary`.
-- If your custom template omits `{{character_prompt}}` or `{{base_agent_prompt}}`, the renderer will still inject them in the correct roles at render time.
+- If your custom template omits `{{character_prompt}}` or `{{initial_state_agent_prompt}}` (legacy: `{{base_agent_prompt}}`), the renderer will still inject them in the correct roles at render time.
 
 Examples
 Inline template with explicit placeholders
@@ -102,13 +101,13 @@ from miniverse.cognition import LLMExecutor
 template = PromptTemplate(
     name="inline",
     system=(
-        "{{character_prompt}}\n"
-        "You are an agent in a simulation. Respond with an AgentAction JSON."
+        "{{character_prompt}}\n\n"
+        "{{simulation_instructions}}\n\n"
+        "Available actions:\n{{action_catalog}}\n"
     ),
     user=(
-        "{{base_agent_prompt}}\n\n"
-        "Perception:\n{{perception_json}}\n\n"
-        "Available actions:\n{{action_catalog}}\n"
+        "{{initial_state_agent_prompt}}\n\n"
+        "Perception:\n{{perception_json}}\n"
     ),
 )
 
