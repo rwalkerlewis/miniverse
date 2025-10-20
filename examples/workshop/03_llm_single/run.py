@@ -15,7 +15,7 @@ REQUIRES:
 
 RUN:
     export LLM_PROVIDER=openai
-    export LLM_MODEL=gpt-4
+    export LLM_MODEL=gpt-5-nano
     export OPENAI_API_KEY=your_key
     uv run python -m examples.workshop.03_llm_single.run
 """
@@ -164,9 +164,27 @@ async def main():
     # - No reflection (no memory synthesis)
     # - Agent makes intelligent decisions based on context
 
+    # Provide a minimal explicit action catalog and default template for clarity
+    available_actions = [
+        {
+            "name": "work",
+            "action_type": "work",
+            "description": "Work on current task",
+            "schema": {"action_type": "work", "target": "<location>", "parameters": {}, "reasoning": "<string>", "communication": None},
+            "examples": [{"agent_id": "ai_worker", "tick": 1, "action_type": "work", "target": "ops", "parameters": {}, "reasoning": "Continue coordinating", "communication": None}],
+        },
+        {
+            "name": "rest",
+            "action_type": "rest",
+            "description": "Rest to recover energy",
+            "schema": {"action_type": "rest", "target": "<location>", "parameters": {}, "reasoning": "<string>", "communication": None},
+            "examples": [{"agent_id": "ai_worker", "tick": 2, "action_type": "rest", "target": "ops", "parameters": {}, "reasoning": "Low energy", "communication": None}],
+        },
+    ]
+
     cognition_map = {
         "ai_worker": AgentCognition(
-            executor=LLMExecutor()  # That's it! LLM decides what to do each tick
+            executor=LLMExecutor(template_name="default", available_actions=available_actions)
         ),
     }
 

@@ -189,8 +189,26 @@ async def main():
     # Configure cognition
     # ========================================
 
+    # Explicit minimal action catalog and default template for clarity
+    available_actions = [
+        {
+            "name": "work",
+            "action_type": "work",
+            "description": "Work on current task",
+            "schema": {"action_type": "work", "target": "<location>", "parameters": {}, "reasoning": "<string>", "communication": None},
+            "examples": [{"agent_id": "adaptive_worker", "tick": 1, "action_type": "work", "target": "ops", "parameters": {}, "reasoning": "Address backlog", "communication": None}],
+        },
+        {
+            "name": "rest",
+            "action_type": "rest",
+            "description": "Rest to recover energy",
+            "schema": {"action_type": "rest", "target": "<location>", "parameters": {}, "reasoning": "<string>", "communication": None},
+            "examples": [{"agent_id": "adaptive_worker", "tick": 2, "action_type": "rest", "target": "ops", "parameters": {}, "reasoning": "Recover from breakdown", "communication": None}],
+        },
+    ]
+
     cognition_map = {
-        "adaptive_worker": AgentCognition(executor=LLMExecutor()),
+        "adaptive_worker": AgentCognition(executor=LLMExecutor(template_name="default", available_actions=available_actions)),
     }
 
     agent_prompts = {

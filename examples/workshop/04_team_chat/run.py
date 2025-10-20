@@ -15,7 +15,7 @@ REQUIRES:
 
 RUN:
     export LLM_PROVIDER=openai
-    export LLM_MODEL=gpt-4
+    export LLM_MODEL=gpt-5-nano
     export OPENAI_API_KEY=your_key
     uv run python -m examples.workshop.04_team_chat.run
 """
@@ -176,8 +176,33 @@ async def main():
     # ========================================
     # All agents use LLMExecutor - they'll coordinate via communication
 
+    # Explicit minimal action catalog and default template for clarity
+    available_actions = [
+        {
+            "name": "work",
+            "action_type": "work",
+            "description": "Work on current task",
+            "schema": {"action_type": "work", "target": "<location>", "parameters": {}, "reasoning": "<string>", "communication": None},
+            "examples": [{"agent_id": "leader", "tick": 1, "action_type": "work", "target": "ops", "parameters": {}, "reasoning": "Coordinate team", "communication": None}],
+        },
+        {
+            "name": "rest",
+            "action_type": "rest",
+            "description": "Rest to recover energy",
+            "schema": {"action_type": "rest", "target": "<location>", "parameters": {}, "reasoning": "<string>", "communication": None},
+            "examples": [{"agent_id": "worker1", "tick": 2, "action_type": "rest", "target": "ops", "parameters": {}, "reasoning": "Recover energy", "communication": None}],
+        },
+        {
+            "name": "communicate",
+            "action_type": "communicate",
+            "description": "Send message to another agent",
+            "schema": {"action_type": "communicate", "target": "<location>", "parameters": {}, "reasoning": "<string>", "communication": {"to": "<agent_id>", "message": "<string>"}},
+            "examples": [{"agent_id": "leader", "tick": 3, "action_type": "communicate", "target": "ops", "parameters": {}, "reasoning": "Coordinate", "communication": {"to": "worker2", "message": "Please rest if low energy"}}],
+        },
+    ]
+
     cognition_map = {
-        agent_id: AgentCognition(executor=LLMExecutor())
+        agent_id: AgentCognition(executor=LLMExecutor(template_name="default", available_actions=available_actions))
         for agent_id in agents.keys()
     }
 
