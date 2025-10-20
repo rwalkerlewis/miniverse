@@ -9,6 +9,7 @@ Authoritative instructions for working on the **Miniverse** codebase.
 - **README.md** – Installation, examples, quick start, and high-level architecture.
 - **ISSUES.md** – Current status, known issues, architectural improvements, and next steps. ⭐ Start here for context!
 - **plan.md** – Engineering workflow, repo orientation, and immediate priorities.
+- **docs/PROMPTS.md** – Prompt system guide (placeholders, templates, role separation). ⭐ Essential for LLM cognition!
 - **docs/architecture/** – Deep dives on cognition stack and environment tiers.
 - **docs/USAGE.md** – Step-by-step guide for building new simulations.
 - **docs/RESEARCH.md** – Academic foundations (Stanford Generative Agents, AgentTorch, etc.).
@@ -29,7 +30,7 @@ Miniverse is a **generalist agent-based simulation library** designed to replica
 - **Pluggable persistence** (in-memory, JSON, PostgreSQL)
 - **Modular cognition stack** (scratchpad, planner, executor, reflection engine)
 
-**Current Status**: Core architecture is in place. The workshop example demonstrates both deterministic and LLM-driven modes. **Information diffusion fixed (2025-10-16)** – recipients now receive communication memories, enabling Stanford-style information propagation. Valentine's Day party scenario ready for testing.
+**Current Status**: Core architecture is in place. The workshop example demonstrates both deterministic and LLM-driven modes. **Information diffusion fixed (2025-10-16)** – recipients now receive communication memories, enabling Stanford-style information propagation. Valentine's Day party scenario ready for testing. **39 tests passing**.
 
 ---
 
@@ -157,6 +158,8 @@ Configure LLM providers via environment variables (`LLM_PROVIDER`, `LLM_MODEL`, 
 - `[✓]` Green: Success/completion
 - `[i]` Cyan: Metadata/reasoning (in verbose mode)
 
+**Note**: For comprehensive logging UX improvements (verbosity levels, agent-centric grouping), see ISSUES.md A8.
+
 ---
 
 ## Current Code Layout
@@ -174,6 +177,7 @@ miniverse/
   llm_calls.py                    # LLM helper functions (process world update)
   llm_utils.py                    # Tenacity-backed retry logic + structured outputs
   scenario.py                     # ScenarioLoader for JSON files
+  logging_utils.py                # Color-coded output utilities (DEBUG_* flags)
   cognition/
     __init__.py                   # Cognition module exports
     scratchpad.py                 # Working memory data structure
@@ -185,6 +189,7 @@ miniverse/
     prompts.py                    # PromptLibrary + PromptTemplate + DEFAULT_PROMPTS
     renderers.py                  # Template rendering ({{context_json}}, etc.)
     llm.py                        # LLMPlanner + LLMReflectionEngine
+    cadence.py                    # PlannerCadence + ReflectionCadence scheduling
   environment/
     __init__.py                   # Environment tier exports
     schemas.py                    # EnvironmentGraphState, EnvironmentGridState, etc.
@@ -348,11 +353,14 @@ docs/
 | `miniverse/cognition/llm.py` | LLM-backed planner + reflection engine |
 | `miniverse/cognition/prompts.py` | Default prompt templates; `DEFAULT_PROMPTS` library |
 | `miniverse/cognition/renderers.py` | Template rendering logic (`render_prompt`) |
+| `miniverse/cognition/cadence.py` | PlannerCadence + ReflectionCadence scheduling |
 | `miniverse/memory.py` | MemoryStrategy interface; `SimpleMemoryStream` |
 | `miniverse/persistence.py` | PersistenceStrategy interface; three adapters |
 | `miniverse/simulation_rules.py` | Deterministic physics interface |
+| `miniverse/logging_utils.py` | Color-coded output; DEBUG_* environment variables |
 | `miniverse/environment/helpers.py` | Graph/grid utilities (occupancy, pathfinding) |
 | `examples/workshop/run.py` | Reference implementation (deterministic + LLM modes) |
+| `docs/PROMPTS.md` | Prompt system guide (A9/A10 refactor) |
 | `docs/architecture/cognition.md` | Cognition stack deep dive |
 | `docs/architecture/environment.md` | Environment tiers deep dive |
 | `docs/research/agent-simulations/stanford-comparison.md` | Gap analysis |

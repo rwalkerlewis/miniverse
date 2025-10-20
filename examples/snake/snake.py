@@ -256,7 +256,7 @@ DO NOT use any other action type. ONLY move actions.'''
 
     # LLM config
     provider = os.getenv('LLM_PROVIDER', 'openai')
-    model = os.getenv('LLM_MODEL', 'gpt-4o-mini')
+    model = os.getenv('LLM_MODEL', 'gpt-5-nano')
 
     orchestrator = Orchestrator(
         world_state=world_state,

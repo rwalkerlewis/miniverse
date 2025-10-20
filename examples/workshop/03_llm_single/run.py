@@ -10,7 +10,7 @@ WHAT THIS SHOWS:
 
 REQUIRES:
 - LLM_PROVIDER environment variable (e.g., "openai")
-- LLM_MODEL environment variable (e.g., "gpt-4")
+- LLM_MODEL environment variable (e.g., "gpt-5-nano")
 - API key for your provider (e.g., OPENAI_API_KEY)
 
 RUN:

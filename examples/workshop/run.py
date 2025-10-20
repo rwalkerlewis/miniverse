@@ -11,7 +11,7 @@ API key), pass `--llm`:
 
 Environment variables expected when `--llm` is used:
 - `LLM_PROVIDER` (e.g., `openai`)
-- `LLM_MODEL` (e.g., `gpt-4.1`)
+- `LLM_MODEL` (e.g., `gpt-5-nano`)
 - Provider-specific API key (e.g., `OPENAI_API_KEY`)
 """
 
@@ -524,6 +524,46 @@ async def run_simulation(
 
     prompt_library = build_prompt_library() if use_llm else None
 
+    # Define available actions for LLM executor
+    available_actions = [
+        {
+            "action_type": "work",
+            "description": "Work on current task",
+            "schema": {"action_type": "work", "target": "<location>", "parameters": {}, "reasoning": "<string>", "communication": None},
+            "examples": [{"agent_id": "lead", "tick": 1, "action_type": "work", "target": "ops", "parameters": {}, "reasoning": "Continue coordinating team", "communication": None}]
+        },
+        {
+            "action_type": "communicate",
+            "description": "Send message to another agent",
+            "schema": {"action_type": "communicate", "target": "<location>", "parameters": {}, "reasoning": "<string>", "communication": {"to": "<agent_id>", "message": "<string>"}},
+            "examples": [{"agent_id": "lead", "tick": 2, "action_type": "communicate", "target": "ops", "parameters": {}, "reasoning": "Coordinate with team", "communication": {"to": "tech", "message": "Can you check station B?"}}]
+        },
+        {
+            "action_type": "move",
+            "description": "Move to different location",
+            "schema": {"action_type": "move", "target": "<location>", "parameters": {}, "reasoning": "<string>", "communication": None},
+            "examples": [{"agent_id": "tech", "tick": 3, "action_type": "move", "target": "workbench", "parameters": {}, "reasoning": "Need tools for repair", "communication": None}]
+        },
+        {
+            "action_type": "rest",
+            "description": "Rest to recover energy",
+            "schema": {"action_type": "rest", "target": "<location>", "parameters": {}, "reasoning": "<string>", "communication": None},
+            "examples": [{"agent_id": "lead", "tick": 5, "action_type": "rest", "target": "ops", "parameters": {}, "reasoning": "Low energy, need break", "communication": None}]
+        },
+        {
+            "action_type": "analyze",
+            "description": "Analyze metrics or situation",
+            "schema": {"action_type": "analyze", "target": "<location>", "parameters": {}, "reasoning": "<string>", "communication": None},
+            "examples": [{"agent_id": "analyst", "tick": 4, "action_type": "analyze", "target": "ops", "parameters": {}, "reasoning": "Review backlog metrics", "communication": None}]
+        },
+        {
+            "action_type": "monitor",
+            "description": "Monitor systems or environment",
+            "schema": {"action_type": "monitor", "target": "<subject>", "parameters": {}, "reasoning": "<string>", "communication": None},
+            "examples": [{"agent_id": "analyst", "tick": 6, "action_type": "monitor", "target": "battery_reserve", "parameters": {}, "reasoning": "Check power levels", "communication": None}]
+        }
+    ]
+
     cognition_map: Dict[str, AgentCognition] = {}
     for agent_id, profile in profiles_map.items():
         if use_llm and prompt_library is not None:
@@ -533,7 +573,7 @@ async def run_simulation(
                     template_name="plan_workshop",
                     prompt_library=prompt_library,
                 ),
-                executor=LLMExecutor(template_name="default"),
+                executor=LLMExecutor(template_name="default", available_actions=available_actions),
                 reflection=LLMReflectionEngine(
                     template_name="reflect_workshop",
                     prompt_library=prompt_library,

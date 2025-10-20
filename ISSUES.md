@@ -48,6 +48,25 @@ This file lists only unresolved items aligned with the current architecture.
 - Updated example READMEs (smallville, examples index); examples now explicitly use `LLMExecutor(template_name="default")`
 - Removed/avoided legacy notebook guidance in examples index
 
+### A9: Agent Prompt Pattern - Identity Buried in JSON ✅
+**Status:** COMPLETED (2025-10-19)
+- Renderer builds a character prompt from `AgentProfile` and injects it into SYSTEM
+- Introduced `initial_state_agent_prompt` (first tick only) in USER; `base_agent_prompt` remains as a deprecated alias
+- Added `simulation_instructions` placeholder (SYSTEM) with sensible default
+- Action catalog moved to SYSTEM for stability across turns
+- Examples updated (Smallville Valentine’s) to use `initial_state_agent_prompt`
+- New docs: `docs/PROMPTS.md` with roles, placeholders, perception lifecycle, logging flags
+- Tests updated to cover new placeholder behavior
+
+### A10: Prompt Template System - Template Noise Masks Intent ✅
+**Status:** COMPLETED (2025-10-19)
+- Minimal default template now uses placeholders instead of long generic examples
+- SYSTEM: `{{character_prompt}}`, `{{simulation_instructions}}`, `{{action_catalog}}`
+- USER: `{{initial_state_agent_prompt}}` (first turn), `{{perception_json}}`
+- Renderer and context now support env-gated debug logs: `DEBUG_PROMPT_RENDER`, `DEBUG_PROMPT_CONTEXT`
+- `LLMExecutor` continues to accept `template` or `template_name` (default "default")
+- Tests pass with explicit template selection and new layout
+
 ---
 
 ## OUTSTANDING ISSUES
@@ -69,9 +88,52 @@ Effort: 2–4 hours for docs/examples; more for algorithmic upgrade.
 
 ---
 
----
+### A11: Grid Perception Not Exposed to Agents
 
----
+**Problem:** Tier 2 spatial grid environments (`EnvironmentGridState`) are built and maintained in `WorldState`, but agents cannot perceive grid data. The `AgentPerception` schema and `build_agent_perception()` function do not expose grid tiles, positions, or nearby objects.
+
+**Impact:**
+- Snake example LLM is completely blind (can't see food, walls, or own position)
+- LLM makes decisions with "No map data available" reasoning
+- Crashes into walls within 11 ticks despite grid being correctly maintained
+- Grid infrastructure exists (`EnvironmentGridState`, pathfinding helpers) but unusable for LLM cognition
+- Any Tier 2 spatial scenario will have same issue
+
+**Current Behavior:**
+- `world_state.environment_grid` contains full tile map with collision/objects
+- `agent_status.grid_position` tracks agent coordinates
+- `build_agent_perception()` ignores both fields entirely
+- LLM receives empty perception with no spatial awareness
+
+**Expected Behavior:**
+- Agents should perceive visible tiles within some radius (e.g., 5x5 window around position)
+- Perception should include: walls, objects, food, nearby agents' positions
+- LLM should make informed decisions based on visible grid state
+
+**Technical Details:**
+- `AgentPerception` schema (schemas.py:456) has no grid-related fields
+- `build_agent_perception()` (perception.py:44) doesn't check `world_state.environment_grid`
+- No helper function for "get visible tiles around position(x,y) with radius N"
+- Grid visibility likely needs partial observability (fog of war) for believability
+
+**Reproduction:**
+```bash
+LLM_PROVIDER=openai LLM_MODEL=gpt-5-nano uv run python examples/snake/snake.py --ticks 12
+# Snake moves blindly, reasoning shows "No map data available"
+# Crashes into wall at tick 11 (score: 0, never saw food)
+```
+
+**Proposed Solution:**
+1. Add `visible_grid_tiles: Optional[Dict[Tuple[int, int], GridTileState]]` to `AgentPerception`
+2. Add `get_visible_tiles(grid, position, radius)` helper to `environment/helpers.py`
+3. Update `build_agent_perception()` to populate visible_grid_tiles when `environment_grid` present
+4. Update snake example to validate LLM can now see and navigate
+
+**Effort:** 4-6 hours (schema extension, perception builder update, helper function, tests)
+
+**Priority:** Medium (blocks all Tier 2 spatial scenarios with LLM agents)
+
+**Workaround:** Pass grid as string in agent prompt (hacky, doesn't scale to large grids)
 
 ---
 
@@ -103,54 +165,12 @@ Effort: 2–4 hours for docs/examples; more for algorithmic upgrade.
 
 ---
 
-### A9: Agent Prompt Pattern - Identity Buried in JSON
-
-**Problem:** AgentProfile (name, background, personality, relationships) is buried in user prompt JSON instead of system prompt, creating suboptimal LLM behavior and confusing separation of concerns.
-
-**Impact:**
-- LLM must parse JSON to understand who it is (poor role-play performance)
-- Users forced to repeat identity info in `agent_prompts` to compensate
-- Unclear mental model: what goes in `AgentProfile` vs `agent_prompts`
-- Redundant information and inconsistent voice guidance
-
-**Plan:**
-1. **Phase 1:** Update renderer to build character prompt from AgentProfile
-   - Move identity (name, background, personality, relationships) to system prompt
-   - Keep only situational context in `agent_prompts`
-   - Use first-person voice for identity, situational for current state
-2. **Phase 2:** Update schema docs with clear guidance
-3. **Phase 3:** Migration guide for existing scenarios
-4. **Phase 4:** Advanced PromptBuilder class for explicit control
-
-**Effort:** Phase 1: 1 day; Phases 2-3: 1 day each; Phase 4: Future
-
----
-
-### A10: Prompt Template System - Template Noise Masks Intent
-
-**Problem:** Default templates contain 130+ lines of generic action examples that can conflict with domain-specific agent instructions, creating opaque behavior and debugging difficulty.
-
-**Impact:**
-- Domain-specific instructions (e.g., "ONLY move actions" for snake game) get diluted by generic examples
-- Template choice is invisible in code (`LLMExecutor()` hides what template is used)
-- Users don't understand where tuning is needed due to leaky abstraction
-
-**Plan:**
-1. **Short-term:** Create minimal default template (no action examples)
-2. **Medium-term:** Add domain-specific templates users can opt into:
-   - `execute_ops` - work/rest/monitor examples
-   - `execute_social` - communicate/rest examples  
-   - `execute_game` - move/action examples
-3. **Long-term:** Allow `agent_prompts` to override template when needed
-
-**Effort:** 1-2 days for minimal template + domain variants
-
 ---
 
 
 ## Test/Build Status
 
-- Unit/integration tests: 29 passing
+- Unit/integration tests: 39 passing
 - New tests assert truthful logging tags: `[LLM]` only on real LLM branches, `[•]` on deterministic branches
 
 ---
@@ -222,6 +242,4 @@ Next Review: After A3–A6 changes land
 ### OUTSTANDING
 - A3: Docs recommend `ImportanceWeightedMemory`; example adapter for embeddings exists.
 - A8: Log output is readable at multiple verbosity levels; agent information is grouped together; message content is visible in summaries.
-- A9: AgentProfile identity appears in system prompt; users don't need to repeat identity info in agent_prompts; clear separation between identity and situational context.
-- A10: Default template is minimal; domain-specific templates available; template choice is explicit in code; no conflicting action examples.
 
