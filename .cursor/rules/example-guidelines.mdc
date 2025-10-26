@@ -1,0 +1,19 @@
+# Example Guidelines
+
+## Example Structure
+- **Progressive complexity** - Start simple, add features incrementally (workshop pattern: 01, 02, 03...)
+- **Module docstring explains** - WHAT THIS SHOWS (key concepts), RUN (exact command with `uv run`)
+- **Self-contained** - Each example runs independently with minimal dependencies
+- **Inline comments explain WHY** - Use section separators (`# ===`) and explain design decisions, not just what code does
+- **Show both modes** - Demonstrate deterministic AND LLM versions where applicable (like workshop/run.py)
+- **Working examples only** - All examples must run successfully with `uv run python -m examples.path.to.example`
+
+## Example Categories
+- **workshop/** - Progressive tutorial series (01_hello_world → 05_stochastic)
+- **smallville/** - Stanford Generative Agents replication scenarios
+- **{domain}/** - Domain-specific examples (snake, etc.)
+
+## Documentation
+- Each example directory has README.md explaining the concept
+- Code comments explain key patterns and design decisions
+- Keep examples focused on teaching one concept at a time

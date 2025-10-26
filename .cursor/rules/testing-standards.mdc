@@ -1,0 +1,9 @@
+# Testing Standards
+
+- **TDD required** - All new features MUST include pytest tests. No exceptions. Run: `UV_CACHE_DIR=.uv-cache uv run pytest`
+- **Test naming** - `def test_{what}_{scenario}():` with one-line docstring
+- **Arrange-Act-Assert structure** - Organize tests clearly with comments for each section
+- **Mock external dependencies** - Never make real API calls, database queries, or file I/O. Use `AsyncMock` and test implementations
+- **Use @pytest.mark.asyncio** - For async tests
+- **Required coverage** - Happy path, error cases, edge cases, integration tests
+- **All tests must pass before committing** - No broken tests in main branch

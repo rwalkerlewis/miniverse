@@ -1,0 +1,20 @@
+---
+alwaysApply: false
+---
+
+# PR and Contribution Standards
+
+- **One feature per PR** - Single feature, bug, or improvement only. Don't mix unrelated changes.
+- **Must include** - Core implementation + tests (pytest) + documentation + backward compatibility
+- **Must NOT include** - Formatting changes to unrelated files, refactoring unrelated code, CI/CD changes, pre-commit hooks, temporary scripts
+- **Before submitting** - Run `UV_CACHE_DIR=.uv-cache uv run pytest` (all tests must pass)
+- **Clear PR title** - "Add OpenRouter integration" not "Updates"
+- **PR description includes** - What (brief description), Why (problem solved), Testing (how tested), Breaking changes (if any)
+# PR and Contribution Standards
+
+- **One feature per PR** - Single feature, bug, or improvement only. Don't mix unrelated changes.
+- **Must include** - Core implementation + tests (pytest) + documentation + backward compatibility
+- **Must NOT include** - Formatting changes to unrelated files, refactoring unrelated code, CI/CD changes, pre-commit hooks, temporary scripts
+- **Before submitting** - Run `UV_CACHE_DIR=.uv-cache uv run pytest` (all tests must pass)
+- **Clear PR title** - "Add OpenRouter integration" not "Updates"
+- **PR description includes** - What (brief description), Why (problem solved), Testing (how tested), Breaking changes (if any)
