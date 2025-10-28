@@ -1,0 +1,7 @@
+---
+alwaysApply: true
+---
+
+# Code Formatting and Style
+
+- **Python ≥3.10, PEP 8, type hints** - Use `str | None` not `Optional[str]`, add `from __future__ import annotations` for forward refs

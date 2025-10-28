@@ -1,0 +1,9 @@
+---
+alwaysApply: true
+---
+
+# Package Management
+
+Always use `uv` for package management. Never use pip, poetry, or other tools.# Package Management
+
+Always use `uv` for package management. Never use pip, poetry, or other tools.

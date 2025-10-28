@@ -1,0 +1,11 @@
+---
+alwaysApply: true
+---
+
+# Data Modeling and Architecture
+
+- **Pydantic BaseModel** - Use for all serializable data structures, API schemas, and persistence models
+- **@dataclass** - Use for lightweight, performance-critical structures (environment tiles, graph nodes)
+- **Protocol** - Use for interfaces and abstract contracts
+- **Field validation** - Use Pydantic `Field()` for constraints, descriptions, and metadata
+- **Type unions** - Use `str | None` syntax for optional fields, not `Optional[str]`
