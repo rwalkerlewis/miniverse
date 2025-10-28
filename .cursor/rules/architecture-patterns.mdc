@@ -1,7 +1,7 @@
 # Architecture Overview
 
 ## System Design
-Miniverse combines **deterministic physics** (pure Python simulation rules) with **emergent cognition** (LLM-driven agent behavior).
+Miniverse combines **deterministic physics** (pure Python simulation rules) with **non-deterministic cognition** (LLM-driven agent behavior).
 
 ## Key Patterns
 - **Dependency injection** - All dependencies passed as constructor arguments, no globals

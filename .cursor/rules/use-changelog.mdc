@@ -1,0 +1,10 @@
+---
+alwaysApply: true
+---
+
+# Changelog Usage
+
+- **Document all changes** - Update `CHANGELOG.md` for every PR with meaningful changes
+- **Use conventional format** - Follow "Added", "Changed", "Fixed", "Removed" sections
+- **Include PR references** - Link to PR numbers for traceability
+- **Group by version** - Organize entries under version headers with dates

@@ -5,14 +5,3 @@ alwaysApply: true
 # Code Formatting and Style
 
 - **Python ≥3.10, PEP 8, type hints** - Use `str | None` not `Optional[str]`, add `from __future__ import annotations` for forward refs
-- **Naming conventions** - Files: `snake_case.py`, Classes: `PascalCase`, Functions/vars: `snake_case`, Constants: `UPPER_SNAKE_CASE`, Private: `_underscore`
-- **Special suffixes** - `*Strategy` (pluggable backends), `*Engine` (processors), `*State` (Pydantic schemas), `*Rules` (physics), `*Error` (exceptions)
-- **Imports in order** - Standard library, third-party, local (separate groups with blank lines)
-- **Pydantic and Protocols** - Use `BaseModel` for data, `Protocol` for interfaces, `@dataclass(slots=True)` for performance-critical structures
-# Code Formatting and Style
-
-- **Python ≥3.10, PEP 8, type hints** - Use `str | None` not `Optional[str]`, add `from __future__ import annotations` for forward refs
-- **Naming conventions** - Files: `snake_case.py`, Classes: `PascalCase`, Functions/vars: `snake_case`, Constants: `UPPER_SNAKE_CASE`, Private: `_underscore`
-- **Special suffixes** - `*Strategy` (pluggable backends), `*Engine` (processors), `*State` (Pydantic schemas), `*Rules` (physics), `*Error` (exceptions)
-- **Imports in order** - Standard library, third-party, local (separate groups with blank lines)
-- **Pydantic and Protocols** - Use `BaseModel` for data, `Protocol` for interfaces, `@dataclass(slots=True)` for performance-critical structures

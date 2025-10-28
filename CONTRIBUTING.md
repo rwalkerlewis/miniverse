@@ -1,7 +1,3 @@
----
-alwaysApply: false
----
-
 # PR and Contribution Standards
 
 - **One feature per PR** - Single feature, bug, or improvement only. Don't mix unrelated changes.
