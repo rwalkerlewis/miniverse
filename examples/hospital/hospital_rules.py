@@ -35,39 +35,87 @@ class HospitalRules(SimulationRules):
     
     def apply_tick(
         self,
-        world: WorldState,
-        actions: Sequence[AgentAction],
-    ) -> tuple[WorldState, list[Event]]:
+        state: WorldState,
+        tick: int,
+    ) -> WorldState:
         """Apply one tick of hospital physics.
         
-        1. Update patient vitals (deterioration/improvement)
-        2. Apply treatment effects from actions
-        3. Handle department transfers
-        4. Check for critical events (code blue, discharge)
-        5. Generate new patient arrivals
+        This runs BEFORE agent actions are gathered.
+        Updates:
+        1. Patient vitals (deterioration/improvement)
+        2. Check for critical events (code blue)
+        3. Generate new patient arrivals
+        4. Update global metrics
         """
-        events: list[Event] = []
+        world = state.model_copy(deep=True)
         
         # Update patient vitals
-        self._update_patient_vitals(world, events)
-        
-        # Apply treatment effects from actions
-        self._apply_treatments(world, actions, events)
-        
-        # Handle department transfers
-        self._process_transfers(world, actions, events)
+        for agent_status in world.agents:
+            if agent_status.role != "patient":
+                continue
+            
+            # Get current vitals from attributes
+            health_stat = agent_status.attributes.get("health")
+            stability_stat = agent_status.attributes.get("stability")
+            pain_stat = agent_status.attributes.get("pain_level")
+            
+            if not health_stat or not stability_stat or not pain_stat:
+                continue
+            
+            health = float(health_stat.value)
+            stability = float(stability_stat.value)
+            pain_level = float(pain_stat.value)
+            
+            # Patients in ICU may deteriorate faster
+            if agent_status.location == "icu":
+                if stability < 40:
+                    stability -= 2
+                    health -= 1
+            
+            # Patients in ER waiting may get worse
+            elif agent_status.location == "er_waiting":
+                if pain_level > 70:
+                    stability -= 1
+            
+            # Natural recovery for stable patients
+            if stability > 70 and health < 90:
+                health += 1
+                pain_level = max(0, pain_level - 2)
+            
+            # Update stats
+            health_stat.value = max(0, min(100, health))
+            stability_stat.value = max(0, min(100, stability))
+            pain_stat.value = max(0, min(100, pain_level))
         
         # Check for critical events
-        self._check_critical_events(world, events)
+        for agent_status in world.agents:
+            if agent_status.role != "patient":
+                continue
+            
+            health_stat = agent_status.attributes.get("health")
+            stability_stat = agent_status.attributes.get("stability")
+            
+            if not health_stat or not stability_stat:
+                continue
+            
+            health = float(health_stat.value)
+            stability = float(stability_stat.value)
+            
+            # Code Blue - critical condition (would generate events in full implementation)
+            if stability < 30 and health < 40:
+                # Mark as critical in metadata or attributes
+                pass
         
-        # Generate new patient arrivals
+        # Generate new patient arrivals occasionally
         if self.rng.random() < self.arrival_rate:
-            self._generate_patient_arrival(world, events)
+            # In full implementation, would add new patient to world.agents
+            pass
         
         # Update global metrics
         self._update_hospital_metrics(world)
         
-        return world, events
+        world.tick = tick
+        return world
     
     def _update_patient_vitals(self, world: WorldState, events: list[Event]) -> None:
         """Update vital signs for all patients."""
@@ -329,3 +377,14 @@ class HospitalRules(SimulationRules):
         metric = resource_state.metrics.get(name)
         if metric:
             metric.value = value
+    
+    def validate_action(self, action: AgentAction, state: WorldState) -> bool:
+        """Validate if an action is allowed in the current state.
+        
+        For hospital simulation, we allow most actions but could add checks for:
+        - Location capacity constraints
+        - Staff permissions (e.g., only doctors can prescribe certain treatments)
+        - Patient safety rules
+        """
+        # For now, allow all actions
+        return True
