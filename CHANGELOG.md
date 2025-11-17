@@ -1,5 +1,10 @@
 # Changelog
 
+## 2025-11-17 (hospital example)
+
+- Added: `examples/hospital/run.py` and `examples/hospital/scenario.json` showcase a Riverside General Hospital simulation with ER, ICU, imaging, operating rooms, nurses, doctors, patients, visitors, and support staff plus deterministic + optional `gpt-5-nano` cognition.
+- Docs: `examples/README.md` now points to the hospital example with run instructions for deterministic and LLM modes.
+
 ## 2025-10-20 (grid perception)
 
 - Perception: Restored the minimal Tier-2 behavior; `AgentPerception` no longer exposes `grid_ascii`. The builder now only prepends the ASCII view to `recent_observations`, and scenarios inject richer context via `SimulationRules.customize_perception()`.

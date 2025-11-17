@@ -1,0 +1,463 @@
+{
+  "name": "Riverside General Hospital",
+  "description": "A busy urban teaching hospital balancing ER surges, ICU load, imaging requests, and operating room schedules.",
+  "initial_timestamp": "2025-11-17T06:30:00",
+  "environment": {
+    "metrics": {
+      "hospital_noise_db": {
+        "value": 68,
+        "unit": "dB",
+        "label": "Ambient Noise"
+      },
+      "air_quality_index": {
+        "value": 42,
+        "label": "Air Quality Index"
+      },
+      "current_shift": {
+        "value": "day",
+        "label": "Shift"
+      }
+    }
+  },
+  "resources": {
+    "metrics": {
+      "er_waiting_patients": {
+        "value": 8,
+        "label": "ER Waiting Patients",
+        "description": "Patients still waiting for a treatment bay"
+      },
+      "icu_beds_available": {
+        "value": 1,
+        "label": "ICU Beds Available"
+      },
+      "imaging_queue": {
+        "value": 3,
+        "label": "Imaging Queue Length"
+      },
+      "or_cases_pending": {
+        "value": 2,
+        "label": "Pending OR Cases"
+      },
+      "staff_fatigue_index": {
+        "value": 42,
+        "unit": "%",
+        "label": "Staff Fatigue Index"
+      },
+      "visitor_count": {
+        "value": 6,
+        "label": "Visitors Onsite"
+      }
+    }
+  },
+  "environment_graph": {
+    "nodes": {
+      "waiting_room": {
+        "name": "Waiting Room",
+        "capacity": 12,
+        "metadata": {"department": "public"}
+      },
+      "family_lounge": {
+        "name": "Family Lounge",
+        "capacity": 6,
+        "metadata": {"department": "public"}
+      },
+      "cafeteria": {
+        "name": "Cafeteria",
+        "capacity": 10,
+        "metadata": {"department": "amenities"}
+      },
+      "er_triage": {
+        "name": "ER Triage",
+        "capacity": 6,
+        "metadata": {"department": "ER"}
+      },
+      "er_treatment": {
+        "name": "ER Treatment Bays",
+        "capacity": 4,
+        "metadata": {"department": "ER"}
+      },
+      "icu": {
+        "name": "Intensive Care Unit",
+        "capacity": 3,
+        "metadata": {"department": "ICU"}
+      },
+      "imaging_ct": {
+        "name": "CT Suite",
+        "capacity": 1,
+        "metadata": {"department": "Imaging"}
+      },
+      "imaging_mri": {
+        "name": "MRI Suite",
+        "capacity": 1,
+        "metadata": {"department": "Imaging"}
+      },
+      "operating_room_a": {
+        "name": "Operating Room A",
+        "capacity": 1,
+        "metadata": {"department": "Surgery"}
+      },
+      "operating_room_b": {
+        "name": "Operating Room B",
+        "capacity": 1,
+        "metadata": {"department": "Surgery"}
+      },
+      "recovery": {
+        "name": "Post-Op Recovery",
+        "capacity": 4,
+        "metadata": {"department": "Surgery"}
+      },
+      "pharmacy": {
+        "name": "Pharmacy",
+        "capacity": 2,
+        "metadata": {"department": "Support"}
+      },
+      "staff_break_room": {
+        "name": "Staff Break Room",
+        "capacity": 4,
+        "metadata": {"department": "Support"}
+      },
+      "administration": {
+        "name": "Administration",
+        "capacity": 4,
+        "metadata": {"department": "Operations"}
+      }
+    },
+    "adjacency": {
+      "waiting_room": ["family_lounge", "er_triage"],
+      "family_lounge": ["waiting_room", "cafeteria"],
+      "cafeteria": ["family_lounge", "staff_break_room"],
+      "staff_break_room": ["cafeteria", "administration"],
+      "administration": ["staff_break_room", "pharmacy"],
+      "pharmacy": ["administration", "er_triage"],
+      "er_triage": ["waiting_room", "er_treatment", "imaging_ct", "pharmacy"],
+      "er_treatment": ["er_triage", "icu", "operating_room_a", "operating_room_b"],
+      "icu": ["er_treatment", "recovery"],
+      "recovery": ["icu", "operating_room_a", "operating_room_b"],
+      "imaging_ct": ["er_triage", "imaging_mri"],
+      "imaging_mri": ["imaging_ct", "operating_room_a"],
+      "operating_room_a": ["er_treatment", "imaging_mri", "recovery"],
+      "operating_room_b": ["er_treatment", "recovery"]
+    }
+  },
+  "agents": [
+    {
+      "profile": {
+        "agent_id": "er_doctor",
+        "name": "Dr. Priya Malhotra",
+        "age": 39,
+        "background": "Emergency physician coordinating critical resuscitations and throughput decisions.",
+        "role": "er_doctor",
+        "personality": "decisive",
+        "skills": {
+          "diagnostics": "expert",
+          "communication": "advanced"
+        },
+        "goals": [
+          "Stabilize critical arrivals",
+          "Keep ER wait time under 30 minutes"
+        ],
+        "relationships": {
+          "er_nurse": "Relies on for real-time signals",
+          "icu_nurse": "Escalates post-resuscitation handoffs"
+        }
+      },
+      "status": {
+        "agent_id": "er_doctor",
+        "display_name": "Dr. Malhotra",
+        "role": "er_doctor",
+        "location": "er_treatment",
+        "activity": null,
+        "attributes": {
+          "energy": {"value": 72, "unit": "%", "label": "Energy"},
+          "stress": {"value": 48, "unit": "%", "label": "Stress"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "er_nurse",
+        "name": "Nurse Amira Holt",
+        "age": 31,
+        "background": "Charge nurse running ER triage flow and bedside coaching.",
+        "role": "er_nurse",
+        "personality": "steady",
+        "skills": {
+          "triage": "expert",
+          "coaching": "advanced"
+        },
+        "goals": [
+          "Keep triage queue moving",
+          "Protect nurse staffing ratios"
+        ],
+        "relationships": {
+          "er_doctor": "Flags deteriorating patients",
+          "transport_aide": "Coordinates transfers"
+        }
+      },
+      "status": {
+        "agent_id": "er_nurse",
+        "display_name": "Nurse Holt",
+        "role": "er_nurse",
+        "location": "er_triage",
+        "activity": null,
+        "attributes": {
+          "energy": {"value": 68, "unit": "%", "label": "Energy"},
+          "stress": {"value": 46, "unit": "%", "label": "Stress"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "icu_nurse",
+        "name": "Nurse Liam Ortega",
+        "age": 34,
+        "background": "ICU nurse leading ventilator rounds and family updates.",
+        "role": "icu_nurse",
+        "personality": "methodical",
+        "skills": {
+          "ventilation": "advanced",
+          "family_support": "advanced"
+        },
+        "goals": [
+          "Hold ICU handoffs under 15 minutes",
+          "Anticipate bed openings"
+        ],
+        "relationships": {
+          "er_doctor": "Receives escalations",
+          "patient_icu": "Primary nurse"
+        }
+      },
+      "status": {
+        "agent_id": "icu_nurse",
+        "display_name": "Nurse Ortega",
+        "role": "icu_nurse",
+        "location": "icu",
+        "activity": null,
+        "attributes": {
+          "energy": {"value": 64, "unit": "%", "label": "Energy"},
+          "stress": {"value": 52, "unit": "%", "label": "Stress"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "imaging_tech",
+        "name": "Avery Park",
+        "age": 28,
+        "background": "Imaging technologist covering CT and MRI scans.",
+        "role": "imaging_tech",
+        "personality": "organized",
+        "skills": {
+          "ct": "advanced",
+          "mri": "advanced"
+        },
+        "goals": [
+          "Clear STAT scans quickly",
+          "Minimize scanner idle time"
+        ],
+        "relationships": {
+          "er_doctor": "Preps emergent scans",
+          "surgeon": "Shares intra-op imaging"
+        }
+      },
+      "status": {
+        "agent_id": "imaging_tech",
+        "display_name": "Avery Park",
+        "role": "imaging_tech",
+        "location": "imaging_mri",
+        "activity": null,
+        "attributes": {
+          "energy": {"value": 70, "unit": "%", "label": "Energy"},
+          "stress": {"value": 35, "unit": "%", "label": "Stress"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "surgeon",
+        "name": "Dr. Elena Cho",
+        "age": 45,
+        "background": "Trauma surgeon leading the operating room schedule.",
+        "role": "surgeon",
+        "personality": "focused",
+        "skills": {
+          "procedures": "expert",
+          "coordination": "advanced"
+        },
+        "goals": [
+          "Start first case on time",
+          "Coordinate with ICU for beds"
+        ],
+        "relationships": {
+          "imaging_tech": "Requests intra-op support",
+          "hospital_admin": "Advocates for resources"
+        }
+      },
+      "status": {
+        "agent_id": "surgeon",
+        "display_name": "Dr. Cho",
+        "role": "surgeon",
+        "location": "operating_room_a",
+        "activity": null,
+        "attributes": {
+          "energy": {"value": 66, "unit": "%", "label": "Energy"},
+          "stress": {"value": 58, "unit": "%", "label": "Stress"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "hospital_admin",
+        "name": "Samir Patel",
+        "age": 52,
+        "background": "Operations chief balancing staffing, beds, and visitors.",
+        "role": "hospital_admin",
+        "personality": "analytical",
+        "skills": {
+          "logistics": "expert",
+          "communication": "advanced"
+        },
+        "goals": [
+          "Avoid divert status",
+          "Support families with timely updates"
+        ],
+        "relationships": {
+          "surgeon": "Aligns on OR priorities",
+          "visitor": "Ensures visitor policy is clear"
+        }
+      },
+      "status": {
+        "agent_id": "hospital_admin",
+        "display_name": "Samir Patel",
+        "role": "hospital_admin",
+        "location": "administration",
+        "activity": null,
+        "attributes": {
+          "energy": {"value": 74, "unit": "%", "label": "Energy"},
+          "stress": {"value": 40, "unit": "%", "label": "Stress"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "transport_aide",
+        "name": "Kai Romero",
+        "age": 26,
+        "background": "Patient transport aide moving bodies between departments and keeping carts ready.",
+        "role": "transport_aide",
+        "personality": "helpful",
+        "skills": {
+          "mobility": "advanced",
+          "sterilization": "intermediate"
+        },
+        "goals": [
+          "Move critical patients without delay",
+          "Keep equipment sanitized"
+        ],
+        "relationships": {
+          "er_nurse": "Receives stretcher requests",
+          "surgeon": "Preps OR hallways"
+        }
+      },
+      "status": {
+        "agent_id": "transport_aide",
+        "display_name": "Kai Romero",
+        "role": "transport_aide",
+        "location": "er_triage",
+        "activity": null,
+        "attributes": {
+          "energy": {"value": 78, "unit": "%", "label": "Energy"},
+          "stress": {"value": 32, "unit": "%", "label": "Stress"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "patient_er",
+        "name": "Jordan Ellis",
+        "age": 24,
+        "background": "Cyclist with abdominal trauma awaiting imaging.",
+        "role": "patient",
+        "personality": "concerned",
+        "skills": {},
+        "goals": [
+          "Understand treatment plan",
+          "Manage pain"
+        ],
+        "relationships": {
+          "visitor": "Partner providing support"
+        }
+      },
+      "status": {
+        "agent_id": "patient_er",
+        "display_name": "Jordan Ellis",
+        "role": "patient",
+        "location": "waiting_room",
+        "activity": null,
+        "attributes": {
+          "pain": {"value": 63, "unit": "%", "label": "Pain"},
+          "anxiety": {"value": 58, "unit": "%", "label": "Anxiety"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "patient_icu",
+        "name": "Maya Singh",
+        "age": 58,
+        "background": "Post-op patient on ventilator support.",
+        "role": "patient",
+        "personality": "resilient",
+        "skills": {},
+        "goals": [
+          "Stay stable overnight",
+          "Communicate with family"
+        ],
+        "relationships": {
+          "icu_nurse": "Primary caregiver"
+        }
+      },
+      "status": {
+        "agent_id": "patient_icu",
+        "display_name": "Maya Singh",
+        "role": "patient",
+        "location": "icu",
+        "activity": null,
+        "attributes": {
+          "pain": {"value": 41, "unit": "%", "label": "Pain"},
+          "anxiety": {"value": 52, "unit": "%", "label": "Anxiety"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "visitor",
+        "name": "Carlos Bennett",
+        "age": 30,
+        "background": "Visitor supporting Jordan during ER stay.",
+        "role": "visitor",
+        "personality": "supportive",
+        "skills": {},
+        "goals": [
+          "Stay informed",
+          "Keep Jordan calm"
+        ],
+        "relationships": {
+          "patient_er": "Partner",
+          "hospital_admin": "Asks for updates"
+        }
+      },
+      "status": {
+        "agent_id": "visitor",
+        "display_name": "Carlos Bennett",
+        "role": "visitor",
+        "location": "family_lounge",
+        "activity": null,
+        "attributes": {
+          "patience": {"value": 55, "unit": "%", "label": "Patience"},
+          "stress": {"value": 47, "unit": "%", "label": "Stress"}
+        }
+      }
+    }
+  ]
+}

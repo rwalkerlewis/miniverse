@@ -88,6 +88,22 @@ See `workshop/README.md` for detailed explanations of each example.
 - **Want to see complete simulations?** → Run workshop examples
 - **Building your own simulation?** → Read `docs/USAGE.md`, then adapt workshop examples
 
+## Hospital Operations Example
+
+`examples/hospital/run.py` models Riverside General Hospital with ER triage/treatment, ICU beds, imaging suites, operating rooms, nurses, doctors, patients, visitors, and supporting staff sharing the same environment graph.
+
+- Deterministic mode:
+  ```bash
+  uv run python examples/hospital/run.py --ticks 6 --analysis
+  ```
+- LLM cognition (OpenAI `gpt-5-nano`):
+  ```bash
+  export LLM_PROVIDER=openai
+  export LLM_MODEL=gpt-5-nano
+  export OPENAI_API_KEY=your_key
+  uv run python examples/hospital/run.py --llm --ticks 8 --analysis
+  ```
+
 ## LLM Configuration (Optional)
 
 For LLM-powered examples (03-05), configure your provider:
@@ -95,7 +111,7 @@ For LLM-powered examples (03-05), configure your provider:
 ```bash
 # OpenAI
 export LLM_PROVIDER=openai
-export LLM_MODEL=gpt-4
+export LLM_MODEL=gpt-5-nano
 export OPENAI_API_KEY=your_key
 
 # Anthropic
