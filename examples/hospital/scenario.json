@@ -1,0 +1,384 @@
+{
+  "name": "Hospital Emergency and Critical Care",
+  "description": "Multi-department hospital simulation with ER, ICU, OR, and imaging facilities",
+  "initial_timestamp": "2025-11-17T08:00:00",
+  "environment": {
+    "metrics": {
+      "ambient_temp_c": {
+        "value": 22.0,
+        "unit": "°C",
+        "label": "Ambient Temperature"
+      },
+      "hospital_status": {
+        "value": "operational",
+        "label": "Hospital Status"
+      }
+    }
+  },
+  "resources": {
+    "metrics": {
+      "patients_in_er": {
+        "value": 0,
+        "label": "Patients in ER"
+      },
+      "patients_in_icu": {
+        "value": 0,
+        "label": "Patients in ICU"
+      },
+      "patients_in_or": {
+        "value": 0,
+        "label": "Patients in OR"
+      },
+      "total_discharged": {
+        "value": 0,
+        "label": "Total Discharged"
+      },
+      "avg_patient_health": {
+        "value": 0,
+        "label": "Average Patient Health"
+      }
+    }
+  },
+  "environment_graph": {
+    "nodes": {
+      "er_waiting": {
+        "name": "ER Waiting Room",
+        "capacity": 20,
+        "metadata": {"department": "emergency"}
+      },
+      "er_triage": {
+        "name": "ER Triage",
+        "capacity": 3,
+        "metadata": {"department": "emergency"}
+      },
+      "er": {
+        "name": "Emergency Room",
+        "capacity": 6,
+        "metadata": {"department": "emergency"}
+      },
+      "icu": {
+        "name": "Intensive Care Unit",
+        "capacity": 4,
+        "metadata": {"department": "critical_care"}
+      },
+      "operating_room": {
+        "name": "Operating Rooms",
+        "capacity": 2,
+        "metadata": {"department": "surgery"}
+      },
+      "imaging": {
+        "name": "Imaging Department",
+        "capacity": 4,
+        "metadata": {"department": "diagnostics", "equipment": ["xray", "ct", "mri"]}
+      },
+      "nurses_station": {
+        "name": "Nurses Station",
+        "capacity": 10,
+        "metadata": {"department": "general"}
+      },
+      "admin": {
+        "name": "Administration",
+        "capacity": 5,
+        "metadata": {"department": "administration"}
+      }
+    },
+    "adjacency": {
+      "er_waiting": ["er_triage", "admin"],
+      "er_triage": ["er", "er_waiting"],
+      "er": ["icu", "operating_room", "imaging", "nurses_station"],
+      "icu": ["operating_room", "imaging", "nurses_station"],
+      "operating_room": ["icu", "er"],
+      "imaging": ["er", "icu"],
+      "nurses_station": ["er", "icu"],
+      "admin": ["er_waiting"]
+    }
+  },
+  "agents": [
+    {
+      "profile": {
+        "agent_id": "dr_chen",
+        "name": "Dr. Sarah Chen",
+        "role": "er_doctor",
+        "personality": "Experienced and decisive ER physician. Excellent at rapid triage and stabilization. Remains calm under pressure.",
+        "goals": ["Provide excellent emergency care", "Stabilize critical patients", "Coordinate with specialists"]
+      },
+      "status": {
+        "agent_id": "dr_chen",
+        "display_name": "Dr. Sarah Chen",
+        "role": "er_doctor",
+        "location": "er",
+        "activity": null,
+        "attributes": {
+          "experience_years": {"value": 12, "label": "Experience"},
+          "current_workload": {"value": 0, "label": "Workload"},
+          "patients_treated": {"value": 0, "label": "Patients Treated"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "dr_martinez",
+        "name": "Dr. James Martinez",
+        "role": "icu_doctor",
+        "personality": "Meticulous intensivist with strong attention to detail. Collaborative and thorough.",
+        "goals": ["Monitor ICU patients closely", "Adjust treatment plans", "Prevent complications"]
+      },
+      "status": {
+        "agent_id": "dr_martinez",
+        "display_name": "Dr. James Martinez",
+        "role": "icu_doctor",
+        "location": "icu",
+        "activity": null,
+        "attributes": {
+          "experience_years": {"value": 15, "label": "Experience"},
+          "current_workload": {"value": 0, "label": "Workload"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "dr_kumar",
+        "name": "Dr. Priya Kumar",
+        "role": "surgeon",
+        "personality": "Skilled surgeon with steady hands and clear communication. Confident but not arrogant.",
+        "goals": ["Perform necessary surgeries efficiently", "Ensure patient safety"]
+      },
+      "status": {
+        "agent_id": "dr_kumar",
+        "display_name": "Dr. Priya Kumar",
+        "role": "surgeon",
+        "location": "operating_room",
+        "activity": null,
+        "attributes": {
+          "experience_years": {"value": 10, "label": "Experience"},
+          "surgeries_today": {"value": 0, "label": "Surgeries Today"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "dr_williams",
+        "name": "Dr. Robert Williams",
+        "role": "radiologist",
+        "personality": "Detail-oriented with excellent pattern recognition. Clear and precise in reporting findings.",
+        "goals": ["Interpret imaging studies accurately and promptly"]
+      },
+      "status": {
+        "agent_id": "dr_williams",
+        "display_name": "Dr. Robert Williams",
+        "role": "radiologist",
+        "location": "imaging",
+        "activity": null,
+        "attributes": {
+          "experience_years": {"value": 8, "label": "Experience"},
+          "scans_reviewed": {"value": 0, "label": "Scans Reviewed"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "nurse_johnson",
+        "name": "Emily Johnson",
+        "role": "er_nurse",
+        "personality": "Compassionate and efficient. Excellent at multitasking and patient communication.",
+        "goals": ["Triage incoming patients", "Administer treatments", "Support doctors"]
+      },
+      "status": {
+        "agent_id": "nurse_johnson",
+        "display_name": "Emily Johnson",
+        "role": "er_nurse",
+        "location": "er_triage",
+        "activity": null,
+        "attributes": {
+          "experience_years": {"value": 7, "label": "Experience"},
+          "patients_triaged": {"value": 0, "label": "Patients Triaged"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "nurse_patel",
+        "name": "Aisha Patel",
+        "role": "er_nurse",
+        "personality": "Quick-thinking and proactive. Strong clinical skills and patient advocacy.",
+        "goals": ["Monitor ER patients", "Administer medications", "Assist with procedures"]
+      },
+      "status": {
+        "agent_id": "nurse_patel",
+        "display_name": "Aisha Patel",
+        "role": "er_nurse",
+        "location": "er",
+        "activity": null,
+        "attributes": {
+          "experience_years": {"value": 5, "label": "Experience"},
+          "medications_given": {"value": 0, "label": "Medications Given"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "nurse_davis",
+        "name": "Michael Davis",
+        "role": "icu_nurse",
+        "personality": "Vigilant and detail-oriented. Expert at recognizing subtle changes in patient condition.",
+        "goals": ["Provide intensive monitoring", "Care for critically ill patients"]
+      },
+      "status": {
+        "agent_id": "nurse_davis",
+        "display_name": "Michael Davis",
+        "role": "icu_nurse",
+        "location": "icu",
+        "activity": null,
+        "attributes": {
+          "experience_years": {"value": 9, "label": "Experience"},
+          "vital_checks": {"value": 0, "label": "Vital Checks"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "nurse_thompson",
+        "name": "Lisa Thompson",
+        "role": "or_nurse",
+        "personality": "Organized and anticipates needs. Maintains sterile field and assists surgeons.",
+        "goals": ["Support surgical procedures", "Ensure patient safety in OR"]
+      },
+      "status": {
+        "agent_id": "nurse_thompson",
+        "display_name": "Lisa Thompson",
+        "role": "or_nurse",
+        "location": "operating_room",
+        "activity": null,
+        "attributes": {
+          "experience_years": {"value": 6, "label": "Experience"},
+          "surgeries_assisted": {"value": 0, "label": "Surgeries Assisted"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "tech_garcia",
+        "name": "Carlos Garcia",
+        "role": "imaging_tech",
+        "personality": "Patient and technically proficient. Good at explaining procedures to anxious patients.",
+        "goals": ["Perform imaging studies safely and efficiently"]
+      },
+      "status": {
+        "agent_id": "tech_garcia",
+        "display_name": "Carlos Garcia",
+        "role": "imaging_tech",
+        "location": "imaging",
+        "activity": null,
+        "attributes": {
+          "experience_years": {"value": 4, "label": "Experience"},
+          "scans_performed": {"value": 0, "label": "Scans Performed"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "admin_clark",
+        "name": "Jennifer Clark",
+        "role": "admin_staff",
+        "personality": "Organized and empathetic. Handles admissions and discharge paperwork efficiently.",
+        "goals": ["Coordinate patient flow", "Manage documentation", "Facilitate communication"]
+      },
+      "status": {
+        "agent_id": "admin_clark",
+        "display_name": "Jennifer Clark",
+        "role": "admin_staff",
+        "location": "admin",
+        "activity": null,
+        "attributes": {
+          "patients_processed": {"value": 0, "label": "Patients Processed"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "patient_001",
+        "name": "John Miller",
+        "role": "patient",
+        "personality": "Anxious about symptoms, worried about heart attack",
+        "goals": ["Get diagnosed and treated quickly"]
+      },
+      "status": {
+        "agent_id": "patient_001",
+        "display_name": "John Miller",
+        "role": "patient",
+        "location": "er_waiting",
+        "activity": null,
+        "attributes": {
+          "health": {"value": 65, "unit": "%", "label": "Health"},
+          "stability": {"value": 70, "unit": "%", "label": "Stability"},
+          "pain_level": {"value": 75, "unit": "%", "label": "Pain Level"},
+          "condition_severity": {"value": 1, "label": "Condition Severity"},
+          "discharged": {"value": 0, "label": "Discharged"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "patient_002",
+        "name": "Maria Rodriguez",
+        "role": "patient",
+        "personality": "Stoic but clearly in distress",
+        "goals": ["Find out what's wrong and get relief"]
+      },
+      "status": {
+        "agent_id": "patient_002",
+        "display_name": "Maria Rodriguez",
+        "role": "patient",
+        "location": "er_waiting",
+        "activity": null,
+        "attributes": {
+          "health": {"value": 50, "unit": "%", "label": "Health"},
+          "stability": {"value": 55, "unit": "%", "label": "Stability"},
+          "pain_level": {"value": 85, "unit": "%", "label": "Pain Level"},
+          "condition_severity": {"value": 2, "label": "Condition Severity"},
+          "discharged": {"value": 0, "label": "Discharged"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "patient_003",
+        "name": "David Kim",
+        "role": "patient",
+        "personality": "Unconscious, critical condition",
+        "goals": ["Survive and stabilize"]
+      },
+      "status": {
+        "agent_id": "patient_003",
+        "display_name": "David Kim",
+        "role": "patient",
+        "location": "icu",
+        "activity": null,
+        "attributes": {
+          "health": {"value": 30, "unit": "%", "label": "Health"},
+          "stability": {"value": 35, "unit": "%", "label": "Stability"},
+          "pain_level": {"value": 20, "unit": "%", "label": "Pain Level"},
+          "condition_severity": {"value": 4, "label": "Condition Severity"},
+          "discharged": {"value": 0, "label": "Discharged"}
+        }
+      }
+    },
+    {
+      "profile": {
+        "agent_id": "visitor_001",
+        "name": "Susan Kim",
+        "role": "visitor",
+        "personality": "Worried and seeking information about husband's condition",
+        "goals": ["Support husband", "Understand his prognosis", "Communicate with medical team"]
+      },
+      "status": {
+        "agent_id": "visitor_001",
+        "display_name": "Susan Kim",
+        "role": "visitor",
+        "location": "icu",
+        "activity": null,
+        "attributes": {}
+      }
+    }
+  ]
+}
