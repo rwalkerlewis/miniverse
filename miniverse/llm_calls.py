@@ -12,6 +12,7 @@ No file I/O or global state.
 
 import json
 
+from miniverse.config import Config
 from miniverse.schemas import AgentAction, AgentPerception, WorldState
 from .llm_utils import call_llm_with_retries
 
@@ -61,6 +62,8 @@ What do you do? Output JSON matching AgentAction schema.
         llm_provider=llm_provider,
         llm_model=llm_model,
         response_model=AgentAction,
+        base_url=Config.LOCAL_LLM_BASE_URL,
+        api_key=Config.LOCAL_LLM_API_KEY,
     )
 
 
@@ -123,4 +126,6 @@ Output JSON matching WorldState schema.
         llm_provider=llm_provider,
         llm_model=llm_model,
         response_model=WorldState,
+        base_url=Config.LOCAL_LLM_BASE_URL,
+        api_key=Config.LOCAL_LLM_API_KEY,
     )

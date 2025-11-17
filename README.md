@@ -38,12 +38,14 @@ Each example folder ships a README with prompts, flags, and debugging tips.
 
 1. `01_hello_world` - Single deterministic agent, minimal `SimulationRules`. Run: `uv run python -m examples.workshop.01_hello_world.run`
 2. `02_deterministic` - Multiple agents with threshold logic and resource coupling.
-3. `03_llm_single` - Swaps in `LLMExecutor`; requires `LLM_PROVIDER`, `LLM_MODEL`, and a provider API key.
+3. `03_llm_single` - Swaps in `LLMExecutor`; requires `LLM_PROVIDER`, `LLM_MODEL`, and a provider API key (or local LLM).
 4. `04_team_chat` - Natural-language coordination via the `communication` field; memories capture transcripts.
 5. `05_stochastic` - Adds randomness to physics while LLM cognition adapts.
 6. `monte_carlo.py` - Batch runner executing many trials with different seeds, printing statistics (mean backlog, clearance rate, worst case).
 
 `examples/workshop/run.py` ties these ideas together: deterministic baseline by default, `--llm` flag, cadence controls, optional world-engine calls, and per-tick analysis hooks.
+
+**Using Local LLMs**: Miniverse supports local LLM servers like Ollama, LM Studio, and vLLM. See [`docs/LOCAL_LLMS.md`](docs/LOCAL_LLMS.md) for setup instructions.
 
 ### Snake (`examples/snake/run.py`)
 
@@ -57,12 +59,23 @@ Run: `uv run python -m examples.snake.run --ticks 40`
 - Recreates the Generative Agents Valentine's scenario with planning, execution, reflection, and memory streams.
 - Debug flags (`DEBUG_LLM`, `DEBUG_MEMORY`, `MINIVERSE_VERBOSE`) surface prompts, memories, and world updates.
 
-Run:
+Run with cloud LLM:
 
 ```bash
 export LLM_PROVIDER=openai
 export LLM_MODEL=gpt-5-nano
 export OPENAI_API_KEY=sk-your-key
+uv run python examples/smallville/valentines_party.py
+```
+
+Run with local LLM (Ollama):
+
+```bash
+# First: ollama pull llama3.1:8b
+export LLM_PROVIDER=openai
+export LLM_MODEL=llama3.1:8b
+export LOCAL_LLM_BASE_URL=http://localhost:11434/v1
+export OPENAI_API_KEY=not-needed
 uv run python examples/smallville/valentines_party.py
 ```
 
@@ -144,6 +157,7 @@ Swap agents to `LLMExecutor`, add planners (`LLMPlanner` or deterministic altern
 ## Documentation
 
 - `docs/USAGE.md` - scenario authoring, cognition wiring, cadence decisions.
+- `docs/LOCAL_LLMS.md` - complete guide to using local LLMs (Ollama, LM Studio, vLLM) instead of cloud APIs.
 - `docs/PROMPTS.md` - renderer placeholders, action catalog formatting, template conventions.
 - `docs/architecture/` - deep dives on cognition flow, environment tiers, persistence design.
 - `docs/RESEARCH.md` - research notes referencing Stanford Generative Agents, Smallville-inspired studies, branching narrative systems, structured simulation-state management, and other sources catalogued in `docs/research/`.

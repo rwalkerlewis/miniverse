@@ -1,5 +1,51 @@
 # Changelog
 
+## 2025-11-17 (local LLM support)
+
+### Added
+- **Local LLM support**: Miniverse now supports local LLM servers like Ollama, LM Studio, vLLM, and any OpenAI-compatible API
+  - New config options: `LOCAL_LLM_BASE_URL` and `LOCAL_LLM_API_KEY` environment variables
+  - All LLM calls (`call_llm_with_retries`, `LLMPlanner`, `LLMExecutor`, `LLMReflectionEngine`) now accept `base_url` and `api_key` parameters
+  - Config validation updated to handle local provider configuration
+  - **Breaking change**: For local LLMs, set `LLM_PROVIDER=openai` (for compatibility) and `LOCAL_LLM_BASE_URL` to your server endpoint
+
+### Changed
+- `miniverse/config.py`: Added `LOCAL_LLM_BASE_URL` and `LOCAL_LLM_API_KEY` configuration
+- `miniverse/llm_utils.py`: `call_llm_with_retries()` now accepts optional `base_url` and `api_key` parameters for local servers
+- `miniverse/llm_calls.py`: Updated `get_agent_action()` and `process_world_update()` to pass local LLM configuration
+- `miniverse/cognition/llm.py`: Updated `LLMPlanner`, `LLMExecutor`, and `LLMReflectionEngine` to support local LLMs
+
+### Documentation
+- New guide: `docs/LOCAL_LLMS.md` - comprehensive guide covering:
+  - Why use local LLMs (privacy, cost, offline, control)
+  - Setup instructions for Ollama, LM Studio, and vLLM
+  - Model selection guide with recommendations for different use cases
+  - Hardware requirements and performance optimization
+  - Troubleshooting common issues
+  - Examples for all workshop and Smallville scenarios
+- Updated `README.md` with local LLM examples and link to guide
+
+### Example Usage
+
+**Ollama (recommended for beginners):**
+```bash
+ollama pull llama3.1:8b
+export LLM_PROVIDER=openai
+export LLM_MODEL=llama3.1:8b
+export LOCAL_LLM_BASE_URL=http://localhost:11434/v1
+export OPENAI_API_KEY=not-needed
+uv run python examples/workshop/run.py --llm --ticks 10
+```
+
+**LM Studio:**
+```bash
+export LLM_PROVIDER=openai
+export LLM_MODEL=mistral-7b-instruct
+export LOCAL_LLM_BASE_URL=http://localhost:1234/v1
+export OPENAI_API_KEY=not-needed
+uv run python examples/smallville/valentines_party.py
+```
+
 ## 2025-10-20 (grid perception)
 
 - Perception: Restored the minimal Tier-2 behavior; `AgentPerception` no longer exposes `grid_ascii`. The builder now only prepends the ASCII view to `recent_observations`, and scenarios inject richer context via `SimulationRules.customize_perception()`.

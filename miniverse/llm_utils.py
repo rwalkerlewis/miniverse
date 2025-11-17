@@ -108,6 +108,8 @@ async def call_llm_with_retries(
     response_model: type[ModelT],
     max_attempts: int = 3,
     feedback_builder: Callable[[ValidationError], ValidationFeedback] = inject_validation_feedback,
+    base_url: str | None = None,
+    api_key: str | None = None,
 ) -> ModelT:
     """Invoke a structured LLM call with validation-aware retries.
 
@@ -132,7 +134,22 @@ async def call_llm_with_retries(
     # Define LLM call using Mirascope decorator. The decorator handles provider-specific
     # API calls, response parsing, and schema validation. response_model triggers Pydantic
     # validation on LLM output - raises ValidationError if output doesn't match schema.
-    @llm.call(provider=llm_provider, model=llm_model, response_model=response_model)
+    # Build call_params dynamically to include base_url and api_key for local LLMs
+    call_params: dict[str, Any] = {
+        "provider": llm_provider,
+        "model": llm_model,
+        "response_model": response_model,
+    }
+    
+    # Add base_url for local LLM servers (Ollama, LM Studio, vLLM, etc.)
+    if base_url:
+        call_params["base_url"] = base_url
+    
+    # Add api_key if provided (some local servers require auth)
+    if api_key:
+        call_params["api_key"] = api_key
+    
+    @llm.call(**call_params)
     async def _invoke(prompt: str) -> str:
         return prompt
 

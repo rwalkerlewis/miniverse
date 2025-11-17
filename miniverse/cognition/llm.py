@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
+from miniverse.config import Config
 from miniverse.llm_calls import call_llm_with_retries
 from miniverse.schemas import AgentAction, AgentPerception
 
@@ -117,6 +118,8 @@ class LLMPlanner(Planner):
             llm_provider=provider,
             llm_model=model,
             response_model=LLMPlanResponse,
+            base_url=Config.LOCAL_LLM_BASE_URL,
+            api_key=Config.LOCAL_LLM_API_KEY,
         )
 
         # Debug logging: Show LLM response
@@ -226,6 +229,8 @@ class LLMReflectionEngine(ReflectionEngine):
             llm_provider=provider,
             llm_model=model,
             response_model=LLMReflectionResponse,
+            base_url=Config.LOCAL_LLM_BASE_URL,
+            api_key=Config.LOCAL_LLM_API_KEY,
         )
 
         # Debug logging: Show LLM response
@@ -366,6 +371,8 @@ class LLMExecutor(Executor):
             llm_provider=provider,
             llm_model=model,
             response_model=AgentAction,
+            base_url=Config.LOCAL_LLM_BASE_URL,
+            api_key=Config.LOCAL_LLM_API_KEY,
         )
 
         # Debug logging: Show LLM response
