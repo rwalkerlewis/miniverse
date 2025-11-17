@@ -10,8 +10,11 @@ from mirascope import llm
 from pydantic import BaseModel, ValidationError
 from tenacity import AsyncRetrying, retry_if_exception_type, stop_after_attempt
 
+from miniverse.local_llm import LocalLLMError, call_ollama_chat
+
 
 ModelT = TypeVar("ModelT", bound=BaseModel)
+LLM_TIMEOUT_SECONDS = 120.0
 
 
 @dataclass(slots=True)
@@ -119,11 +122,24 @@ async def call_llm_with_retries(
     it, so model retains full context while seeing what needs correction.
     """
 
-    # Combine system and user prompts with double newline separator. This simplifies
-    # retry logic - we append feedback to combined prompt rather than managing multiple
-    # prompt components separately.
-    prompt_sections = [section.strip() for section in (system_prompt, user_prompt) if section.strip()]
-    base_prompt = "\n\n".join(prompt_sections)
+    system_prompt = system_prompt.strip()
+    base_user_prompt = user_prompt.strip()
+
+    def _build_user_prompt(
+        feedback_payload: ValidationFeedback | None,
+    ) -> str:
+        sections = [base_user_prompt]
+        if feedback_payload is not None:
+            sections.append(feedback_payload.llm_text)
+        return "\n\n".join(section for section in sections if section)
+
+    def _build_combined_prompt(user_section: str) -> str:
+        sections: list[str] = []
+        if system_prompt:
+            sections.append(system_prompt)
+        if user_section:
+            sections.append(user_section)
+        return "\n\n".join(sections)
 
     # Track validation feedback across retries. Starts None (no feedback), gets populated
     # after first failure, then carries forward to subsequent retries.
@@ -132,9 +148,15 @@ async def call_llm_with_retries(
     # Define LLM call using Mirascope decorator. The decorator handles provider-specific
     # API calls, response parsing, and schema validation. response_model triggers Pydantic
     # validation on LLM output - raises ValidationError if output doesn't match schema.
-    @llm.call(provider=llm_provider, model=llm_model, response_model=response_model)
-    async def _invoke(prompt: str) -> str:
-        return prompt
+    use_local_llm = llm_provider.lower() == "ollama"
+
+    remote_invoke: Callable[[str], Any] | None = None
+    if not use_local_llm:
+        @llm.call(provider=llm_provider, model=llm_model, response_model=response_model)
+        async def _invoke(prompt: str) -> str:
+            return prompt
+
+        remote_invoke = _invoke
 
     attempt_number = 0
     # AsyncRetrying from tenacity handles retry logic. retry_if_exception_type(ValidationError)
@@ -155,19 +177,33 @@ async def call_llm_with_retries(
                     " attempting schema correction."
                 )
             # Append validation feedback to base prompt (if available). First attempt uses
-            # base prompt only; subsequent attempts include feedback from previous failure.
+            # the raw prompt only; subsequent attempts include feedback from previous failure.
             # Feedback explains what was wrong and how to fix it.
-            final_prompt = (
-                base_prompt
-                if feedback_payload is None
-                else f"{base_prompt}\n\n{feedback_payload.llm_text}"
-            )
+            user_section = _build_user_prompt(feedback_payload)
+            final_prompt = _build_combined_prompt(user_section)
             try:
-                # Wrap LLM call in timeout to prevent hanging. 120s timeout is generous
-                # (typical LLM calls complete in 1-5s) but allows for large responses
-                # or slow providers. Timeout raises asyncio.TimeoutError, not ValidationError,
-                # so doesn't trigger retry.
-                return await asyncio.wait_for(_invoke(final_prompt), timeout=120)
+                # Wrap LLM calls in a timeout to prevent hanging. The 120s timeout is
+                # generous (typical invocations finish in a few seconds) but accommodates
+                # larger responses or slower providers. asyncio.TimeoutError does not
+                # trigger retries because it's usually a provider/network issue.
+                if use_local_llm:
+                    raw_response = await asyncio.wait_for(
+                        call_ollama_chat(
+                            system_prompt=system_prompt,
+                            user_prompt=user_section,
+                            llm_model=llm_model,
+                        ),
+                        timeout=LLM_TIMEOUT_SECONDS,
+                    )
+                    return response_model.model_validate_json(raw_response)
+
+                if remote_invoke is None:
+                    raise RuntimeError("Remote LLM invoke is not initialized.")
+
+                return await asyncio.wait_for(
+                    remote_invoke(final_prompt),
+                    timeout=LLM_TIMEOUT_SECONDS,
+                )
             except ValidationError as exc:  # pragma: no cover - retry path
                 # Validation failed - generate feedback for next retry. Feedback builder
                 # extracts field paths, error messages, and input previews from Pydantic error.
@@ -185,9 +221,15 @@ async def call_llm_with_retries(
                 # Timeout doesn't trigger retry - propagate immediately. Timeouts usually
                 # indicate provider outages or network issues that won't resolve with retry.
                 print(
-                    f"LLM call timed out after 120s for {response_model.__name__}."
+                    f"LLM call timed out after {int(LLM_TIMEOUT_SECONDS)}s for {response_model.__name__}."
                 )
                 raise exc
+            except LocalLLMError as exc:
+                # Local provider failures should surface immediately since retries are
+                # unlikely to help (usually indicates the server is offline or misconfigured).
+                raise RuntimeError(
+                    f"Local LLM provider error ({llm_provider}): {exc}"
+                ) from exc
 
     # AsyncRetrying with reraise=True will always exit via return or raise. This line
     # is unreachable but satisfies type checker (function must return ModelT or raise).

@@ -1,5 +1,17 @@
 # Changelog
 
+# Changelog
+
+## 2025-11-17
+
+### Added
+- Local LLM support via Ollama, including `call_ollama_chat`, schema-aware retries in `call_llm_with_retries`, and the `OLLAMA_BASE_URL` configuration hook.
+- Documentation for acquiring and loading local models (README, `docs/USAGE.md`, `examples/workshop/README.md`), plus `.env.example` guidance.
+- Regression tests for the new local helper and retry path to ensure we stay API-compatible without a running Ollama instance.
+
+### Changed
+- `Config.display()` now highlights the resolved local endpoint so misconfigurations surface immediately during runs.
+
 ## 2025-10-20 (grid perception)
 
 - Perception: Restored the minimal Tier-2 behavior; `AgentPerception` no longer exposes `grid_ascii`. The builder now only prepends the ASCII view to `recent_observations`, and scenarios inject richer context via `SimulationRules.customize_perception()`.
