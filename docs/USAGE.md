@@ -344,6 +344,45 @@ Preflight prints the selected mode and why at the start of the run.
 
 ---
 
+## Local LLMs (Ollama)
+
+You can run the entire cognition stack without cloud providers by pointing Miniverse at an [Ollama](https://ollama.com) server. This path is ideal when you want reproducible offline experiments or simply prefer not to send data to external APIs.
+
+1. **Install and start Ollama**
+   ```bash
+   curl -fsSL https://ollama.com/install.sh | sh   # Linux
+   # macOS/Windows installers are available on the site; the daemon auto-starts.
+   ```
+   Verify the daemon is running with `ollama serve` (Linux) or by checking `ollama list`.
+
+2. **Acquire a model**
+   ```bash
+   ollama pull llama3.1           # meta-llama 3.1 8B (default)
+   ollama pull qwen2.5:7b-instruct
+   ```
+   Use `ollama list` to see every tag you have locally.
+
+3. **Wire Miniverse to the local endpoint**
+   ```bash
+   export LLM_PROVIDER=ollama
+   export LLM_MODEL=llama3.1                # any tag from `ollama list`
+   export OLLAMA_BASE_URL=http://127.0.0.1:11434   # optional; defaults to this URL
+   uv run python examples/workshop/run.py --llm
+   ```
+   The same values flow into `Config.LLM_PROVIDER`, so no code changes are required. If your Ollama host runs on another machine, point `OLLAMA_BASE_URL` to that host.
+
+4. **Load weights into memory (optional)**
+   - Run `ollama run llama3.1 --keep-alive 15m` in another terminal to warm the model before launching Miniverse.
+   - Adjust `OLLAMA_NUM_PARALLEL` or `OLLAMA_MAX_LOADED_MODELS` if you want multiple models resident concurrently.
+
+5. **Troubleshoot**
+   - If the server is offline or the endpoint rejects requests, `Local LLM provider error (ollama)` will include the HTTP status or socket failure.
+   - Validation retries still apply: schema feedback is appended to the user prompt so the local model can self-correct JSON outputs just like cloud providers.
+
+This flow works for both agent-level cognition and the optional world engine. Simply select the model size that fits your hardware budget; everything else in Miniverse remains unchanged.
+
+---
+
 ## 5. Run the Simulation
 
 Use `orchestrator.run(num_ticks=N)` inside `asyncio.run(...)` or your own loop. The method handles persistence strategy initialization, tick iteration, persistence/memory updates, and optional reflections.

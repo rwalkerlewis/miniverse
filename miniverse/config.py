@@ -18,6 +18,7 @@ class Config:
     # LLM Provider Configuration
     LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "openai")
     LLM_MODEL: str = os.getenv("LLM_MODEL", "gpt-5-nano")
+    OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434")
 
     # API Keys
     ANTHROPIC_API_KEY: str | None = os.getenv("ANTHROPIC_API_KEY")
@@ -57,6 +58,7 @@ class Config:
             "Miniverse Configuration:",
             f"  LLM Provider: {cls.LLM_PROVIDER}",
             f"  LLM Model: {cls.LLM_MODEL}",
+            f"  Local LLM Base: {cls.OLLAMA_BASE_URL}",
             f"  Database: {cls.DATABASE_URL}",
             f"  Default Ticks: {cls.DEFAULT_TICK_COUNT}",
             f"  Tick Duration: {cls.TICK_DURATION_SECONDS}s",

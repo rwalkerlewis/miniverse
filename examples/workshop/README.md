@@ -2,6 +2,8 @@
 
 This directory contains a series of examples that progressively introduce Miniverse concepts, from simple deterministic agents to complex LLM-driven simulations.
 
+> **Tip:** Prefer local inference? Set `LLM_PROVIDER=ollama`, `LLM_MODEL=<tag from \`ollama list\`>`, and optionally `OLLAMA_BASE_URL=http://127.0.0.1:11434` to run any `--llm` example without cloud API keys. Full instructions live in `docs/USAGE.md#local-llms-ollama`.
+
 ## Learning Progression
 
 ### 01_hello_world - The Basics
@@ -49,7 +51,7 @@ uv run python -m examples.workshop.02_deterministic.run
 - LLM making nuanced decisions beyond simple thresholds
 - Minimal LLM configuration (just executor, no planning/reflection)
 
-**Requires:** LLM API key (OpenAI, Anthropic, etc.)
+**Requires:** LLM API key (OpenAI, Anthropic, etc.) or a local Ollama model (`LLM_PROVIDER=ollama`).
 
 **Run:**
 ```bash
@@ -74,7 +76,7 @@ Tip: set `WORLD_UPDATE_MODE=deterministic` during development to skip the world 
 - Agents reading and responding to each other's messages
 - Emergent team behavior from individual LLM decisions
 
-**Requires:** LLM API key
+**Requires:** LLM API key or local Ollama setup
 
 **Run:**
 ```bash
@@ -99,7 +101,7 @@ Tip: `WORLD_UPDATE_MODE=deterministic` avoids the world engine LLM; `WORLD_UPDAT
 - Distinction between deterministic/stochastic physics and LLM decisions
 - Using `random.Random` with seeds for reproducible stochastic simulations
 
-**Requires:** LLM API key
+**Requires:** LLM API key or local Ollama setup
 
 **Run:**
 ```bash

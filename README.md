@@ -68,6 +68,25 @@ uv run python examples/smallville/valentines_party.py
 
 The folder includes a notebook and notes detailing the replication.
 
+### Use local LLMs with Ollama
+
+Prefer to run everything on your machine? Any Ollama model can drive Miniverse as long as it returns JSON that matches the schemas.
+
+1. [Install Ollama](https://ollama.com/download) and start the daemon (`ollama serve` launches automatically on macOS/Windows; Linux users can run `ollama serve` manually).
+2. Pull a model (e.g., the latest Llama 3.1 8B):
+   ```bash
+   ollama pull llama3.1
+   ```
+3. Point Miniverse at the local server:
+   ```bash
+   export LLM_PROVIDER=ollama
+   export LLM_MODEL=llama3.1   # or any tag shown by `ollama list`
+   export OLLAMA_BASE_URL=http://127.0.0.1:11434  # optional; this is the default
+   uv run python examples/workshop/run.py --llm
+   ```
+
+No API keys are required in this mode, and the same retry/validation logic is used to keep responses schema-safe. See `docs/USAGE.md#local-llms-ollama` for detailed guidance (GPU/CPU requirements, troubleshooting, and multi-model tips).
+
 ## How a tick works
 
 1. `SimulationRules.apply_tick()` updates deterministic physics (resource drains, stochastic events).

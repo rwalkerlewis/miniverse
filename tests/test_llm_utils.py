@@ -81,3 +81,35 @@ async def test_call_llm_with_retries_injects_feedback(monkeypatch):
     assert len(attempts) == 2
     assert "Your previous JSON response failed to validate against the required schema." in attempts[1]
     assert "- content: Field required" in attempts[1]
+
+
+@pytest.mark.asyncio
+async def test_call_llm_with_retries_local_provider(monkeypatch):
+    captured_kwargs: dict[str, str] = {}
+
+    async def fake_local_call(*, system_prompt, user_prompt, llm_model, base_url=None, timeout=120.0):
+        captured_kwargs["system_prompt"] = system_prompt
+        captured_kwargs["user_prompt"] = user_prompt
+        captured_kwargs["llm_model"] = llm_model
+        captured_kwargs["base_url"] = base_url
+        captured_kwargs["timeout"] = str(timeout)
+        return '{"content":"ok"}'
+
+    def fail_decorator(*args, **kwargs):
+        raise AssertionError("remote provider path should not be used for ollama")
+
+    monkeypatch.setattr("miniverse.llm_utils.call_ollama_chat", fake_local_call)
+    monkeypatch.setattr("miniverse.llm_utils.llm.call", fail_decorator)
+
+    result = await call_llm_with_retries(
+        system_prompt="System context",
+        user_prompt="User payload",
+        llm_provider="ollama",
+        llm_model="llama3.1",
+        response_model=DummyModel,
+    )
+
+    assert result.content == "ok"
+    assert captured_kwargs["system_prompt"] == "System context"
+    assert captured_kwargs["user_prompt"] == "User payload"
+    assert captured_kwargs["llm_model"] == "llama3.1"
