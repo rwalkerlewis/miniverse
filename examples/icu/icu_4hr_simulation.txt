@@ -1,0 +1,7067 @@
+ICU SIMULATION DETAILED REPORT
+================================================================================
+Mode: Deterministic
+Target Duration: 4.0 hours (240 minutes)
+Time steps: Dynamic (5-30 minutes based on event severity)
+Patient conditions will progress naturally based on severity
+================================================================================
+
+
+================================================================================
+TICK 1 REPORT (Step: 30 min | Elapsed: 0h 30m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 67/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+• Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 42/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Health declined 6 points due to septic shock progression
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+• Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 71/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Health improved 1 points
+
+• Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 63/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Health improved 3 points
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 84/100
+  Stress: 20/100
+  Assigned Patients: none
+  Activity: at_icu_bed_1
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 75/100
+  Stress: 30/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 73/100
+  Stress: 30/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 73/100
+  Stress: 30/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: move_to
+  Target: icu_bed_1
+  Clinical Reasoning: Starting patient rounds
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "Maintaining steady vigilance with all patients."
+
+Sarah Martinez: "Maintaining steady vigilance with all patients."
+
+James Chen: "Maintaining steady vigilance with all patients."
+
+Patricia Anderson: "Maintaining steady vigilance with all patients."
+
+
+================================================================================
+TICK 2 REPORT (Step: 30 min | Elapsed: 1h 0m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 67/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+• Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 37/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Health declined 5 points due to septic shock progression
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+• Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 72/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Health improved 1 points
+
+• Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 64/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Health improved 1 points
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 84/100
+  Stress: 20/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 73/100
+  Stress: 30/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 71/100
+  Stress: 31/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 73/100
+  Stress: 31/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "Maintaining steady vigilance with all patients."
+
+Sarah Martinez: "Maintaining steady vigilance with all patients."
+
+James Chen: "Staying focused on providing quality care despite the busy ICU."
+
+Patricia Anderson: "Staying focused on providing quality care despite the busy ICU."
+
+
+================================================================================
+TICK 3 REPORT (Step: 15 min | Elapsed: 1h 15m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 67/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+• Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 30/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Health declined 7 points due to septic shock progression
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+• Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 75/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Health improved 3 points
+
+• Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 66/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Health improved 2 points
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 83/100
+  Stress: 21/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 73/100
+  Stress: 30/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 70/100
+  Stress: 31/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 73/100
+  Stress: 32/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [external_event] Severity 3: Family member requesting update at desk
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "Maintaining steady vigilance with all patients."
+
+Sarah Martinez: "Maintaining steady vigilance with all patients."
+
+James Chen: "Staying focused on providing quality care despite the busy ICU."
+
+Patricia Anderson: "Staying focused on providing quality care despite the busy ICU."
+
+
+================================================================================
+TICK 4 REPORT (Step: 5 min | Elapsed: 1h 20m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 69/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+• Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 21/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Health declined 9 points due to septic shock progression
+    → CRITICAL: Vital signs deteriorated to critical_unstable
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+• Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 76/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Health improved 1 points
+
+• Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 69/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Health improved 3 points
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 82/100
+  Stress: 25/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 73/100
+  Stress: 36/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 68/100
+  Stress: 37/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 73/100
+  Stress: 35/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [medical_emergency] Severity 5: CODE BLUE - patient_b experiencing septic shock with cardiovascular collapse!
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "Maintaining steady vigilance with all patients."
+
+Sarah Martinez: "Staying focused on providing quality care despite the busy ICU."
+
+James Chen: "Staying focused on providing quality care despite the busy ICU."
+
+Patricia Anderson: "Staying focused on providing quality care despite the busy ICU."
+
+
+================================================================================
+TICK 5 REPORT (Step: 5 min | Elapsed: 1h 25m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 70/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+• Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 15/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Health declined 6 points due to septic shock progression
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+• Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 77/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Health improved 1 points
+
+• Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 70/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Health improved 1 points
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 81/100
+  Stress: 30/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 71/100
+  Stress: 40/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 67/100
+  Stress: 41/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 71/100
+  Stress: 41/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "Maintaining steady vigilance with all patients."
+
+Sarah Martinez: "Staying focused on providing quality care despite the busy ICU."
+
+James Chen: "Staying focused on providing quality care despite the busy ICU."
+
+Patricia Anderson: "Staying focused on providing quality care despite the busy ICU."
+
+
+================================================================================
+TICK 6 REPORT (Step: 5 min | Elapsed: 1h 30m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 72/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+• Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 9/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Health declined 6 points due to septic shock progression
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+• Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 80/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Health improved 3 points
+
+• Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 73/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Health improved 3 points
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 81/100
+  Stress: 33/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 70/100
+  Stress: 45/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 65/100
+  Stress: 46/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 70/100
+  Stress: 44/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "Staying focused on providing quality care despite the busy ICU."
+
+Sarah Martinez: "Staying focused on providing quality care despite the busy ICU."
+
+James Chen: "Staying focused on providing quality care despite the busy ICU."
+
+Patricia Anderson: "Staying focused on providing quality care despite the busy ICU."
+
+
+================================================================================
+TICK 7 REPORT (Step: 5 min | Elapsed: 1h 35m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 73/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+• Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Health declined 11 points due to septic shock progression
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+• Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 82/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Health improved 2 points
+
+• Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 74/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Health improved 1 points
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 81/100
+  Stress: 37/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 68/100
+  Stress: 50/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 63/100
+  Stress: 50/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 69/100
+  Stress: 47/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "Staying focused on providing quality care despite the busy ICU."
+
+Sarah Martinez: "Staying focused on providing quality care despite the busy ICU."
+
+James Chen: "Staying focused on providing quality care despite the busy ICU."
+
+Patricia Anderson: "Staying focused on providing quality care despite the busy ICU."
+
+
+================================================================================
+TICK 8 REPORT (Step: 5 min | Elapsed: 1h 40m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 75/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: deceased_postmortem_care
+  ** DECEASED POSTMORTEM CARE **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Time of death recorded
+    → Post-mortem care initiated
+    → Family notification in progress
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+• Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 84/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Health improved 2 points
+
+• Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 77/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Health improved 3 points
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 79/100
+  Stress: 43/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 67/100
+  Stress: 54/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 63/100
+  Stress: 54/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 69/100
+  Stress: 50/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 5: Patient patient_b has passed away
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "Staying focused on providing quality care despite the busy ICU."
+
+Sarah Martinez: "Managing multiple critical patients is challenging today."
+
+James Chen: "Managing multiple critical patients is challenging today."
+
+Patricia Anderson: "Staying focused on providing quality care despite the busy ICU."
+
+
+================================================================================
+TICK 9 REPORT (Step: 5 min | Elapsed: 1h 45m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 76/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: deceased_postmortem_care
+  ** DECEASED POSTMORTEM CARE **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Continued post-mortem care
+    → Documentation completion
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+• Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Health improved 3 points
+
+• Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 78/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Health improved 1 points
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 78/100
+  Stress: 49/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 66/100
+  Stress: 60/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 63/100
+  Stress: 59/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 67/100
+  Stress: 56/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "Staying focused on providing quality care despite the busy ICU."
+
+Sarah Martinez: "Managing multiple critical patients is challenging today."
+
+James Chen: "Managing multiple critical patients is challenging today."
+
+Patricia Anderson: "Managing multiple critical patients is challenging today."
+
+
+================================================================================
+TICK 10 REPORT (Step: 5 min | Elapsed: 1h 50m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 76/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 80/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Health improved 2 points
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 78/100
+  Stress: 55/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 66/100
+  Stress: 65/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 62/100
+  Stress: 62/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 66/100
+  Stress: 61/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "Managing multiple critical patients is challenging today."
+
+Sarah Martinez: "Managing multiple critical patients is challenging today."
+
+James Chen: "Managing multiple critical patients is challenging today."
+
+Patricia Anderson: "Managing multiple critical patients is challenging today."
+
+
+================================================================================
+TICK 11 REPORT (Step: 5 min | Elapsed: 1h 55m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 76/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 83/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Health improved 3 points
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 77/100
+  Stress: 59/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 66/100
+  Stress: 70/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 62/100
+  Stress: 65/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 64/100
+  Stress: 64/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "Managing multiple critical patients is challenging today."
+
+Sarah Martinez: "Managing multiple critical patients is challenging today."
+
+James Chen: "Managing multiple critical patients is challenging today."
+
+Patricia Anderson: "Managing multiple critical patients is challenging today."
+
+
+================================================================================
+TICK 12 REPORT (Step: 5 min | Elapsed: 2h 0m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 78/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 84/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Health improved 1 points
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 77/100
+  Stress: 65/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 66/100
+  Stress: 76/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 60/100
+  Stress: 69/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 62/100
+  Stress: 69/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "Managing multiple critical patients is challenging today."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "Managing multiple critical patients is challenging today."
+
+Patricia Anderson: "Managing multiple critical patients is challenging today."
+
+
+================================================================================
+TICK 13 REPORT (Step: 5 min | Elapsed: 2h 5m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 80/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Health improved 2 points
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 76/100
+  Stress: 69/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 66/100
+  Stress: 79/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 59/100
+  Stress: 74/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 60/100
+  Stress: 74/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_admission] Severity 3: New patient Sarah Johnson admitted to icu_bed_2 - Acute respiratory distress syndrome (ARDS)
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "Managing multiple critical patients is challenging today."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+
+================================================================================
+TICK 14 REPORT (Step: 5 min | Elapsed: 2h 10m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 80/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 74/100
+  Stress: 73/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 64/100
+  Stress: 83/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 57/100
+  Stress: 79/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 58/100
+  Stress: 78/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+
+================================================================================
+TICK 15 REPORT (Step: 5 min | Elapsed: 2h 15m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 80/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 74/100
+  Stress: 78/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 63/100
+  Stress: 88/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 56/100
+  Stress: 85/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 58/100
+  Stress: 81/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+
+================================================================================
+TICK 16 REPORT (Step: 5 min | Elapsed: 2h 20m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 80/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 74/100
+  Stress: 81/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 61/100
+  Stress: 92/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 55/100
+  Stress: 89/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 57/100
+  Stress: 84/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+
+================================================================================
+TICK 17 REPORT (Step: 5 min | Elapsed: 2h 25m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 82/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 74/100
+  Stress: 86/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 59/100
+  Stress: 95/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 55/100
+  Stress: 93/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 56/100
+  Stress: 88/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+
+================================================================================
+TICK 18 REPORT (Step: 5 min | Elapsed: 2h 30m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 82/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 73/100
+  Stress: 90/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 58/100
+  Stress: 100/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 54/100
+  Stress: 97/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 56/100
+  Stress: 92/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+
+================================================================================
+TICK 19 REPORT (Step: 5 min | Elapsed: 2h 35m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 84/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 73/100
+  Stress: 94/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 58/100
+  Stress: 100/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 52/100
+  Stress: 100/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 54/100
+  Stress: 95/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+  [patient_admission] Severity 3: New patient Daniel Johnson admitted to icu_bed_2 - Stroke (ischemic)
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+
+================================================================================
+TICK 20 REPORT (Step: 5 min | Elapsed: 2h 40m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 86/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 73/100
+  Stress: 98/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 56/100
+  Stress: 100/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 52/100
+  Stress: 100/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 53/100
+  Stress: 99/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+
+================================================================================
+TICK 21 REPORT (Step: 5 min | Elapsed: 2h 45m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+✓ Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 86/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 72/100
+  Stress: 100/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 55/100
+  Stress: 100/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 50/100
+  Stress: 100/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 52/100
+  Stress: 100/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_a discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+
+================================================================================
+TICK 22 REPORT (Step: 5 min | Elapsed: 2h 50m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+✓ Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 86/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 71/100
+  Stress: 100/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 54/100
+  Stress: 100/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 48/100
+  Stress: 100/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 50/100
+  Stress: 100/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_a discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+  [patient_admission] Severity 3: New patient Jessica Johnson admitted to icu_bed_2 - Gastrointestinal bleeding
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+
+================================================================================
+TICK 23 REPORT (Step: 5 min | Elapsed: 2h 55m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+✓ Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 86/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 70/100
+  Stress: 100/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 54/100
+  Stress: 100/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 46/100
+  Stress: 100/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 49/100
+  Stress: 100/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_a discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+  [patient_admission] Severity 3: New patient Michael Smith admitted to icu_bed_5 - Gastrointestinal bleeding
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+
+================================================================================
+TICK 24 REPORT (Step: 5 min | Elapsed: 3h 0m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+✓ Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 86/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 68/100
+  Stress: 100/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 52/100
+  Stress: 100/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 44/100
+  Stress: 100/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 49/100
+  Stress: 100/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_a discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+
+================================================================================
+TICK 25 REPORT (Step: 5 min | Elapsed: 3h 5m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+✓ Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 86/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 68/100
+  Stress: 100/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 50/100
+  Stress: 100/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 44/100
+  Stress: 100/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 48/100
+  Stress: 100/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_a discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+  [patient_admission] Severity 3: New patient Amanda Miller admitted to icu_bed_2 - Acute respiratory distress syndrome (ARDS)
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+
+================================================================================
+TICK 26 REPORT (Step: 5 min | Elapsed: 3h 10m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+✓ Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 86/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 68/100
+  Stress: 100/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 49/100
+  Stress: 100/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 42/100
+  Stress: 100/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 46/100
+  Stress: 100/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_a discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+  [patient_admission] Severity 3: New patient Michael Davis admitted to icu_bed_1 - Acute renal failure
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+
+================================================================================
+TICK 27 REPORT (Step: 5 min | Elapsed: 3h 15m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+✓ Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 86/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 67/100
+  Stress: 100/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 49/100
+  Stress: 100/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 40/100
+  Stress: 100/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 45/100
+  Stress: 100/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_a discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+
+================================================================================
+TICK 28 REPORT (Step: 5 min | Elapsed: 3h 20m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+✓ Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 86/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 65/100
+  Stress: 100/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 47/100
+  Stress: 100/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 40/100
+  Stress: 100/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 43/100
+  Stress: 100/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_a discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+  [patient_admission] Severity 3: New patient Amanda Miller admitted to icu_bed_5 - Gastrointestinal bleeding
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+
+================================================================================
+TICK 29 REPORT (Step: 5 min | Elapsed: 3h 25m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+✓ Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 86/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 65/100
+  Stress: 100/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 47/100
+  Stress: 100/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 38/100
+  Stress: 100/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 41/100
+  Stress: 100/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_a discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels. Feeling fatigued - need to stay alert."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+
+================================================================================
+TICK 30 REPORT (Step: 5 min | Elapsed: 3h 30m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+✓ Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 86/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 64/100
+  Stress: 100/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 47/100
+  Stress: 100/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 37/100
+  Stress: 100/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 40/100
+  Stress: 100/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_a discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+  [patient_admission] Severity 3: New patient David Jones admitted to icu_bed_5 - Acute renal failure
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels. Feeling fatigued - need to stay alert."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+
+================================================================================
+TICK 31 REPORT (Step: 5 min | Elapsed: 3h 35m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+✓ Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 86/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 64/100
+  Stress: 100/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 47/100
+  Stress: 100/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 35/100
+  Stress: 100/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 39/100
+  Stress: 100/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_a discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+  [patient_admission] Severity 3: New patient Jessica Jones admitted to icu_bed_5 - Stroke (ischemic)
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels. Feeling fatigued - need to stay alert."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels. Feeling fatigued - need to stay alert."
+
+
+================================================================================
+TICK 32 REPORT (Step: 5 min | Elapsed: 3h 40m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+✓ Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 86/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 62/100
+  Stress: 100/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 47/100
+  Stress: 100/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 35/100
+  Stress: 100/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 39/100
+  Stress: 100/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_a discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels. Feeling fatigued - need to stay alert."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels. Feeling fatigued - need to stay alert."
+
+
+================================================================================
+TICK 33 REPORT (Step: 5 min | Elapsed: 3h 45m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+✓ Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 86/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 61/100
+  Stress: 100/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 45/100
+  Stress: 100/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 33/100
+  Stress: 100/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 38/100
+  Stress: 100/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_a discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+  [external_event] Severity 3: Lab results available for review
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels. Feeling fatigued - need to stay alert."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels. Feeling fatigued - need to stay alert."
+
+
+================================================================================
+TICK 34 REPORT (Step: 5 min | Elapsed: 3h 50m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+✓ Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 86/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 60/100
+  Stress: 100/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 43/100
+  Stress: 100/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 31/100
+  Stress: 100/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 37/100
+  Stress: 100/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_a discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels. Feeling fatigued - need to stay alert."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels. Feeling fatigued - need to stay alert."
+
+
+================================================================================
+TICK 35 REPORT (Step: 5 min | Elapsed: 3h 55m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+✓ Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 86/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 58/100
+  Stress: 100/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 41/100
+  Stress: 100/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 30/100
+  Stress: 100/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 36/100
+  Stress: 100/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_a discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels. Feeling fatigued - need to stay alert."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels. Feeling fatigued - need to stay alert."
+
+
+================================================================================
+TICK 36 REPORT (Step: 5 min | Elapsed: 4h 0m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+✓ Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 86/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: transferred_to_mortuary
+  ** TRANSFERRED TO MORTUARY **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Body prepared
+    → Belongings collected
+    → Transferred to mortuary
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+✓ Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 87/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+✓ Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 86/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: discharged_to_general_ward
+  ** DISCHARGED TO GENERAL WARD **
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Final ICU assessment completed
+    → Cleared for transfer to general medical ward
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: icu_bed_1
+  Energy: 57/100
+  Stress: 100/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 41/100
+  Stress: 100/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 30/100
+  Stress: 100/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 35/100
+  Stress: 100/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 2: Patient patient_a discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_d discharged to general ward - condition stable
+  [patient_outcome] Severity 2: Patient patient_e discharged to general ward - condition stable
+  [external_event] Severity 3: Radiology report ready for ICU patient
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_assessment
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Assessing patient condition
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_care
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Monitoring patient vital signs
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+Sarah Martinez: "This shift is extremely intense. The code blue really elevated my stress levels."
+
+James Chen: "This shift is extremely intense. The code blue really elevated my stress levels. Feeling fatigued - need to stay alert."
+
+Patricia Anderson: "This shift is extremely intense. The code blue really elevated my stress levels. Feeling fatigued - need to stay alert."
+
+
+================================================================================
+SIMULATION COMPLETE
+================================================================================
+
+FINAL STATISTICS:
+  Final tick: 36
+  Total elapsed time: 4h 0m (240 minutes)
+  Active patients health: 16.7
+  Stable patients: 1
+  Critical patients: 1
+  Discharged patients: 3
+  Deceased patients: 0
+  Medications administered: 0

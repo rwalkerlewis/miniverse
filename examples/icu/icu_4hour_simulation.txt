@@ -1,0 +1,569 @@
+ICU SIMULATION DETAILED REPORT
+================================================================================
+Mode: LLM-Driven
+Target Duration: 4.0 hours (240 minutes)
+Time steps: Dynamic (5-30 minutes based on event severity)
+Patient conditions will progress naturally based on severity
+================================================================================
+
+
+================================================================================
+TICK 1 REPORT (Step: 30 min | Elapsed: 0h 30m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 67/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+• Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 42/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Health declined 6 points due to septic shock progression
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+• Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 71/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Health improved 1 points
+
+• Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 63/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Health improved 3 points
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: nurses_station
+  Energy: 84/100
+  Stress: 20/100
+  Assigned Patients: none
+  Activity: working_on_monitor_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 75/100
+  Stress: 30/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_assess_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 73/100
+  Stress: 30/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 73/100
+  Stress: 30/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_1
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Initial assessment shows one critical patient, necessitating continuous monitoring to prevent deterioration.
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_a
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Initial assessment of patient A is necessary to determine their current condition and appropriate treatment plan.
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_c
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Patient C is currently in a critical state, necessitating continuous monitoring to prevent any sudden deterioration.
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_f
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Patient F has a critical condition with an average health score of 57.2, indicating severe issues that require close monitoring and potential intervention to prevent deterioration.
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "Managing patients with stress at 20/100 and energy at 84/100."
+
+Sarah Martinez: "Managing patients with stress at 30/100 and energy at 75/100."
+
+James Chen: "Managing patients with stress at 30/100 and energy at 73/100."
+
+Patricia Anderson: "Managing patients with stress at 30/100 and energy at 73/100."
+
+
+================================================================================
+TICK 2 REPORT (Step: 30 min | Elapsed: 1h 0m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 67/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+• Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 37/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Health declined 5 points due to septic shock progression
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+• Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 72/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Health improved 1 points
+
+• Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 64/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Health improved 1 points
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: nurses_station
+  Energy: 84/100
+  Stress: 20/100
+  Assigned Patients: none
+  Activity: working_on_monitor_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 73/100
+  Stress: 30/100
+  Assigned Patients: patient_a,patient_b
+  Activity: assessing_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 71/100
+  Stress: 31/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 73/100
+  Stress: 31/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_critical_1
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Initial assessment of the critical patient indicates a need for continuous monitoring to prevent potential deterioration. This involves frequent checks on vital signs and clinical status.
+
+Sarah Martinez (nurse_sarah):
+  Action: assess_patient
+  Target: patient_a
+  Clinical Reasoning: Initial assessment of patient A is required to determine their current condition and appropriate treatment plan.
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_c
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Patient C is in a critical state and requires continuous monitoring to prevent any sudden deterioration.
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_f
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Patient F has a critical condition with an average health score of 57.2, indicating severe issues that require close monitoring and potential intervention to prevent deterioration.
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "Managing patients with stress at 20/100 and energy at 84/100."
+
+Sarah Martinez: "Managing patients with stress at 30/100 and energy at 73/100."
+
+James Chen: "Managing patients with stress at 31/100 and energy at 71/100."
+
+Patricia Anderson: "Managing patients with stress at 31/100 and energy at 73/100."
+
+
+================================================================================
+TICK 3 REPORT (Step: 15 min | Elapsed: 1h 15m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 67/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+• Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 30/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+  THIS TICK:
+    → Health declined 7 points due to septic shock progression
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+• Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 75/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+  THIS TICK:
+    → Health improved 3 points
+
+• Thomas Wright (patient_e):
+  Condition: Acute pancreatitis (Severity: moderate)
+  Location: icu_bed_5
+  Health: 66/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV fluids (aggressive resuscitation)
+    - Pain management (Fentanyl)
+    - NPO (nothing by mouth)
+    - Antiemetics
+
+  THIS TICK:
+    → Health improved 2 points
+
+• Maria Gonzalez (patient_f):
+  Condition: Hemorrhagic stroke (Severity: severe)
+  Location: icu_bed_6
+  Health: 45/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Blood pressure management
+    - Neuro checks q1h
+    - Head of bed elevated
+    - Seizure precautions
+
+  THIS TICK:
+    → Continued monitoring
+    → No significant changes
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: nurses_station
+  Energy: 83/100
+  Stress: 21/100
+  Assigned Patients: none
+  Activity: working_on_monitor_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 73/100
+  Stress: 30/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_assess_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 70/100
+  Stress: 31/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_monitor_patient
+
+Patricia Anderson (nurse_patricia) - icu_nurse:
+  Location: icu_bed_5
+  Energy: 73/100
+  Stress: 32/100
+  Assigned Patients: patient_e,patient_f
+  Activity: working_on_monitor_patient
+
+--- EVENTS ---
+  [external_event] Severity 3: Family member requesting update at desk
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: room_101
+  Parameters: {'task': 'monitor_patient', 'treatment': 'continuous'}
+  ** TREATMENT: continuous **
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Initial assessment of the critical patient in room 101 indicates a need for continuous monitoring to prevent potential deterioration. This involves frequent checks on vital signs and clinical status.
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_a
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Initial assessment of patient A is required to determine their current condition and appropriate treatment plan.
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_c
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Patient C is in a critical state and requires continuous monitoring to prevent any sudden deterioration.
+
+Patricia Anderson (nurse_patricia):
+  Action: work
+  Target: patient_f
+  Parameters: {'task': 'monitor_patient', 'treatment': 'closely'}
+  ** TREATMENT: closely **
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Patient F has a critical condition with an average health score of 57.2, indicating severe issues that require close monitoring and potential intervention to prevent deterioration.
+
+--- AGENT PERSONAL COMMENTS ---
+
+Dr. Emily Wilson: "Managing patients with stress at 21/100 and energy at 83/100."
+
+Sarah Martinez: "Managing patients with stress at 30/100 and energy at 73/100."
+
+James Chen: "Managing patients with stress at 31/100 and energy at 70/100."
+
+Patricia Anderson: "Managing patients with stress at 32/100 and energy at 73/100."
+

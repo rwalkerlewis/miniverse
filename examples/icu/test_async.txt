@@ -1,0 +1,8 @@
+ICU SIMULATION DETAILED REPORT
+================================================================================
+Mode: LLM-Driven
+Target Duration: 0.5 hours (30 minutes)
+Time steps: Dynamic (5-30 minutes based on event severity)
+Patient conditions will progress naturally based on severity
+================================================================================
+

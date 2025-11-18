@@ -1,0 +1,937 @@
+ICU SIMULATION DETAILED REPORT
+================================================================================
+Mode: LLM-Driven
+Target Duration: 1.5 hours (90 minutes)
+Time steps: Dynamic (5-30 minutes based on event severity)
+Patient conditions will progress naturally based on severity
+================================================================================
+
+
+================================================================================
+TICK 1 REPORT (Step: 30 min | Elapsed: 0h 30m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 67/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+• Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 42/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+• Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 71/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: nurses_station
+  Energy: 83/100
+  Stress: 21/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 75/100
+  Stress: 30/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 75/100
+  Stress: 30/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_assess_patient
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_critical_01
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Initial assessment of critical patient to determine severity and appropriate interventions.
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_a
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Patient A is the most critical with a high average patient health score, requiring immediate monitoring to prevent any sudden deterioration.
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_d
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Patient D is in a critical condition, necessitating immediate and thorough assessment to determine the appropriate course of action.
+
+
+================================================================================
+TICK 2 REPORT (Step: 30 min | Elapsed: 1h 0m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 69/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+• Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 36/100
+  Vital Signs: unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+• Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 74/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: nurses_station
+  Energy: 82/100
+  Stress: 21/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 75/100
+  Stress: 30/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 75/100
+  Stress: 30/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_assess_patient
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_critical_1
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Critical patient requires immediate attention to assess severity and determine appropriate interventions. Initial evaluation is essential for timely treatment.
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_a
+  Parameters: {'task': 'monitor_patient'}
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Patient A is the most critical with a high average patient health score, requiring immediate monitoring to prevent any sudden deterioration.
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_d
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Patient D is in a critical condition, necessitating an immediate and thorough assessment to determine the appropriate course of action.
+
+
+================================================================================
+TICK 3 REPORT (Step: 5 min | Elapsed: 1h 5m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 69/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+• Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 28/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+• Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 77/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: nurses_station
+  Energy: 80/100
+  Stress: 25/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 74/100
+  Stress: 34/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_monitor_patient
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 75/100
+  Stress: 35/100
+  Assigned Patients: patient_c,patient_d
+  Activity: communicating
+
+--- EVENTS ---
+  [medical_emergency] Severity 5: CODE BLUE - patient_b experiencing septic shock with cardiovascular collapse!
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_b
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Patient B is experiencing septic shock with cardiovascular collapse, indicating a critical condition. Immediate assessment is necessary to determine the severity and appropriate interventions.
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_b
+  Parameters: {'task': 'monitor_patient', 'treatment': 'intensified monitoring and support'}
+  ** TREATMENT: intensified monitoring and support **
+  ** TASK: monitor_patient **
+  Clinical Reasoning: Patient B is experiencing septic shock with cardiovascular collapse, indicating critical condition. Immediate intensified monitoring and support are necessary to stabilize the patient.
+
+James Chen (nurse_james):
+  Action: communicate
+  Target: doc_michael
+  Clinical Reasoning: Patient D is in a critical condition, and immediate action is required. Communication with Dr. Michael to coordinate care is necessary.
+
+
+================================================================================
+TICK 4 REPORT (Step: 5 min | Elapsed: 1h 10m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 69/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+• Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 18/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+• Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 78/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: nurses_station
+  Energy: 80/100
+  Stress: 29/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 73/100
+  Stress: 40/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_intubate
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 74/100
+  Stress: 40/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_assess_patient
+
+--- EVENTS ---
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_b
+  Parameters: {'task': 'assess_patient', 'treatment': 'initial evaluation'}
+  ** TREATMENT: initial evaluation **
+  ** TASK: assess_patient **
+  Clinical Reasoning: Immediate assessment of patient B is necessary to determine the severity and appropriate interventions for septic shock with cardiovascular collapse.
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_b
+  Parameters: {'task': 'intubate', 'treatment': 'initiate pressors and IV fluids'}
+  ** TREATMENT: initiate pressors and IV fluids **
+  ** TASK: intubate **
+  Clinical Reasoning: Patient B is experiencing septic shock with cardiovascular collapse, indicating a critical condition. Immediate intubation to secure the airway and initiate pressors and IV fluids are necessary to stabilize the patient.
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_d
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Patient D is in a critical condition, and an immediate and thorough assessment is necessary to determine the appropriate course of action. This includes monitoring vital signs, reviewing current medications, and considering any underlying conditions that may be contributing to their severe state.
+
+
+================================================================================
+TICK 5 REPORT (Step: 5 min | Elapsed: 1h 15m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 69/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+• Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 7/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+• Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 79/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: nurses_station
+  Energy: 78/100
+  Stress: 35/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 71/100
+  Stress: 46/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_intubate
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 74/100
+  Stress: 43/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_assess_patient
+
+--- EVENTS ---
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_b
+  Parameters: {'task': 'assess_patient', 'treatment': 'initial evaluation'}
+  ** TREATMENT: initial evaluation **
+  ** TASK: assess_patient **
+  Clinical Reasoning: Patient B is experiencing septic shock with cardiovascular collapse, indicating a critical condition. Immediate assessment is necessary to determine the severity and appropriate interventions.
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_b
+  Parameters: {'task': 'intubate', 'treatment': 'Intubation for airway protection and mechanical ventilation'}
+  ** TREATMENT: Intubation for airway protection and mechanical ventilation **
+  ** TASK: intubate **
+  Clinical Reasoning: Patient B is experiencing septic shock with cardiovascular collapse, indicating a critical condition. Immediate intubation to secure the airway and initiate pressors and IV fluids are necessary to stabilize the patient.
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_d
+  Parameters: {'task': 'assess_patient', 'treatment': 'septic shock management'}
+  ** TREATMENT: septic shock management **
+  ** TASK: assess_patient **
+  Clinical Reasoning: Patient D is in a critical condition with septic shock, requiring immediate and thorough assessment to determine the appropriate course of action. This includes monitoring vital signs, reviewing current medications, and considering any underlying conditions contributing to their severe state.
+
+
+================================================================================
+TICK 6 REPORT (Step: 5 min | Elapsed: 1h 20m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 70/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+• Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 1/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+• Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 80/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: nurses_station
+  Energy: 78/100
+  Stress: 40/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 70/100
+  Stress: 50/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_intubate
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 73/100
+  Stress: 47/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_assess_patient
+
+--- EVENTS ---
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_b
+  Parameters: {'task': 'assess_patient', 'treatment': 'initial evaluation'}
+  ** TREATMENT: initial evaluation **
+  ** TASK: assess_patient **
+  Clinical Reasoning: Immediate assessment of patient B is necessary to determine the severity and appropriate interventions for septic shock with cardiovascular collapse.
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_b
+  Parameters: {'task': 'intubate', 'treatment': 'Initiate pressors and IV fluids'}
+  ** TREATMENT: Initiate pressors and IV fluids **
+  ** TASK: intubate **
+  Clinical Reasoning: Patient B is experiencing septic shock with cardiovascular collapse, indicating a critical condition. Immediate intubation to secure the airway and initiate pressors and IV fluids are necessary to stabilize the patient.
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_b
+  Parameters: {'task': 'assess_patient', 'treatment': 'code_response'}
+  ** TREATMENT: code_response **
+  ** TASK: assess_patient **
+  Clinical Reasoning: Patient B is experiencing septic shock with cardiovascular collapse, indicating a critical condition. Immediate assessment and potential code blue response are necessary to stabilize the patient.
+
+
+================================================================================
+TICK 7 REPORT (Step: 5 min | Elapsed: 1h 25m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 72/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+• Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+• Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 83/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: nurses_station
+  Energy: 76/100
+  Stress: 45/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 68/100
+  Stress: 53/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_intubate
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 72/100
+  Stress: 52/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_assess_patient
+
+--- EVENTS ---
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_b
+  Parameters: {'task': 'assess_patient', 'treatment': 'code_response'}
+  ** TREATMENT: code_response **
+  ** TASK: assess_patient **
+  Clinical Reasoning: Immediate assessment of patient B is necessary due to septic shock with cardiovascular collapse, indicating a critical condition. Initial evaluation will guide the appropriate interventions.
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: patient_b
+  Parameters: {'task': 'intubate', 'treatment': 'Immediate intubation to secure the airway and initiate pressors and IV fluids'}
+  ** TREATMENT: Immediate intubation to secure the airway and initiate pressors and IV fluids **
+  ** TASK: intubate **
+  Clinical Reasoning: Patient B is experiencing septic shock with cardiovascular collapse, indicating a critical condition. Immediate intubation to secure the airway and initiate pressors and IV fluids are necessary to stabilize the patient.
+
+James Chen (nurse_james):
+  Action: work
+  Target: patient_b
+  Parameters: {'task': 'assess_patient', 'treatment': 'start_pressors'}
+  ** TREATMENT: start_pressors **
+  ** TASK: assess_patient **
+  Clinical Reasoning: Patient B is experiencing septic shock with cardiovascular collapse, indicating a critical condition. Immediate assessment and potential code blue response are necessary to stabilize the patient.
+
+
+================================================================================
+TICK 8 REPORT (Step: 5 min | Elapsed: 1h 30m)
+================================================================================
+
+--- PATIENT STATUS ---
+
+• Robert Harris (patient_a):
+  Condition: Severe pneumonia with respiratory failure (Severity: moderate)
+  Location: icu_bed_1
+  Health: 74/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Antibiotics (Ceftriaxone, Azithromycin)
+    - Supplemental oxygen
+
+† Linda Chen (patient_b):
+  Condition: Septic shock from abdominal infection (Severity: severe)
+  Location: icu_bed_2
+  Health: 0/100
+  Vital Signs: critical_unstable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: deceased
+  ** DECEASED **
+
+  TREATMENT DETAILS:
+    - Broad-spectrum antibiotics (Vancomycin, Meropenem)
+    - IV fluids (crystalloids)
+    - Vasopressors (Norepinephrine)
+
+• Marcus Johnson (patient_c):
+  Condition: Post-cardiac arrest, therapeutic hypothermia (Severity: severe)
+  Location: icu_bed_3
+  Health: 55/100
+  Vital Signs: critical
+  Pain Level: 3/10
+  On Ventilator: True
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - Mechanical ventilation
+    - Aspirin
+    - Beta-blockers
+    - Anticoagulation
+    - Continuous cardiac monitoring
+
+• Elena Rodriguez (patient_d):
+  Condition: Diabetic ketoacidosis (Severity: moderate)
+  Location: icu_bed_4
+  Health: 86/100
+  Vital Signs: stable
+  Pain Level: 3/10
+  On Ventilator: False
+  Activity: resting
+
+  TREATMENT DETAILS:
+    - IV insulin infusion
+    - Potassium replacement
+    - Fluid resuscitation
+
+--- STAFF STATUS ---
+
+Dr. Emily Wilson (dr_wilson) - icu_doctor:
+  Location: nurses_station
+  Energy: 74/100
+  Stress: 50/100
+  Assigned Patients: none
+  Activity: working_on_assess_patient
+
+Sarah Martinez (nurse_sarah) - icu_nurse:
+  Location: icu_bed_1
+  Energy: 67/100
+  Stress: 56/100
+  Assigned Patients: patient_a,patient_b
+  Activity: working_on_intubate
+
+James Chen (nurse_james) - icu_nurse:
+  Location: icu_bed_3
+  Energy: 72/100
+  Stress: 57/100
+  Assigned Patients: patient_c,patient_d
+  Activity: working_on_assess_patient
+
+--- EVENTS ---
+  [patient_outcome] Severity 5: Patient patient_b has passed away
+
+--- AGENT CLINICAL DECISIONS ---
+
+Dr. Emily Wilson (dr_wilson):
+  Action: work
+  Target: patient_b
+  Parameters: {'task': 'assess_patient'}
+  ** TASK: assess_patient **
+  Clinical Reasoning: Patient B is experiencing septic shock with cardiovascular collapse, indicating a critical condition. Immediate assessment is necessary to determine the severity and appropriate interventions.
+
+Sarah Martinez (nurse_sarah):
+  Action: work
+  Target: icu_bed_1
+  Parameters: {'task': 'intubate', 'treatment': 'secure airway, initiate pressors and IV fluids'}
+  ** TREATMENT: secure airway, initiate pressors and IV fluids **
+  ** TASK: intubate **
+  Clinical Reasoning: Patient B is experiencing septic shock with cardiovascular collapse. Immediate intubation to secure the airway and initiation of pressors and IV fluids are critical for stabilization.
+
+James Chen (nurse_james):
+  Action: work
+  Target: icu_bed_3
+  Parameters: {'task': 'assess_patient', 'treatment': 'review_medical_history'}
+  ** TREATMENT: review_medical_history **
+  ** TASK: assess_patient **
+  Clinical Reasoning: Patient B has passed away due to septic shock with cardiovascular collapse. Patient D is in a critical condition and requires immediate assessment, monitoring of vital signs, review of current medications, and consideration of underlying conditions contributing to their severe state.
+
+
+================================================================================
+SIMULATION COMPLETE
+================================================================================
+
+FINAL STATISTICS:
+  Final tick: 8
+  Total elapsed time: 1h 30m (90 minutes)
+  Active patients health: 52.5
+  Stable patients: 3
+  Critical patients: 0
+  Discharged patients: 0
+  Deceased patients: 1
+  Medications administered: 0
